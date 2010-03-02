@@ -1,0 +1,17 @@
+# Plop
+
+range = {<s, e>
+  i = s;
+  l = [];
+
+  std.while {i <= e}
+  {
+      l.append i;
+      i = i + 1;
+  };
+
+  l;
+};
+
+std.print (range 1 100);
+

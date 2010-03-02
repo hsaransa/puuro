@@ -1,0 +1,13 @@
+# joo
+
+for = {<start, end, code>
+    i = start;
+
+    std.while {i <= end}
+    {
+        code i;
+        i = i + 1;
+    };
+};
+
+for 1 10 {<i> std.print "jou " i};

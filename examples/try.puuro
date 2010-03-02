@@ -1,0 +1,17 @@
+# Plop
+
+std.pollute std;
+
+try = {<a, b>
+    f = a.call_frame;
+    f.set_exception_handler b;
+    f.execute;
+};
+
+try
+{
+    1 / 0;
+}
+{<a, b>
+    print "catch " a " " b;
+};

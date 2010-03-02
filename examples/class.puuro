@@ -1,0 +1,46 @@
+# Plop
+
+classes = std.assoc;
+
+class = {<name, code>
+    f = code.call_frame;
+    c = std.new_type ("class_" + name.s).to_symbol;
+
+    f.set_local 'var {<k>
+      c.type.set_method k {<obj> obj.unbox.get k };
+      c.type.set_method ("set_" + k.s).to_symbol {<obj, v> obj.unbox.set k v };
+    };
+
+    f.set_local 'method {<name, code>
+        c.type.set_method name {<obj>
+            ff = code.call_frame;
+            ff.set_local 'self obj;
+            ff.execute;
+        };
+    };
+
+    f.execute;
+
+    classes.set name { c.new std.assoc };
+};
+
+new = {<name> (classes.get name)() };
+
+# Test it
+
+class 'lol
+{
+    var 'a;
+    var 'b;
+    var 'c;
+
+    method 'sum { self.a + self.b + self.c };
+};
+
+plop = new 'lol;
+
+plop.set_a 1000;
+plop.set_b  200;
+plop.set_c    7;
+
+std.print plop.sum; # Prints 1207

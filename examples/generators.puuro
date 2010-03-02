@@ -1,0 +1,37 @@
+# Plop
+
+std.pollute std;
+
+generator = {<code>
+    f = code.call_frame;
+
+    return = \f;
+
+    f.set_local 'yield {<value>
+        return.continue value;
+        value
+    };
+
+    {
+        new_continuation {<orig>
+            return = orig;
+            f.continue 0;
+        };
+    }
+};
+
+fib = generator {
+    a = 0;
+    b = 1;
+
+    repeat
+    {
+        yield b;
+        tmp = a;
+        a = b;
+        b = tmp + b;
+        \t;
+    };
+};
+
+20.times { print "fibo " fib() };

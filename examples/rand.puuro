@@ -1,0 +1,31 @@
+# Plop
+
+0.type.set_method 'ne {<a,b> !(a == b)};
+
+srand = 0;
+rand = {
+  x = 0;
+  srand = {<s> x = s};
+  { x = (x * 113 + 17) % 128; x }
+}();
+
+find_cycle_length = {
+    first = rand();
+    i = 0;
+    std.while {rand() != first} { i = i + 1; };
+    i;
+};
+
+std.print "cycle length " find_cycle_length();
+
+srand 50;
+std.print rand();
+std.print rand();
+std.print rand();
+std.print rand();
+srand 50;
+std.print rand();
+std.print rand();
+std.print rand();
+std.print rand();
+

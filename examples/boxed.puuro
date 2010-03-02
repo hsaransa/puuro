@@ -1,0 +1,41 @@
+# Plop
+
+mint = {
+    c = std.new_type 'mint;
+
+    c.type.set_method 'to_string
+    {<v>
+        "<mint " + v.unbox.to_string + ">"
+    };
+
+    c.type.set_method 'bad_method
+    {<obj, name, args>
+        obj = obj.unbox;
+
+        args = args.map {<x> (x.type.name == 'mint).if {x.unbox} {x} };
+
+        ret = std.apply
+            (obj.type.get_method name):rcall
+            [obj] + args;
+
+        # Keep things boxed
+        (ret.type.name == 'integer).if {mint ret} {ret};
+    };
+
+    c.type.set_method 'inc
+    {<v>
+        v.box (v.unbox + 1)
+    };
+
+    # Box value if it's not boxed already
+    {<v> (v.type.name == 'mint).if {v} {c.new v}};
+}();
+
+a = mint 1;
+a.inc;
+a.inc;
+
+std.print a * 100;
+std.print a + (mint 1000);
+std.print (mint (mint a * 100));
+std.print a.type;

@@ -1,0 +1,14 @@
+# Plop
+
+std.pollute std;
+
+continuation = \f;
+
+func = {<a>
+  b = call_with_cloned_frame {<c> continuation = c; 3 };
+  a * b
+};
+
+print "returns " func(111);
+
+(continuation != \f).then { continuation.continue 7 };

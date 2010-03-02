@@ -1,0 +1,11 @@
+# Plop
+
+std.pollute std;
+
+caller().set_exception_handler
+{<exc, cont>
+  print "Hello, exception " exc " " cont;
+  cont.continue "porkkana";
+};
+
+print "hei".jaska;

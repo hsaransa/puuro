@@ -1,0 +1,16 @@
+# Plop
+
+plop = {<c>
+    f = c.call_frame;
+    l = [];
+    f.set_local 'push {<v> l.push v};
+    f.set_local 'pop {l.pop};
+    f.execute;
+};
+
+plop
+{
+    push 3;
+    push 7;
+    std.print "popping: " pop() " " pop();
+};

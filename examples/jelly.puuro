@@ -1,0 +1,17 @@
+# Plop
+
+i = 0;
+j = 0;
+
+std.while {i<2000}
+{
+    std.if j == 5
+    {
+        std.print "Jellyfish " i;
+        j = 0;
+    };
+
+    i = i+1;
+    j = j+1;
+}
+
