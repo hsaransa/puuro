@@ -1,0 +1,24 @@
+# Jelly
+
+launch = {<t>
+    std.new_continuation
+    {<orig>
+        std.sleep t orig;
+
+        i = 0;
+
+        std.repeat
+        {
+            std.print "MUIKKU " t;
+            std.sleep t;
+            i = i + 1;
+            i < 5;
+        };
+    };
+};
+
+launch  50;
+launch 100;
+launch 200;
+
+std.print "Main frame done";
