@@ -1,4 +1,4 @@
-import glob
+import glob, os
 
 env = Environment()
 
@@ -12,6 +12,8 @@ if not refcount:
 
 if not gc:
   env.Append(CPPDEFINES=[('NO_GC')])
+
+env.Append(CPPDEFINES=[('LIB_DIR', '"\\"%s/lib\\""' % os.getcwd())])
 
 src = []
 src += glob.glob('src/*.cpp')

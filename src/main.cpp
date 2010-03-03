@@ -50,6 +50,9 @@ static void execute_file(const char* fn, List* args)
         Std* std = new Std();
         frame->set_local("std", *std);
         frame->set_local("args", args ? (ObjP)*args : 0);
+        String* lib_dir = new String(LIB_DIR);
+        frame->set_local("lib_dir", *lib_dir);
+        dec_ref(lib_dir);
 
         dec_ref(args);
         dec_ref(std);
@@ -84,7 +87,7 @@ int main(int argc, char* argv[])
             dec_ref(s);
         }
 
-        const char* main_file = "lib/main.puuro";
+        const char* main_file = LIB_DIR "/main.puuro";
 
         for (int i = 0; i < argc; i++)
         {
