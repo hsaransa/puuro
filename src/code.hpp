@@ -5,6 +5,8 @@
 #include "object.hpp"
 #include "nametable.hpp"
 #include "primitives.hpp"
+#include "gc.hpp"
+#include "ast.hpp"
 #include <vector>
 
 namespace pr
@@ -42,6 +44,7 @@ namespace pr
         int get_size() const { return (int)operators.size(); }
         Op get_op(int i) const { assert(i >= 0 && i < get_size()); return operators[i]; }
         ObjP get_arg(int i) const { assert(i >= 0 && i < get_size()); return arguments[i]; }
+        const FilePosition& get_position(int i) const { assert(i >= 0 && i < get_size()); return positions[i]; }
 
         void debug_print();
 
@@ -58,7 +61,10 @@ namespace pr
         Name sink_param;
         std::vector<Name> post_params;
         std::vector<Op> operators;
-        std::vector<ObjP> arguments;
+        std::vector<Ref<ObjP> > arguments;
+        std::vector<FilePosition> positions;
+
+        FilePosition tmp_filepos;
     };
 
     inline Code* to_code(ObjP p)

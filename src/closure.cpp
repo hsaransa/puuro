@@ -16,7 +16,7 @@ Type* Closure::type = 0;
 Closure::Closure(Frame* frame, Code* code)
 :   Object(get_type()), frame(frame), code(code)
 {
-    assert(frame && code);
+//    assert(frame && code);
 }
 
 Closure::~Closure()
@@ -50,28 +50,28 @@ ObjP Closure::to_string_()
 
 ObjP Closure::frame_()
 {
-    return *frame.get();
+    return inc_ref(*frame.get());
 }
 
 ObjP Closure::code_()
 {
-    return *code.get();
+    return inc_ref(*code.get());
 }
 
 ObjP Closure::call_(List* args)
 {
-    PR_LOCAL_REF(args);
-
     Frame* f = (Frame*)to_object(call_frame_(args));
 
     get_executor()->call(f);
+
+    dec_ref(f);
 
     return error_object();
 }
 
 ObjP Closure::call_frame_(List* args)
 {
-    PR_LOCAL_REF(args);
+    // Check parameter count.
 
     const std::vector<Name>& pre = code->get_pre_params();
     Name sink = code->get_sink_param();
@@ -87,6 +87,8 @@ ObjP Closure::call_frame_(List* args)
             throw new Exception(Name("bad_parameter_count"), 0);
     }
 
+    // Make frame and set local variables.
+
     Frame* f = new Frame(frame.get(), 0, code.get());
 
     int i = 0;
@@ -100,6 +102,7 @@ ObjP Closure::call_frame_(List* args)
         while (i < args->get_size() - (int)post.size())
             l->append(args->get(i++));
         f->set_local(sink, *l);
+        dec_ref(l);
     }
 
     for (int j = 0; j < (int)post.size(); j++)

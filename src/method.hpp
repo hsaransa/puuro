@@ -25,7 +25,7 @@ namespace pr
         ObjP rcall_(List* arg);
 
     private:
-        ObjP object;
+        Ref<ObjP> object;
         Type* object_type;
         Callable callable;
 

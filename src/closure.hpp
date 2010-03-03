@@ -24,8 +24,8 @@ namespace pr
         ObjP call_frame_(List*);
 
     private:
-        RefCount<Frame> frame;
-        RefCount<Code> code;
+        Ref<Frame*> frame;
+        Ref<Code*> code;
 
         static Type* type;
     };

@@ -31,6 +31,7 @@ Type* Executor::get_type()
 
 void Executor::gc_mark()
 {
+    GC::mark(f);
 }
 
 void Executor::emit(MiniCode* mc)
@@ -39,17 +40,18 @@ void Executor::emit(MiniCode* mc)
     f->minicode_stack.push_back(mc);
 }
 
-void Executor::set_frame(Frame* f)
+void Executor::set_frame(Frame* nf)
 {
-    assert(!f->callee);
-    this->f = f;
+    assert(!nf->callee.get()); // make sure it's not inside a call
+    f = nf;
 }
 
 void Executor::call(Frame* nf)
 {
     f->callee = nf;
     nf->caller = f;
-    f = nf;
+
+    set_frame(nf);
 }
 
 void Executor::execute()
@@ -63,9 +65,8 @@ void Executor::execute()
 
     GC::gc();
 
-    while (f)
+    while (f.get())
     {
-        PR_LOCAL_REF(f);
         GC::gc();
 
         // Execute ExecOp.
@@ -83,7 +84,7 @@ void Executor::execute()
                 break;
 
             case MiniCode::Pop:
-                f->pop();
+                dec_ref(f->pop());
                 break;
 
             case MiniCode::Peek:
@@ -97,6 +98,7 @@ void Executor::execute()
                 {
                     ObjP p = f->pop();
                     f->args.push_back(p);
+                    dec_ref(p);
                 }
                 break;
 
@@ -109,22 +111,35 @@ void Executor::execute()
                 break;
 
             case MiniCode::IfTrue:
-                if (f->pop() == true_object())
-                    mc->pos = op.ref;
+                {
+                    ObjP p = f->pop();
+                    if (p == true_object())
+                        mc->pos = op.ref;
+                    dec_ref(p);
+                }
                 break;
 
             case MiniCode::IfFalse:
-                if (f->pop() == false_object())
-                    mc->pos = op.ref;
+                {
+                    ObjP p = f->pop();
+                    if (p == false_object())
+                        mc->pos = op.ref;
+                    dec_ref(p);
+                }
                 break;
 
             case MiniCode::IfNull:
-                if (f->pop() == 0)
-                    mc->pos = op.ref;
+                {
+                    ObjP p = f->pop();
+                    if (p == 0)
+                        mc->pos = op.ref;
+                    dec_ref(p);
+                }
                 break;
 
             case MiniCode::Set:
                 mc->objects[op.ref] = f->pop();
+                dec_ref(mc->objects[op.ref]);
                 break;
 
             case MiniCode::CallFunc0:
@@ -146,9 +161,11 @@ void Executor::execute()
 
             case MiniCode::ListAsArgs:
                 {
-                    List* l = to_list(f->pop());
+                    ObjP p = f->pop();
+                    List* l = to_list(p);
                     for (int i = 0; i < l->get_size(); i++)
                         f->arg(l->get(l->get_size() - i - 1));
+                    dec_ref(p);
                 }
                 break;
 
@@ -158,17 +175,23 @@ void Executor::execute()
 
             case MiniCode::NextItemOrGoto:
                 {
-                    List *l = to_list(f->pop());
+                    ObjP p = f->pop();
+                    List *l = to_list(p);
                     if (mc->counter >= l->get_size())
                         mc->pos = op.ref;
                     else
                         f->push(l->get(mc->counter++));
+                    dec_ref(p);
                 }
                 break;
 
             case MiniCode::IfCounterGE:
-                if (mc->counter >= int_value(f->pop()))
-                    mc->pos = op.ref;
+                {
+                    ObjP p = f->pop();
+                    if (mc->counter >= int_value(p))
+                        mc->pos = op.ref;
+                    dec_ref(p);
+                }
                 break;
 
             case MiniCode::IncCounter:
@@ -185,14 +208,25 @@ void Executor::execute()
 
         if (f->position >= f->code->get_size())
         {
+            // TODO: clean up, it's messy due to intensive debugging
+            Frame* old = f;
+
             f->in_execution = false;
-            ObjP ret = f->ret;
-            f = f->caller.get();
+            Ref<ObjP> ret = f->ret;
+
+            assert(!f->caller || f->caller->callee == f);
+
+            Ref<Frame*> nf = f->caller.get();
+            old->caller.set(0);
+
+            f = nf;
+
             if (f)
             {
                 f->callee.set(0);
                 f->push(ret);
             }
+
             continue;
         }
 
@@ -200,7 +234,6 @@ void Executor::execute()
 
         Code::Op op = f->code->get_op(f->position);
         ObjP arg = f->code->get_arg(f->position);
-        PR_LOCAL_REF(arg);
 
         f->position++;
 
@@ -211,7 +244,7 @@ void Executor::execute()
             break;
 
         case Code::Pop:
-            f->pop();
+            dec_ref(f->pop());
             break;
 
         case Code::Peek:
@@ -234,7 +267,11 @@ void Executor::execute()
                 if (c.type == Callable::NONE)
                     handle_exception(new Exception(Name("bad_method"), arg));
 
-                f->push(*new Method(p, c));
+                Method* m = new Method(p, c);
+                f->push(*m);
+
+                dec_ref(m);
+                dec_ref(p);
             }
             break;
 
@@ -242,6 +279,7 @@ void Executor::execute()
             {
                 ObjP p = f->pop();
                 f->args.push_back(p);
+                dec_ref(p);
             }
             break;
 
@@ -255,6 +293,7 @@ void Executor::execute()
                 {
                     ObjP p = f->lookup(symbol_to_name(arg));
                     f->push(p);
+                    dec_ref(p);
                 }
                 catch (Exception* e)
                 {
@@ -268,28 +307,38 @@ void Executor::execute()
                 ObjP p = f->pop();
                 f->push(p);
                 f->set(symbol_to_name(arg), p);
+                dec_ref(p);
             }
             break;
 
         case Code::Return:
-            f->ret = f->pop();
+            {
+                ObjP p = f->pop();
+                f->ret = p;
+                dec_ref(p);
+            }
             break;
 
         case Code::Closure:
             {
                 Closure* closure = new Closure(f, to_code(arg));
                 f->push(*closure);
+                dec_ref(closure);
             }
             break;
 
         case Code::List:
             {
                 List* l = new List();
-                PR_LOCAL_REF(l);
                 int n = fixnum_to_int(arg);
                 for (int i = 0; i < n; i++)
-                    l->prepend(f->pop());
+                {
+                    ObjP p = f->pop();
+                    l->prepend(p);
+                    dec_ref(p);
+                }
                 f->push(*l);
+                dec_ref(l);
             }
             break;
         }
@@ -300,67 +349,70 @@ void Executor::call_method(Name name)
 {
     Frame* old_frame = f;
 
-    ObjP p = f->pop();
-
-    Type* type = pr::get_type(p);
+    ObjP obj = f->pop();
+    Type* type = pr::get_type(obj);
     assert(type);
-
-    Callable c = type->get_method(name);
 
     ObjP ret;
 
     try
     {
+        Callable c = type->get_method(name);
 
-    if (c.type == Callable::NONE)
-    {
-        c = type->get_method("bad_method");
         if (c.type == Callable::NONE)
-            throw new Exception(Name("bad_method"), name_to_symbol(name));
-
-        List* list = new List();
-        PR_LOCAL_REF(list);
-        for (int i = 0; i < (int)f->args.size(); i++)
-            list->append(f->args[f->args.size() - i - 1]);
-        f->args.clear();
-
-        ret = c.call2(p, name_to_symbol(name), *list);
-    }
-    else
-    {
-        switch (f->args.size())
         {
-            case 0:
-                ret = c.call0(p);
-                break;
-            case 1:
-                {
-                    ObjP arg0 = f->args[0];
-                    f->args.clear();
-                    ret = c.call1(p, arg0);
-                    break;
-                }
-            case 2:
-                {
-                    ObjP arg0 = f->args[1];
-                    ObjP arg1 = f->args[0];
-                    f->args.clear();
-                    ret = c.call2(p, arg0, arg1);
-                    break;
-                }
-            default:
-                {
-                    List* list = new List();
-                    PR_LOCAL_REF(list);
-                    for (int i = 0; i < (int)f->args.size(); i++)
-                        list->append(f->args[f->args.size() - i - 1]);
-                    f->args.clear();
-                    ret = c.callx(p, list);
-                }
-                break;
-        }
-    }
+            Callable c = type->get_method("bad_method");
+            if (c.type == Callable::NONE)
+                throw new Exception(Name("bad_method"), name_to_symbol(name));
 
+            List* list = new List();
+            for (int i = 0; i < (int)f->args.size(); i++)
+                list->append(f->args[f->args.size() - i - 1]);
+            f->args.clear();
+
+            ret = c.call2(obj, name_to_symbol(name), *list);
+            dec_ref(list);
+        }
+        else
+        {
+            switch (f->args.size())
+            {
+                case 0:
+                    ret = c.call0(obj);
+                    break;
+                case 1:
+                    {
+                        ObjP arg0 = inc_ref(f->args[0]);
+                        f->args.clear();
+                        ret = c.call1(obj, arg0);
+                        dec_ref(arg0);
+                        break;
+                    }
+                    break;
+                case 2:
+                    {
+                        ObjP arg0 = inc_ref(f->args[1]);
+                        ObjP arg1 = inc_ref(f->args[0]);
+                        f->args.clear();
+                        ret = c.call2(obj, arg0, arg1);
+                        dec_ref(arg0);
+                        dec_ref(arg1);
+                        break;
+                    }
+                default:
+                    {
+                        List* list = new List();
+                        for (int i = 0; i < (int)f->args.size(); i++)
+                            list->append(f->args[f->args.size() - i - 1]);
+                        f->args.clear();
+                        ret = c.callx(obj, list);
+                        dec_ref(list);
+                    }
+                    break;
+            }
+
+            dec_ref(obj);
+        }
     }
     catch (Exception* e)
     {
@@ -368,10 +420,15 @@ void Executor::call_method(Name name)
         return;
     }
 
-    //assert((f->exec_op != 0) == (ret == error_object()));
+    // If error was returned, frame must have changed or there's new minicode.
+    // TODO: check that minicode was emitted, this test isn't enough
+    assert(ret != error_object() || (f != old_frame || !f->minicode_stack.empty()));
 
     if (ret != error_object())
+    {
         old_frame->push(ret);
+        dec_ref(ret);
+    }
 }
 
 void Executor::handle_exception(Exception* e)

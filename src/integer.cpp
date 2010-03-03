@@ -176,7 +176,7 @@ ObjP Integer::times_(ObjP p)
     };
 
     MiniCode* mc = new MiniCode(ops);
-    mc->objects.push_back(*this);
+    mc->objects.push_back((ObjP)*this);
     mc->objects.push_back(p);
     mc->objects.push_back(0);
     mc->counter = 0;

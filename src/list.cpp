@@ -26,7 +26,6 @@ List::List(int n, ...)
     for (int i = 0; i < n; i++)
     {
         ObjP p = va_arg(args, ObjP);
-        inc_ref(p);
         items.push_back(p);
     }
     va_end(args);
@@ -75,8 +74,6 @@ List* List::cast_list()
 List* List::copy() const
 {
     List* l = new List();
-    for (int i = 0; i < (int)items.size(); i++)
-        inc_ref(items[i]);
     l->items = items;
     return l;
 }
@@ -84,7 +81,6 @@ List* List::copy() const
 ObjP List::to_string_()
 {
     String* s = new String("[");
-    PR_LOCAL_REF(s);
     for (int i = 0; i < (int)items.size(); i++)
     {
         if (i != 0)
@@ -97,7 +93,6 @@ ObjP List::to_string_()
 
 void List::append(ObjP p)
 {
-    inc_ref(p);
     items.push_back(p);
 }
 
@@ -109,7 +104,6 @@ ObjP List::append_(ObjP p)
 
 void List::prepend(ObjP p)
 {
-    inc_ref(p);
     items.insert(items.begin(), p);
 }
 
@@ -160,8 +154,8 @@ ObjP List::map_(ObjP p)
     mc->func1 = map_continuation1;
     mc->counter = 0;
 
-    mc->objects.push_back(*this);
-    mc->objects.push_back(*new List());
+    mc->objects.push_back((ObjP)*this);
+    mc->objects.push_back((ObjP)*new List());
     mc->objects.push_back(p);
     mc->objects.push_back(name_to_symbol("call"));
 
@@ -172,15 +166,11 @@ ObjP List::map_(ObjP p)
 
 ObjP List::filter_(ObjP p)
 {
-    PR_LOCAL_REF(p);
-
     List* l = new List();
-    PR_LOCAL_REF(l);
 
     for (int i = 0; i < (int)items.size(); i++)
     {
         ObjP o = method_call1(p, Name("call"), items[i]);
-        PR_LOCAL_REF(o);
         if (is_true(o))
             l->append(items[i]);
     }
@@ -203,7 +193,7 @@ ObjP List::each_(ObjP p)
     };
 
     MiniCode* mc = new MiniCode(ops);
-    mc->objects.push_back(*this);
+    mc->objects.push_back((ObjP)*this);
     mc->objects.push_back(p);
     mc->counter = 0;
 
@@ -217,6 +207,7 @@ ObjP List::pop_()
     if (items.empty())
         throw new Exception("list_empty", *this);
     ObjP ret = items[items.size()-1];
+    inc_ref(ret);
     items.pop_back();
     return ret;
 }
@@ -236,13 +227,11 @@ ObjP List::at_(ObjP p)
     int i = int_value(p);
     if (i < 0 || i >= (int)items.size())
         throw new Exception("out_of_range", p);
-    return items[i];
+    return inc_ref(items[i]);
 }
 
 ObjP List::add_(ObjP p)
 {
-    PR_LOCAL_REF(p);
-
     List* l = pr::to_list(p);
 
     List* l2 = copy();
@@ -256,7 +245,7 @@ ObjP List::first_()
 {
     if (items.empty())
         throw new Exception("empty_list", *this);
-    return items[0];
+    return inc_ref(items[0]);
 }
 
 ObjP List::all_before_(ObjP p)

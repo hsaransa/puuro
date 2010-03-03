@@ -3,13 +3,15 @@
 std.pollute std;
 
 puuro_executable = args.first;
+std.print "JELLY" args;
+
 args = args.all_after 1;
 
 args.empty.then
-{ raise (exception 'not_enough_arguments "more args"); };
+{ raise (exception 'not_enough_arguments "give more arguments to the program"); };
 
 eh = {<e, c>
-    print "EXCEPTION " e.name.s " WITH " e.obj;
+    print c.current_file.s " line " c.current_line ": exception " e.name.s " with " e.obj;
 };
 
 execute = {<fn>
@@ -21,5 +23,6 @@ execute = {<fn>
 };
 
 execute "lib/exceptions.puuro";
+execute "lib/list.puuro";
 
 args.each execute;

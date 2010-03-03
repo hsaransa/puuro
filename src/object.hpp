@@ -2,8 +2,6 @@
 #define _pr_object_hpp_
 
 #include "prdefs.hpp"
-#include "nametable.hpp"
-#include "callable.hpp"
 
 namespace pr
 {
@@ -24,6 +22,8 @@ namespace pr
 
         void increment_reference() { ref_count += 2; }
 
+        inline int get_ref_count() const { return ref_count >> 1; }
+
         inline operator ObjP()
         {
             return (ObjP)this;
@@ -34,6 +34,7 @@ namespace pr
         virtual ~Object();
 
     private:
+        // Deny copy and assignment.
         Object(const Object&) {}
         Object& operator=(const Object&) { return *this; }
 

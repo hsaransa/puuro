@@ -8,8 +8,6 @@
 
 namespace pr
 {
-    template<typename T> class RefCount;
-
     class GC
     {
     public:
@@ -60,7 +58,10 @@ namespace pr
         static inline void dec_ref(Object* p)
         {
             if (!in_progress)
+            {
+                assert(p->get_ref_count() > 0);
                 p->decrement_reference();
+            }
         }
 
         static inline void mark(Object* p)
@@ -74,7 +75,7 @@ namespace pr
         }
 
         template<typename T>
-        static inline void mark(RefCount<T>& p)
+        static inline void mark(Ref<T>& p)
         {
             if (p.get())
                 mark(p.get());
@@ -97,66 +98,90 @@ namespace pr
         static bool intensive_gc;
     };
 
-    inline void inc_ref(ObjP p)
+    inline ObjP inc_ref(ObjP p)
     {
+#ifndef NO_REFCOUNT
         if (p && (p & 3) == 0)
             to_object(p)->increment_reference();
+#endif
+        return p;
     }
 
-    inline void inc_ref(Object* p)
+    inline Object* inc_ref(Object* p)
     {
+#ifndef NO_REFCOUNT
         if (p)
             p->increment_reference();
+#endif
+        return p;
     }
 
     inline void dec_ref(ObjP p)
     {
+        (void)p;
+#ifndef NO_REFCOUNT
         if (p && (p & 3) == 0)
             GC::dec_ref(to_object(p));
+#endif
     }
 
     inline void dec_ref(Object* p)
     {
+        (void)p;
+#ifndef NO_REFCOUNT
         if (p)
             GC::dec_ref(p);
+#endif
     }
 
+#define return_and_inc_ref(p) return inc_ref(p), p
+
     template<typename T>
-    class RefCount
+    class Ref
     {
     public:
-        RefCount() : obj(0) {}
-        RefCount(T* t) : obj(0) { set(t); }
-        ~RefCount() { set(0); }
+        Ref() : obj(0) {}
+        Ref(const Ref<T>& t) : obj(0) { set(t.get()); }
+        Ref(const T& t) : obj(0) { set(t); }
+        ~Ref() { set(0); }
 
-        void set(T* t)
+        void set(T t)
         {
-            if (t)
-                pr::inc_ref(t);
-
-            if (obj)
-                dec_ref(obj);
-
+            inc_ref(t);
+            T old = obj;
             obj = t;
+            dec_ref(old);
         }
 
-        T* get() { return obj; }
+        T get() { return obj; }
+        const T get() const { return obj; }
 
-        T* operator->()
+        T operator->()
         {
             assert(obj);
             return obj;
         }
 
-        void operator=(T* t)
+        const T operator->() const
+        {
+            assert(obj);
+            return obj;
+        }
+
+        operator T() const { return obj; }
+
+        void operator=(const T& t)
         {
             set(t);
         }
 
-        operator bool() const { return !!obj; }
+        void operator=(const Ref<T>& t)
+        {
+            set(t.get());
+        }
 
     private:
-        T* obj;
+        T obj;
     };
 
     class LocalRef
@@ -182,6 +207,9 @@ namespace pr
 
     private:
         Object* obj;
+
+        LocalRef(const LocalRef&) {}
+        void operator=(const LocalRef&) {}
     };
 
 #define PUURO_CONCAT(a, b) a##b

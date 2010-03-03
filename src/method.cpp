@@ -28,7 +28,6 @@ Method::Method(Type* t, Callable c)
 
 Method::~Method()
 {
-    dec_ref(object);
 }
 
 ObjP Method::to_string_()
@@ -53,22 +52,18 @@ void Method::gc_mark()
     GC::mark(object);
     if (object_type)
         GC::mark(object_type);
-    if (callable.type == Callable::OBJECT)
-        GC::mark(callable.obj);
+    callable.gc_mark();
 }
 
 ObjP Method::call_(List* l)
 {
     if (object_type)
         throw new Exception(Name("method_requires_object"), 0);
-    PR_LOCAL_REF(l);
     return callable.callx(object, l);
 }
 
 ObjP Method::rcall_(List* l)
 {
-    PR_LOCAL_REF(l);
-
     if (l->get_size() < 1)
         throw new Exception(Name("bad_argument_count"), *l);
 
@@ -88,8 +83,6 @@ ObjP Method::rcall_(List* l)
     List* l2 = new List();
     for (int i = 1; i < l->get_size(); i++)
         l2->append(l->get(i));
-
-    PR_LOCAL_REF(l2);
 
     return callable.callx(p, l2);
 }

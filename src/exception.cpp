@@ -2,6 +2,7 @@
 #include "string.hpp"
 #include "primitives.hpp"
 #include "gc.hpp"
+#include "type.hpp"
 
 using namespace pr;
 
@@ -10,10 +11,12 @@ Exception::Exception(Name n, ObjP obj)
     name(n),
     obj(obj)
 {
+    inc_ref(obj);
 }
 
 Exception::~Exception()
 {
+    dec_ref(obj);
 }
 
 Type* Exception::get_type()
@@ -37,7 +40,6 @@ void Exception::gc_mark()
 String* Exception::to_string()
 {
     String* s = new String(name.s());
-    PR_LOCAL_REF(s);
     String* s2 = call_to_string(obj);
     s->append(": ");
     s->append(s2);

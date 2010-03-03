@@ -1,4 +1,5 @@
 #include "gc.hpp"
+#include "type.hpp"
 #include <stdio.h>
 
 using namespace pr;
@@ -16,6 +17,7 @@ static int magic_counter;
 
 void GC::add_type(Type* type)
 {
+    inc_ref(type);
     types.insert(type);
 }
 
@@ -91,6 +93,9 @@ void GC::gc()
 
 void GC::force_gc()
 {
+#ifdef NO_GC
+    return;
+#else
     if (in_progress || blocked)
         return;
 
@@ -146,4 +151,5 @@ void GC::force_gc()
     //printf("--- DONE HERE %d (%d types)\n", get_object_count(), types.size());
 
     in_progress = false;
+#endif
 }

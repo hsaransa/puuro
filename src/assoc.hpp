@@ -3,6 +3,7 @@
 
 #include "prdefs.hpp"
 #include "object.hpp"
+#include "gc.hpp"
 
 namespace pr
 {
@@ -21,7 +22,7 @@ namespace pr
         ObjP set_(ObjP, ObjP);
         ObjP copy_();
 
-        std::map<Name, ObjP> assoc;
+        std::map<Name, Ref<ObjP> > assoc;
     };
 }
 

@@ -40,6 +40,7 @@ namespace pr
             Type type;
             int ref;
         };
+
         MiniCode(const Op* ops)
         :   ops(ops), pos(0)
         {
@@ -58,11 +59,15 @@ namespace pr
 
     public:
         const Op* ops;
-        std::vector<ObjP> objects;
+        std::vector<Ref<ObjP> > objects;
         int pos;
         void (*func0)(MiniCode*, Frame*);
         void (*func1)(MiniCode*, Frame*);
         int counter;
+
+    private:
+        MiniCode(const MiniCode&) {}
+        void operator=(const MiniCode&) {}
     };
 
 #define PR_MC_OP0(op)    { MiniCode::op, -1 },

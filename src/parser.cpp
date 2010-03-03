@@ -8,6 +8,7 @@ using namespace pr;
 namespace pr
 {
     extern Lexer* yy_lexer;
+    extern int yy_file;
     extern AST* yy_ast;
 }
 
@@ -22,13 +23,16 @@ Parser::Parser(Lexer* l)
 {
     assert(lexer);
 
-    GC::block_gc();
+    yy_file = l->get_file().id();
 
     yy_lexer = lexer.get();
     yyparse();
-    ast = yy_ast;
+    yy_lexer = 0;
 
-    GC::unblock_gc();
+    ast = yy_ast;
+    dec_ref(yy_ast);
+
+    yy_ast = 0;
 }
 
 Parser::~Parser()
@@ -53,5 +57,5 @@ void Parser::gc_mark()
 
 AST* Parser::get_ast()
 {
-    return ast.get();
+    return_and_inc_ref(ast.get());
 }

@@ -1,0 +1,15 @@
+# List extensions
+
+t = [].type;
+
+{
+t.add_method 'to_string {<l>
+    s = "[";
+
+    # TODO remove recursion
+
+    #l.each {<x> s =
+
+    s = s + "]";
+};
+};

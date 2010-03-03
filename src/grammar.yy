@@ -3,20 +3,21 @@
 %{
 #include "ast.hpp"
 #include "lexer.hpp"
-#include "primitives.hpp"
 #include <stdio.h>
 #include <stdexcept>
 
 using namespace pr;
 
-#define NODE2(dst, type, arg1, arg2) { dst = new AST(Name(#type)); dst->add_child(arg1); dst->add_child(arg2); }
-#define NODE1(dst, type, arg) { dst = new AST(Name(#type)); dst->add_child(arg); }
-#define NODE(dst, type) { dst = new AST(Name(#type)); }
-#define NODEO(dst, type, o) { dst = new AST(Name(#type)); dst->set_object(o); }
+#define NEW_AST(t) new AST(Name(#t), FilePosition(yy_file, yy_lexer->get_line()))
+#define NODE2(dst, type, arg1, arg2) { dst = NEW_AST(type); dst->add_child(arg1); dst->add_child(arg2); }
+#define NODE1(dst, type, arg) { dst = NEW_AST(type); dst->add_child(arg); }
+#define NODE(dst, type) { dst = NEW_AST(type); }
+#define NODEO(dst, type, o) { dst = NEW_AST(type); dst->set_object(o); }
 
 namespace pr
 {
 	Lexer* yy_lexer;
+	int yy_file;
 	AST* yy_ast;
 }
 
@@ -184,13 +185,13 @@ term_expr:
 	{ NODE1($$, Method, $1); $$->set_object($3); } |
 
 	term_expr '.' T_IDENTIFIER
-	{ NODEO($$, CallMethod, $3); $$->add_child($1); $$->add_child(new AST("ArgList")); } |
+	{ NODEO($$, CallMethod, $3); $$->add_child($1); $$->add_child(NEW_AST(ArgList)); } |
 
 	term_expr '.' T_IDENTIFIER '(' comma_arg_list ')'
 	{ NODEO($$, CallMethod, $3); $$->add_child($1); $$->add_child($5); } |
 
 	'[' ']'
-	{ NODE1($$, List, new AST("ArgList")); } |
+	{ NODE1($$, List, NEW_AST(ArgList)); } |
 
 	'[' arg_list ']'
 	{ NODE1($$, List, $2); } |
@@ -204,10 +205,10 @@ term_expr:
 	  NODE2($$, Code, ast, $3); } |
 
 	'{' '<' '>' expr_list '}'
-	{ NODE2($$, Code, new AST("ParamList"), $4); } |
+	{ NODE2($$, Code, NEW_AST(ParamList), $4); } |
 
 	'{' expr_list '}'
-	{ NODE2($$, Code, new AST("ParamList"), $2); } |
+	{ NODE2($$, Code, NEW_AST(ParamList), $2); } |
 
 	'!' term_expr
 	{ NODE1($$, Not, $2); } |
@@ -216,7 +217,7 @@ term_expr:
 	{ NODE2($$, Call, $1, $3); } |
 
 	term_expr '(' ')'
-	{ NODE2($$, Call, $1, new AST("ArgList")); }
+	{ NODE2($$, Call, $1, NEW_AST(ArgList)); }
 	;
 
 assign_target:

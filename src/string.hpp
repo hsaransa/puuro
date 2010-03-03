@@ -44,12 +44,6 @@ namespace pr
             return to_object(p)->cast_string();
         throw new Exception("bad_type", p);
     }
-
-    inline String* call_to_string(ObjP p)
-    {
-        ObjP ret = method_call0(p, Name("to_string"));
-        return to_string(ret);
-    }
 }
 
 #endif

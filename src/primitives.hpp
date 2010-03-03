@@ -2,8 +2,6 @@
 #define _pr_primitives_hpp_
 
 #include "prdefs.hpp"
-#include "object.hpp"
-#include "type.hpp"
 #include "exception.hpp"
 
 namespace pr
@@ -75,6 +73,7 @@ namespace pr
 
     inline Name symbol_to_name(ObjP p)
     {
+        assert(is_symbol(p));
         if ((p & 0x3) == 2)
             return Name(p >> 4);
         else
@@ -108,30 +107,10 @@ namespace pr
         return p >> 1;
     }
 
+#if 0
     inline bool has_method(ObjP p, Name n)
     {
         return get_type(p)->get_method(n).type != Callable::NONE;
-    }
-
-#if 1
-    inline ObjP method_call0(ObjP p, Name n)
-    {
-        return get_type(p)->get_method(n).call0(p);
-    }
-
-    inline ObjP method_call1(ObjP p, Name n, ObjP arg)
-    {
-        return get_type(p)->get_method(n).call1(p, arg);
-    }
-
-    inline ObjP method_call2(ObjP p, Name n, ObjP arg, ObjP arg2)
-    {
-        return get_type(p)->get_method(n).call2(p, arg, arg2);
-    }
-
-    inline ObjP method_callx(ObjP p, Name n, List* l)
-    {
-        return get_type(p)->get_method(n).callx(p, l);
     }
 #endif
 

@@ -37,12 +37,13 @@ String* File::read_file()
     char* tmp = new char [size];
 
     int n = fread(tmp, size, 1, fp);
+    fclose(fp);
+
     if (n <= 0)
     {
         delete [] tmp;
         throw new Exception(Name("file_lolled_2"), *new String(filename.c_str()));
     }
-    fclose(fp);
 
     String* str = new String(tmp, size);
     delete [] tmp;

@@ -11,23 +11,25 @@ namespace pr
     class Lexer : public Object
     {
     public:
-        Lexer(String* s);
+        Lexer(Name f, String* s);
         virtual ~Lexer();
 
         virtual Type* get_type();
         virtual void gc_mark();
 
         int next();
-        int get_line();
+        int get_line() { return line; }
+        Name get_file() { return file; }
 
     private:
-        RefCount<String> src;
+        Ref<String*> src;
         int pos;
 
         int current_token;
-        ObjP object;
+        Ref<ObjP> object;
 
-        int lineno;
+        Name file;
+        int line;
     };
 }
 

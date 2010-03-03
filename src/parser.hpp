@@ -19,8 +19,8 @@ namespace pr
         AST* get_ast();
 
     private:
-        RefCount<Lexer> lexer;
-        RefCount<AST> ast;
+        Ref<Lexer*> lexer;
+        Ref<AST*> ast;
 
         static Type* type;
     };

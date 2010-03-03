@@ -42,35 +42,38 @@ namespace pr
 
         ObjP pollute_(ObjP p);
 
-        ObjP set_exception_handler(ObjP);
-        ObjP get_exception_handler();
+        ObjP set_exception_handler_(ObjP);
+        ObjP get_exception_handler_();
 
         ObjP previous_();
         ObjP caller_();
         ObjP callee_();
         ObjP code_();
 
+        ObjP current_file_();
+        ObjP current_line_();
+
         ObjP cut_previous_();
 
     private:
-        RefCount<Frame> previous;
-        RefCount<Frame> caller;
-        RefCount<Frame> callee;
-        RefCount<Code> code;
+        Ref<Frame*> previous;
+        Ref<Frame*> caller;
+        Ref<Frame*> callee;
+        Ref<Code*> code;
         int position;
 
         std::list<MiniCode*> minicode_stack;
 
-        std::vector<ObjP> stack;
-        std::vector<ObjP> args;
+        std::vector<Ref<ObjP> > stack;
+        std::vector<Ref<ObjP> > args;
 
-        ObjP exc_handler;
+        Ref<ObjP> exc_handler;
 
-        ObjP ret;
+        Ref<ObjP> ret;
 
         bool in_execution;
 
-        std::map<Name, ObjP> locals;
+        std::map<Name, Ref<ObjP> > locals;
     };
 }
 

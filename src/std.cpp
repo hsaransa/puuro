@@ -59,8 +59,10 @@ Type* Std::get_type()
 
 static void print_continuation0(MiniCode*, Frame* f)
 {
-    String* s = to_string(f->pop());
+    ObjP p = f->pop();
+    String* s = to_string(p);
     printf("%s", s->get_data());
+    dec_ref(p);
 }
 
 static void print_continuation1(MiniCode*, Frame*)
@@ -84,7 +86,7 @@ ObjP Std::print(List* l)
     };
 
     MiniCode* mc = new MiniCode(ops);
-    mc->objects.push_back(*l);
+    mc->objects.push_back((ObjP)*l);
     mc->objects.push_back(name_to_symbol("to_string"));
     mc->func0 = print_continuation0;
     mc->func1 = print_continuation1;
@@ -226,7 +228,7 @@ ObjP Std::try_(ObjP a, ObjP b)
 
 ObjP Std::caller_()
 {
-    return *get_executor()->get_caller_frame();
+    return inc_ref(*get_executor()->get_caller_frame());
 }
 
 ObjP Std::repeat_(ObjP c)
@@ -317,11 +319,13 @@ ObjP Std::compile_file_(ObjP pp)
 
     String* s = f->read_file();
 
-    Lexer* l = new Lexer(s);
+    Lexer* l = new Lexer(fn->get_data(), s);
 
     Parser* p = new Parser(l);
 
     AST* ast = p->get_ast();
+
+    ast->debug_print();
 
     Code* code = new Code(ast, false);
 

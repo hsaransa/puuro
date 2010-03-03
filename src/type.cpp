@@ -59,13 +59,15 @@ void Type::gc_mark()
 {
     std::map<Name, Callable>::iterator iter;
     for (iter = methods.begin(); iter != methods.end(); iter++)
-        if (iter->second.type == Callable::OBJECT)
-            GC::mark(iter->second.obj);
+        iter->second.gc_mark();
 }
 
 void Type::add_method(Name n, Callable c)
 {
-    methods[n] = c;
+    std::map<Name, Callable>::iterator iter = methods.find(n);
+    if (iter != methods.end())
+        methods.erase(iter);
+    methods.insert(std::make_pair(n, c));
 }
 
 Callable Type::get_method(Name n)

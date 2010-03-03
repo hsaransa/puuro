@@ -75,7 +75,7 @@ void pr::deferred_method_callx(ObjP p, Name n, List* l)
     MiniCode* mc = new MiniCode(ops);
     mc->objects.push_back(p);
     mc->objects.push_back(name_to_symbol(n));
-    mc->objects.push_back(*l);
+    mc->objects.push_back((ObjP)*l);
 
     get_executor()->emit(mc);
 }

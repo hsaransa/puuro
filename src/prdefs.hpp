@@ -19,7 +19,11 @@ namespace pr
     class MiniCode;
     class Exception;
 
+    struct FilePosition;
+
     typedef unsigned long ObjP;
+
+    template<typename T> class Ref;
 }
 
 #endif

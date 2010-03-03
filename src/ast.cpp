@@ -1,20 +1,19 @@
 #include "ast.hpp"
 #include "primitives.hpp"
+#include "type.hpp"
 
 using namespace pr;
 
-AST::AST(Name t)
+AST::AST(Name t, const FilePosition& p)
 :   Object(get_type()),
     type(t),
-    object(0)
+    object(0),
+    position(p)
 {
 }
 
 AST::~AST()
 {
-    for (int i = 0; i < (int)children.size(); i++)
-        dec_ref(children[i]);
-    dec_ref(object);
 }
 
 Type* AST::get_type()
@@ -32,16 +31,15 @@ void AST::gc_mark()
     GC::mark(object);
 }
 
+#include <iostream>
 void AST::add_child(AST* ast)
 {
-    inc_ref(ast);
     children.push_back(ast);
+    dec_ref(ast);
 }
 
 void AST::set_object(ObjP p)
 {
-    inc_ref(p);
-    dec_ref(object);
     object = p;
 }
 
@@ -49,7 +47,7 @@ void AST::set_object(ObjP p)
 #include <stdio.h>
 void AST::debug_print(int in)
 {
-    printf("%*.s", in*2, "");
+    printf("%3d %*.s", position.line, in*2, "");
 
     printf("%s", type.s());
 
@@ -58,7 +56,7 @@ void AST::debug_print(int in)
         if (is_symbol(object))
             printf(" :%s", symbol_to_name(object).s());
         else
-            printf(" %lx", object);
+            printf(" %lx", object.get());
     }
 
     printf("\n");

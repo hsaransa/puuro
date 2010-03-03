@@ -5,6 +5,7 @@
 #include "primitives.hpp"
 #include "gc.hpp"
 #include "string.hpp"
+#include "type.hpp"
 #include <iostream>
 #include <stdio.h>
 #include <stdexcept>
@@ -14,12 +15,14 @@ using namespace pr;
 Code::Code(AST* ast, bool args)
 :   Object(get_type())
 {
-    PR_LOCAL_REF(ast);
-    PR_LOCAL_REF(this);
+    tmp_filepos.file = Name("<none>").id();
+    tmp_filepos.line = 0;
 
     if (args)
     {
-        AST* param_ast = ast->get_children()[0];
+        // Parse code parameters (pre, sink and post).
+
+        AST* param_ast = ast->get_children()[0].get();
 
         int i = 0;
 
@@ -49,12 +52,14 @@ Code::Code(AST* ast, bool args)
             post_params.push_back(n);
         }
 
-        compile(ast->get_children()[1]);
+        compile(ast->get_children()[1].get());
     }
     else
         compile(ast);
 
     emit(Return);
+
+    debug_print();
 }
 
 Code::Code()
@@ -64,8 +69,6 @@ Code::Code()
 
 Code::~Code()
 {
-    for (int i = 0; i < (int)arguments.size(); i++)
-        dec_ref(arguments[i]);
 }
 
 Type* Code::get_type()
@@ -97,17 +100,20 @@ Code* Code::cast_code()
 
 void Code::emit(Op op, ObjP obj)
 {
-    inc_ref(obj);
     operators.push_back(op);
     arguments.push_back(obj);
+    positions.push_back(tmp_filepos);
 }
 
 void Code::compile(AST* ast)
 {
     Name n = ast->get_node_type();
-    AST* ch0 = ast->get_children().size() >= 1 ? ast->get_children()[0] : 0;
-    AST* ch1 = ast->get_children().size() >= 2 ? ast->get_children()[1] : 0;
+    AST* ch0 = ast->get_children().size() >= 1 ? ast->get_children()[0].get() : 0;
+    AST* ch1 = ast->get_children().size() >= 2 ? ast->get_children()[1].get() : 0;
     //AST* ch2 = ast->get_children().size() >= 3 ? ast->get_children()[2] : 0;
+
+    FilePosition old_pos = tmp_filepos;
+    tmp_filepos = ast->get_position();
 
     switch (n.id())
     {
@@ -117,7 +123,7 @@ void Code::compile(AST* ast)
 
         for (int i = 0; i < (int)ast->get_children().size(); i++)
         {
-            compile(ast->get_children()[i]);
+            compile(ast->get_children()[i].get());
 
             // Ignore all but last.
             if (i+1 != (int)ast->get_children().size())
@@ -138,7 +144,7 @@ void Code::compile(AST* ast)
                 if (n != N_AssignMember)
                     continue;
 
-                compile(ch0->get_children()[i]->get_children()[0]);
+                compile(ch0->get_children()[i]->get_children()[0].get());
                 members_left++;
             }
 
@@ -148,12 +154,12 @@ void Code::compile(AST* ast)
                 int n = ch0->get_children()[i]->get_node_type().id();
                 if (n == N_AssignVariable)
                 {
-                    compile(ch1->get_children()[i]);
+                    compile(ch1->get_children()[i].get());
                     emit(Assign, ch0->get_children()[i]->get_object());
                 }
                 else if (n == N_AssignMember)
                 {
-                    compile(ch1->get_children()[i]);
+                    compile(ch1->get_children()[i].get());
                     emit(Push, ch0->get_children()[i]->get_object());
                     emit(Arg);
                     emit(Arg);
@@ -182,6 +188,7 @@ void Code::compile(AST* ast)
     case N_Integer:
     case N_Symbol:
     case N_String:
+        printf("%d\n", ast->get_position().line);
         emit(Push, ast->get_object());
         break;
 
@@ -244,7 +251,7 @@ void Code::compile(AST* ast)
     case N_Call:
         compile(ch0);
         for (int i = 0; i < (int)ch1->get_children().size(); i++)
-            compile(ch1->get_children()[i]);
+            compile(ch1->get_children()[i].get());
         for (int i = 0; i < (int)ch1->get_children().size(); i++)
             emit(Arg);
         emit(CallMethod, name_to_symbol("call"));
@@ -253,7 +260,7 @@ void Code::compile(AST* ast)
     case N_CallMethod:
         compile(ch0);
         for (int i = 0; i < (int)ch1->get_children().size(); i++)
-            compile(ch1->get_children()[i]);
+            compile(ch1->get_children()[i].get());
         for (int i = 0; i < (int)ch1->get_children().size(); i++)
             emit(Arg);
         emit(CallMethod, ast->get_object());
@@ -261,7 +268,7 @@ void Code::compile(AST* ast)
 
     case N_List:
         for (int i = 0; i < (int)ch0->get_children().size(); i++)
-            compile(ch0->get_children()[i]);
+            compile(ch0->get_children()[i].get());
         emit(List, int_to_fixnum(ch0->get_children().size()));
         break;
 
@@ -271,7 +278,11 @@ void Code::compile(AST* ast)
         break;
 
     case N_Code:
-        emit(Closure, *new Code(ast, true));
+        {
+            Code* code = new Code(ast, true);
+            emit(Closure, *code);
+            dec_ref(code);
+        }
         break;
 
     default:
@@ -280,11 +291,7 @@ void Code::compile(AST* ast)
         break;
     }
 
-    switch (n.id())
-    {
-    case N_Assign:
-        break;
-    }
+    //tmp_filepos = old_pos;
 }
 
 void Code::debug_print()
@@ -296,7 +303,7 @@ void Code::debug_print()
         Op op = operators[i];
         ObjP arg = arguments[i];
 
-        printf("%3d ", i);
+        printf("%3d,%3d ", i, positions[i].line);
 
         switch (op)
         {
@@ -313,9 +320,12 @@ void Code::debug_print()
         case List:       printf("list        "); break;
         }
 
-        String* s = call_to_string(arg);
         if (op != Pop && op != Arg && op != Return)
+        {
+            String* s = call_to_string(arg);
             printf("%s", s->get_data());
+            dec_ref(s);
+        }
 
         printf("\n");
     }

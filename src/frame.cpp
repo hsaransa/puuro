@@ -49,14 +49,16 @@ Type* Frame::get_type()
         type->add_method("execute", (Callable::mptr0)&Frame::execute);
         type->add_method("continue", (Callable::mptr1)&Frame::continue_);
         type->add_method("clone_continuation", (Callable::mptr0)&Frame::clone_continuation);
-        type->add_method("set_exception_handler", (Callable::mptr1)&Frame::set_exception_handler);
-        type->add_method("get_exception_handler", (Callable::mptr0)&Frame::get_exception_handler);
+        type->add_method("set_exception_handler", (Callable::mptr1)&Frame::set_exception_handler_);
+        type->add_method("get_exception_handler", (Callable::mptr0)&Frame::get_exception_handler_);
         type->add_method("previous", (Callable::mptr0)&Frame::previous_);
         type->add_method("caller", (Callable::mptr0)&Frame::caller_);
         type->add_method("callee", (Callable::mptr0)&Frame::callee_);
         type->add_method("code", (Callable::mptr0)&Frame::code_);
         type->add_method("cut_previous", (Callable::mptr0)&Frame::cut_previous_);
         type->add_method("pollute", (Callable::mptr1)&Frame::pollute_);
+        type->add_method("current_file", (Callable::mptr0)&Frame::current_file_);
+        type->add_method("current_line", (Callable::mptr0)&Frame::current_line_);
     }
     return type;
 }
@@ -87,7 +89,7 @@ void Frame::gc_mark()
             (*iter)->gc_mark();
     }
 
-    std::map<Name, ObjP>::iterator iter;
+    std::map<Name, Ref<ObjP> >::iterator iter;
     for (iter = locals.begin(); iter != locals.end(); iter++)
         GC::mark(iter->second);
 }
@@ -101,16 +103,21 @@ void Frame::set(Name n, ObjP p)
 {
     Frame* f = this;
 
+    // Get the frame that has this variable assigned.
+
     while (f)
     {
         if (f->locals.count(n))
         {
+            // Replace the old variable.
             f->locals[n] = p;
             return;
         }
         else
             f = f->previous.get();
     }
+
+    // Not found, add variable to this frame.
 
     locals[n] = p;
 }
@@ -131,24 +138,23 @@ ObjP Frame::set_(ObjP n, ObjP v)
     return v;
 }
 
-ObjP Frame::set_exception_handler(ObjP e)
+ObjP Frame::set_exception_handler_(ObjP e)
 {
-    ObjP prev = exc_handler;
+    ObjP prev = inc_ref(exc_handler);
     exc_handler = e;
     return prev;
 }
 
-ObjP Frame::get_exception_handler()
+ObjP Frame::get_exception_handler_()
 {
     Frame* f = this;
     while (f && f->exc_handler == 0)
         f = f->caller.get();
-    return f ? f->exc_handler : 0;
+    return f ? inc_ref(f->exc_handler.get()) : 0;
 }
 
 void Frame::push(ObjP p)
 {
-    inc_ref(p);
     stack.push_back(p);
 }
 
@@ -156,6 +162,7 @@ ObjP Frame::pop()
 {
     assert(!stack.empty());
     ObjP p = stack[stack.size()-1];
+    inc_ref(p);
     stack.erase(stack.begin() + (stack.size() - 1));
     return p;
 }
@@ -174,7 +181,7 @@ ObjP Frame::lookup(Name n)
         throw new Exception("not_defined", name_to_symbol(n));
     }
     else
-        return locals[n];
+        return inc_ref(locals[n]);
 }
 
 ObjP Frame::execute()
@@ -224,22 +231,22 @@ Frame* Frame::clone_continuation()
 
 ObjP Frame::previous_()
 {
-    return previous ? *previous.get() : 0;
+    return previous ? inc_ref(*previous.get()) : 0;
 }
 
 ObjP Frame::caller_()
 {
-    return caller ? *caller.get() : 0;
+    return caller ? inc_ref(*caller.get()) : 0;
 }
 
 ObjP Frame::callee_()
 {
-    return callee ? *callee.get() : 0;
+    return callee ? inc_ref(*callee.get()) : 0;
 }
 
 ObjP Frame::code_()
 {
-    return code ? *code.get() : 0;
+    return code ? inc_ref(*code.get()) : 0;
 }
 
 ObjP Frame::cut_previous_()
@@ -258,4 +265,14 @@ ObjP Frame::pollute_(ObjP obj)
         f->set_local(iter->first, *new Method(obj, iter->second));
 
     return 0;
+}
+
+ObjP Frame::current_file_()
+{
+    return name_to_symbol(Name(code->get_position(position).file));
+}
+
+ObjP Frame::current_line_()
+{
+    return int_to_fixnum(code->get_position(position).line);
 }

@@ -28,7 +28,7 @@ namespace pr
         void call_method(Name n);
         void handle_exception(Exception*);
 
-        Frame* f;
+        Ref<Frame*> f;
     };
 
     extern Executor* executor;

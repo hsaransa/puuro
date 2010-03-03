@@ -7,23 +7,24 @@
 #include "primitives.hpp"
 #include "grammar.hh"
 #include "gc.hpp"
+#include "type.hpp"
 #include <stdio.h>
 
 using namespace pr;
 
-Lexer::Lexer(String* s)
+Lexer::Lexer(Name f, String* s)
 :   Object(get_type()),
     src(s),
     pos(0),
-    object(0)
+    object(0),
+    file(f)
 {
     assert(s);
-    lineno = 1;
+    line = 1;
 }
 
 Lexer::~Lexer()
 {
-    dec_ref(object);
 }
 
 Type* Lexer::get_type()
@@ -55,7 +56,7 @@ int Lexer::next()
         if (isspace(*p))
         {
             if (*p == '\n')
-                lineno++;
+                line++;
             p++;
             continue;
         }
@@ -66,7 +67,7 @@ int Lexer::next()
                 p++;
             if (*p == '\n')
             {
-                lineno++;
+                line++;
                 p++;
             }
             continue;
@@ -138,7 +139,8 @@ int Lexer::next()
                 p++;
 
             current_token = T_INTEGER;
-            object = *new Integer(s);
+            object = (ObjP)*new Integer(s);
+            dec_ref(object);
             break;
         }
         else if (*p == '"')
@@ -149,7 +151,8 @@ int Lexer::next()
                 p++;
 
             current_token = T_STRING;
-            object = *new String(s, p - s);
+            object = (ObjP)*new String(s, p - s);
+            dec_ref(object);
 
             if (p < end)
                 p++;
@@ -168,9 +171,4 @@ int Lexer::next()
 
     yylval.obj = object;
     return current_token;
-}
-
-int Lexer::get_line()
-{
-    return lineno;
 }

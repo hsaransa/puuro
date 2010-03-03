@@ -3,6 +3,7 @@
 #include "list.hpp"
 #include "primitives.hpp"
 #include "gc.hpp"
+#include "type.hpp"
 #include <stdio.h>
 
 using namespace pr;
@@ -14,8 +15,6 @@ static ObjP param(List* l, int i)
 
 ObjP Callable::callx(ObjP obj, List* l)
 {
-    PR_LOCAL_REF(obj);
-
     assert(type != NONE);
 
     switch (type)
@@ -54,7 +53,6 @@ ObjP Callable::callx(ObjP obj, List* l)
     case OBJECT:
         {
             List* ll = l->copy();
-            PR_LOCAL_REF(ll);
             ll->prepend(obj);
             ObjP ret = method_callx(this->obj, Name("call"), ll);
             dec_ref(ll);
@@ -67,8 +65,6 @@ ObjP Callable::callx(ObjP obj, List* l)
 
 ObjP Callable::call0(ObjP obj)
 {
-    PR_LOCAL_REF(obj);
-
     assert(type != NONE);
 
     switch (type)
@@ -76,11 +72,23 @@ ObjP Callable::call0(ObjP obj)
         case FUNCTION0: return func0(obj);
         case FUNCTION1: return func1(obj, 0);
         case FUNCTION2: return func2(obj, 0, 0);
-        case FUNCTIONX: return funcx(obj, new List());
+        case FUNCTIONX:
+            {
+                List* l = new List();
+                ObjP ret = funcx(obj, l);
+                dec_ref(l);
+                return ret;
+            }
         case METHOD0: return (to_object(obj)->*method0)();
         case METHOD1: return (to_object(obj)->*method1)(0);
         case METHOD2: return (to_object(obj)->*method2)(0, 0);
-        case METHODX: return (to_object(obj)->*methodx)(new List());
+        case METHODX:
+            {
+                List* l = new List();
+                ObjP ret = (to_object(obj)->*methodx)(l);
+                dec_ref(l);
+                return ret;
+            }
         case OBJECT:
             {
                 ObjP ret = method_call1(this->obj, Name("call"), obj);
@@ -93,21 +101,30 @@ ObjP Callable::call0(ObjP obj)
 
 ObjP Callable::call1(ObjP obj, ObjP arg)
 {
-    PR_LOCAL_REF(obj);
-
     assert(type != NONE);
 
     switch (type)
     {
         case FUNCTION1: return func1(obj, arg);
         case FUNCTION2: return func2(obj, arg, 0);
-        case FUNCTIONX: return funcx(obj, new List(1, arg));
+        case FUNCTIONX:
+            {
+                List* l = new List(1, arg);
+                ObjP ret = funcx(obj, l);
+                dec_ref(l);
+                return ret;
+            }
         case METHOD1: return (((Object*)obj)->*method1)(arg);
         case METHOD2: return (((Object*)obj)->*method2)(arg, 0);
-        case METHODX: return (((Object*)obj)->*methodx)(new List(1, arg));
+        case METHODX:
+            {
+                List* l = new List(1, arg);
+                ObjP ret = (to_object(obj)->*methodx)(l);
+                dec_ref(l);
+                return ret;
+            }
         case OBJECT:
             {
-                PR_LOCAL_REF(this->obj);
                 ObjP ret = method_call2(this->obj, Name("call"), obj, arg);
                 return ret;
             }
@@ -118,16 +135,26 @@ ObjP Callable::call1(ObjP obj, ObjP arg)
 
 ObjP Callable::call2(ObjP obj, ObjP arg, ObjP arg2)
 {
-    PR_LOCAL_REF(obj);
-
     assert(type != NONE);
 
     switch (type)
     {
         case FUNCTION2: return func2(obj, arg, arg2);
-        case FUNCTIONX: return funcx(obj, new List(2, arg, arg2));
+        case FUNCTIONX:
+            {
+                List* l = new List(2, arg, arg2);
+                ObjP ret = funcx(obj, l);
+                dec_ref(l);
+                return ret;
+            }
         case METHOD2: return (((Object*)obj)->*method2)(arg, arg2);
-        case METHODX: return (((Object*)obj)->*methodx)(new List(2, arg, arg2));
+        case METHODX:
+            {
+                List* l = new List(2, arg, arg2);
+                ObjP ret = (to_object(obj)->*methodx)(l);
+                dec_ref(l);
+                return ret;
+            }
         case OBJECT:
             {
                 List* ll = new List(3, obj, arg, arg2);

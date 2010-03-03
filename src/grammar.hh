@@ -58,7 +58,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 36 "src/grammar.yy"
+#line 37 "src/grammar.yy"
 
 	pr::AST* ast;
 	pr::ObjP obj;

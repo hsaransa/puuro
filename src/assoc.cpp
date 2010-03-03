@@ -30,7 +30,7 @@ Type* Assoc::get_type()
 
 void Assoc::gc_mark()
 {
-    std::map<Name, ObjP>::iterator iter;
+    std::map<Name, Ref<ObjP> >::iterator iter;
     for (iter = assoc.begin(); iter != assoc.end(); iter++)
         GC::mark(iter->second);
 }

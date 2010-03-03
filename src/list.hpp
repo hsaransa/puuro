@@ -43,7 +43,7 @@ namespace pr
         ObjP all_after_(ObjP);
 
     private:
-        std::vector<ObjP> items;
+        std::vector<Ref<ObjP> > items;
 
         static Type* type;
     };

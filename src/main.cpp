@@ -12,6 +12,7 @@
 #include "gc.hpp"
 #include "executor.hpp"
 #include "list.hpp"
+#include <stdio.h>
 
 using namespace pr;
 
@@ -21,43 +22,50 @@ static void execute_file(const char* fn, List* args)
 
     {
         File* f = new File(fn);
-
         String* s = f->read_file();
-
-        Lexer* l = new Lexer(s);
-
+        Lexer* l = new Lexer(fn, s);
         Parser* p = new Parser(l);
 
         AST* ast = p->get_ast();
-
-#if 0
+#if 1
         ast->debug_print();
         std::cout << '\n';
 #endif
 
-        Code* code = new Code(ast, false);
+        dec_ref(f);
+        dec_ref(s);
+        dec_ref(l);
+        dec_ref(p);
 
-#if 0
+        Code* code = new Code(ast, false);
+#if 1
         code->debug_print();
         std::cout << '\n';
 #endif
+        dec_ref(ast);
 
         frame = new Frame(0, 0, code);
-        GC::add_root(frame);
+        dec_ref(code);
 
-        frame->set_local("std", *new Std());
+        Std* std = new Std();
+        frame->set_local("std", *std);
         frame->set_local("args", args ? (ObjP)*args : 0);
+
+        dec_ref(args);
+        dec_ref(std);
     }
 
-    {
-        executor = new Executor();
-        PR_LOCAL_REF(executor);
-        executor->set_frame(frame);
-        executor->execute();
-        executor = 0;
-    }
+    executor = new Executor();
+    GC::add_root(executor);
 
-    GC::del_root(frame);
+    executor->set_frame(frame);
+    dec_ref(frame);
+
+    executor->execute();
+    dec_ref(executor);
+
+    GC::del_root(executor);
+    executor = 0;
 }
 
 int main(int argc, char* argv[])
@@ -70,7 +78,11 @@ int main(int argc, char* argv[])
     {
         List* args = new List();
         for (int i = 0; i < argc; i++)
-            args->append(*new String(argv[i]));
+        {
+            String* s = new String(argv[i]);
+            args->append(*s);
+            dec_ref(s);
+        }
 
         const char* main_file = "lib/main.puuro";
 
@@ -87,11 +99,14 @@ int main(int argc, char* argv[])
 
         execute_file(main_file, args);
 
+#ifdef NO_GC
+        std::cerr << "objects in the end: " << GC::get_object_count() << '\n';
+#endif
+
         GC::gc();
     }
     catch (Exception* e)
     {
-        PR_LOCAL_REF(e);
         String* s = e->to_string();
         std::cerr << "exception not catched: " << s->get_data() << '\n';
         return 1;

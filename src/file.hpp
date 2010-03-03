@@ -13,9 +13,9 @@ namespace pr
         File(const char* fn);
         virtual ~File();
 
-        String* read_file();
-
         virtual Type* get_type();
+
+        String* read_file();
 
     private:
         std::string filename;
