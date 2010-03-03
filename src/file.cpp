@@ -28,7 +28,7 @@ String* File::read_file()
 {
     FILE* fp = fopen(filename.c_str(), "rb");
     if (!fp)
-        throw new Exception(Name("file_lolled"), String(filename.c_str()));
+        throw new Exception(Name("file_lolled"), *new String(filename.c_str()));
 
     fseek(fp, 0, SEEK_END);
     int size = ftell(fp);
@@ -40,7 +40,7 @@ String* File::read_file()
     if (n <= 0)
     {
         delete [] tmp;
-        throw new Exception(Name("file_lolled_2"), String(filename.c_str()));
+        throw new Exception(Name("file_lolled_2"), *new String(filename.c_str()));
     }
     fclose(fp);
 

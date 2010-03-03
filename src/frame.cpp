@@ -27,6 +27,9 @@ Frame::Frame(Frame* previous, Frame* caller, Code* code)
 
 Frame::~Frame()
 {
+    std::list<MiniCode*>::iterator iter;
+    for (iter = minicode_stack.begin(); iter != minicode_stack.end(); iter++)
+        delete *iter;
 }
 
 ObjP Frame::to_string_()
@@ -47,6 +50,13 @@ Type* Frame::get_type()
         type->add_method("continue", (Callable::mptr1)&Frame::continue_);
         type->add_method("clone_continuation", (Callable::mptr0)&Frame::clone_continuation);
         type->add_method("set_exception_handler", (Callable::mptr1)&Frame::set_exception_handler);
+        type->add_method("get_exception_handler", (Callable::mptr0)&Frame::get_exception_handler);
+        type->add_method("previous", (Callable::mptr0)&Frame::previous_);
+        type->add_method("caller", (Callable::mptr0)&Frame::caller_);
+        type->add_method("callee", (Callable::mptr0)&Frame::callee_);
+        type->add_method("code", (Callable::mptr0)&Frame::code_);
+        type->add_method("cut_previous", (Callable::mptr0)&Frame::cut_previous_);
+        type->add_method("pollute", (Callable::mptr1)&Frame::pollute_);
     }
     return type;
 }
@@ -123,8 +133,17 @@ ObjP Frame::set_(ObjP n, ObjP v)
 
 ObjP Frame::set_exception_handler(ObjP e)
 {
+    ObjP prev = exc_handler;
     exc_handler = e;
-    return 0;
+    return prev;
+}
+
+ObjP Frame::get_exception_handler()
+{
+    Frame* f = this;
+    while (f && f->exc_handler == 0)
+        f = f->caller.get();
+    return f ? f->exc_handler : 0;
 }
 
 void Frame::push(ObjP p)
@@ -201,4 +220,42 @@ Frame* Frame::clone_continuation()
     f->locals = locals;
 
     return f;
+}
+
+ObjP Frame::previous_()
+{
+    return previous ? *previous.get() : 0;
+}
+
+ObjP Frame::caller_()
+{
+    return caller ? *caller.get() : 0;
+}
+
+ObjP Frame::callee_()
+{
+    return callee ? *callee.get() : 0;
+}
+
+ObjP Frame::code_()
+{
+    return code ? *code.get() : 0;
+}
+
+ObjP Frame::cut_previous_()
+{
+    previous = 0;
+    return 0;
+}
+
+ObjP Frame::pollute_(ObjP obj)
+{
+    Type* t = pr::get_type(obj);
+    Frame* f = this;
+
+    std::map<Name, Callable>::iterator iter;
+    for (iter = t->methods.begin(); iter != t->methods.end(); iter++)
+        f->set_local(iter->first, *new Method(obj, iter->second));
+
+    return 0;
 }

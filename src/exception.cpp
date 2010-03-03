@@ -23,6 +23,8 @@ Type* Exception::get_type()
     {
         type = new Type(Name("exception"));
         type->add_method("to_string", (Callable::mptr0)&Exception::to_string);
+        type->add_method("name", (Callable::mptr0)&Exception::name_);
+        type->add_method("obj", (Callable::mptr0)&Exception::obj_);
     }
     return type;
 }
@@ -40,4 +42,14 @@ String* Exception::to_string()
     s->append(": ");
     s->append(s2);
     return s;
+}
+
+ObjP Exception::name_()
+{
+    return name_to_symbol(name);
+}
+
+ObjP Exception::obj_()
+{
+    return obj;
 }

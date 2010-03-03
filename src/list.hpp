@@ -30,6 +30,7 @@ namespace pr
         ObjP to_string_();
         ObjP map_(ObjP p);
         ObjP filter_(ObjP p);
+        ObjP each_(ObjP p);
         ObjP append_(ObjP p);
         ObjP prepend_(ObjP p);
         ObjP pop_();
@@ -37,6 +38,9 @@ namespace pr
         ObjP size_();
         ObjP at_(ObjP);
         ObjP add_(ObjP);
+        ObjP first_();
+        ObjP all_before_(ObjP);
+        ObjP all_after_(ObjP);
 
     private:
         std::vector<ObjP> items;

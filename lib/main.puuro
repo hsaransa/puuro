@@ -1,0 +1,25 @@
+# Puuro main file
+
+std.pollute std;
+
+puuro_executable = args.first;
+args = args.all_after 1;
+
+args.empty.then
+{ raise (exception 'not_enough_arguments "more args"); };
+
+eh = {<e, c>
+    print "EXCEPTION " e.name.s " WITH " e.obj;
+};
+
+execute = {<fn>
+  f = compile_file fn;
+  std.active_frame.set_exception_handler eh;
+  f.pollute std;
+  f.set_local 'std std;
+  f.execute;
+};
+
+execute "lib/exceptions.puuro";
+
+args.each execute;

@@ -45,13 +45,17 @@ Type* List::get_type()
         type->add_method(Name("append"), (Callable::mptr1)&List::append_);
         type->add_method(Name("push"), (Callable::mptr1)&List::append_);
         type->add_method(Name("prepend"), (Callable::mptr1)&List::prepend_);
-        type->add_method(Name("filter"), (Callable::mptr1)&List::filter_);
+        //type->add_method(Name("filter"), (Callable::mptr1)&List::filter_);
+        type->add_method(Name("each"), (Callable::mptr1)&List::each_);
         type->add_method(Name("to_string"), (Callable::mptr0)&List::to_string_);
         type->add_method(Name("pop"), (Callable::mptr0)&List::pop_);
         type->add_method(Name("empty"), (Callable::mptr0)&List::empty_);
         type->add_method(Name("size"), (Callable::mptr0)&List::size_);
         type->add_method(Name("at"), (Callable::mptr1)&List::at_);
         type->add_method(Name("add"), (Callable::mptr1)&List::add_);
+        type->add_method(Name("first"), (Callable::mptr0)&List::first_);
+        type->add_method(Name("all_before"), (Callable::mptr1)&List::all_before_);
+        type->add_method(Name("all_after"), (Callable::mptr1)&List::all_after_);
     }
 
     return type;
@@ -184,6 +188,30 @@ ObjP List::filter_(ObjP p)
     return *l;
 }
 
+ObjP List::each_(ObjP p)
+{
+    static const MiniCode::Op ops[] = {
+        PR_MC_PUSH(0)
+        PR_MC_OP1(NextItemOrGoto, 6)
+        PR_MC_ARG()
+        PR_MC_PUSH(1)
+        PR_MC_CALL_CALL()
+        PR_MC_GOTO(0)
+        // 6
+        PR_MC_NULL()
+        PR_MC_END()
+    };
+
+    MiniCode* mc = new MiniCode(ops);
+    mc->objects.push_back(*this);
+    mc->objects.push_back(p);
+    mc->counter = 0;
+
+    get_executor()->emit(mc);
+
+    return error_object();
+}
+
 ObjP List::pop_()
 {
     if (items.empty())
@@ -221,5 +249,34 @@ ObjP List::add_(ObjP p)
     for (int i = 0; i < (int)l->items.size(); i++)
         l2->append(l->items[i]);
 
+    return *l2;
+}
+
+ObjP List::first_()
+{
+    if (items.empty())
+        throw new Exception("empty_list", *this);
+    return items[0];
+}
+
+ObjP List::all_before_(ObjP p)
+{
+    int i = int_value(p);
+    if (i < 0 || i > (int)items.size())
+        throw new Exception("out_of_range", p);
+    List* l2 = new List();
+    for (int j = 0; j < i; j++)
+        l2->append(items[j]);
+    return *l2;
+}
+
+ObjP List::all_after_(ObjP p)
+{
+    int i = int_value(p);
+    if (i < 0 || i > (int)items.size())
+        throw new Exception("out_of_range", p);
+    List* l2 = new List();
+    for (int j = i; j < (int)items.size(); j++)
+        l2->append(items[j]);
     return *l2;
 }

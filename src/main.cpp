@@ -17,48 +17,47 @@ using namespace pr;
 
 static void execute_file(const char* fn, List* args)
 {
-            Frame* frame;
+    Frame* frame;
 
-            {
-                File* f = new File(fn);
-                PR_LOCAL_REF(f);
+    {
+        File* f = new File(fn);
 
-                String* s = f->read_file();
-                PR_LOCAL_REF(s);
+        String* s = f->read_file();
 
-                Lexer* l = new Lexer(s);
-                PR_LOCAL_REF(l);
+        Lexer* l = new Lexer(s);
 
-                Parser* p = new Parser(l);
-                PR_LOCAL_REF(p);
+        Parser* p = new Parser(l);
 
-                AST* ast = p->get_ast();
-                PR_LOCAL_REF(ast);
+        AST* ast = p->get_ast();
 
-                ast->debug_print();
-                std::cout << '\n';
+#if 0
+        ast->debug_print();
+        std::cout << '\n';
+#endif
 
-                Code* code = new Code(ast, false);
-                PR_LOCAL_REF(code);
-                code->debug_print();
-                std::cout << '\n';
+        Code* code = new Code(ast, false);
 
-                frame = new Frame(0, 0, code);
-                GC::add_root(frame);
+#if 0
+        code->debug_print();
+        std::cout << '\n';
+#endif
 
-                frame->set_local("std", *new Std());
-                frame->set_local("args", args ? (ObjP)*args : 0);
-            }
+        frame = new Frame(0, 0, code);
+        GC::add_root(frame);
 
-            {
-                executor = new Executor();
-                PR_LOCAL_REF(executor);
-                executor->set_frame(frame);
-                executor->execute();
-                executor = 0;
-            }
+        frame->set_local("std", *new Std());
+        frame->set_local("args", args ? (ObjP)*args : 0);
+    }
 
-            GC::del_root(frame);
+    {
+        executor = new Executor();
+        PR_LOCAL_REF(executor);
+        executor->set_frame(frame);
+        executor->execute();
+        executor = 0;
+    }
+
+    GC::del_root(frame);
 }
 
 int main(int argc, char* argv[])
@@ -73,7 +72,20 @@ int main(int argc, char* argv[])
         for (int i = 0; i < argc; i++)
             args->append(*new String(argv[i]));
 
-        execute_file("lib/main.puuro", args);
+        const char* main_file = "lib/main.puuro";
+
+        for (int i = 0; i < argc; i++)
+        {
+            if (strcmp(argv[i], "--main") == 0)
+            {
+                main_file = argv[++i];
+            }
+        }
+
+        if (!main_file)
+            throw new Exception("missing_main", 0);
+
+        execute_file(main_file, args);
 
         GC::gc();
     }
@@ -81,7 +93,8 @@ int main(int argc, char* argv[])
     {
         PR_LOCAL_REF(e);
         String* s = e->to_string();
-        std::cerr << "exception: " << s->get_data() << '\n';
+        std::cerr << "exception not catched: " << s->get_data() << '\n';
+        return 1;
     }
 
     return 0;

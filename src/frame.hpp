@@ -40,7 +40,17 @@ namespace pr
         ObjP set_local_(ObjP, ObjP);
         ObjP set_(ObjP, ObjP);
 
+        ObjP pollute_(ObjP p);
+
         ObjP set_exception_handler(ObjP);
+        ObjP get_exception_handler();
+
+        ObjP previous_();
+        ObjP caller_();
+        ObjP callee_();
+        ObjP code_();
+
+        ObjP cut_previous_();
 
     private:
         RefCount<Frame> previous;

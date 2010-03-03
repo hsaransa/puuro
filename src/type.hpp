@@ -13,6 +13,8 @@ namespace pr
 {
     class Type : public Object
     {
+        friend class Std;
+        friend class Frame;
     public:
         Type(Name n);
         virtual ~Type();
@@ -36,8 +38,6 @@ namespace pr
         Name name;
         std::map<Name, Callable> methods;
         // TODO: store Callable for call separately to speed it up
-
-        friend class Std;
 
         static Type* type;
     };

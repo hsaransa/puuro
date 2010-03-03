@@ -77,6 +77,7 @@ namespace pr
 #define PR_MC_FUNC1()     PR_MC_OP0(CallFunc1)
 #define PR_MC_END()       PR_MC_OP0(End)
 #define PR_MC_NULL()      PR_MC_OP0(PushNull)
+#define PR_MC_ARG()      PR_MC_OP0(Arg)
 #define PR_MC_CALL_CALL() PR_MC_OP0(CallCall)
 
     void deferred_method_call0(ObjP p, Name n);

@@ -45,13 +45,14 @@ Type* Std::get_type()
         type->add_method("apply", (Callable::mptr2)&Std::apply_);
         type->add_method("assoc", (Callable::mptr0)&Std::assoc_);
         type->add_method("try", (Callable::mptr2)&Std::try_);
-        type->add_method("caller", (Callable::mptr0)&Std::caller_);
+        type->add_method("active_frame", (Callable::mptr0)&Std::caller_);
         type->add_method("repeat", (Callable::mptr1)&Std::repeat_);
         type->add_method("iter", (Callable::mptr2)&Std::iter_);
         type->add_method("call_with_cloned_frame", (Callable::mptr1)&Std::call_with_cloned_frame);
         type->add_method("new_continuation", (Callable::mptr1)&Std::new_continuation_);
         type->add_method("raise", (Callable::mptr1)&Std::raise_);
         type->add_method("compile_file", (Callable::mptr1)&Std::compile_file_);
+        type->add_method("exception", (Callable::mptr2)&Std::exception_);
     }
     return type;
 }
@@ -327,4 +328,11 @@ ObjP Std::compile_file_(ObjP pp)
     Frame* frame = new Frame(0, 0, code);
 
     return *frame;
+}
+
+ObjP Std::exception_(ObjP a, ObjP b)
+{
+    if (!is_symbol(a))
+        throw new Exception("bad_type", a);
+    return *new Exception(symbol_to_name(a), b);
 }

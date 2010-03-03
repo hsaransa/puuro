@@ -26,6 +26,7 @@ namespace pr
 
     private:
         void call_method(Name n);
+        void handle_exception(Exception*);
 
         Frame* f;
     };

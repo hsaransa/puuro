@@ -33,6 +33,7 @@ namespace pr
         ObjP new_continuation_(ObjP p);
         ObjP raise_(ObjP);
         ObjP compile_file_(ObjP);
+        ObjP exception_(ObjP, ObjP);
 
         static Type* type;
     };

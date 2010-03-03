@@ -19,6 +19,9 @@ namespace pr
         String* to_string();
 
     private:
+        ObjP name_();
+        ObjP obj_();
+
         Name name;
         ObjP obj;
     };

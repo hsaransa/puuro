@@ -232,7 +232,7 @@ void Executor::execute()
                 Callable c = type->get_method(name);
 
                 if (c.type == Callable::NONE)
-                    throw new Exception(Name("bad_method"), arg);
+                    handle_exception(new Exception(Name("bad_method"), arg));
 
                 f->push(*new Method(p, c));
             }
@@ -251,8 +251,15 @@ void Executor::execute()
 
         case Code::Lookup:
             {
-                ObjP p = f->lookup(symbol_to_name(arg));
-                f->push(p);
+                try
+                {
+                    ObjP p = f->lookup(symbol_to_name(arg));
+                    f->push(p);
+                }
+                catch (Exception* e)
+                {
+                    handle_exception(e);
+                }
             }
             break;
 
@@ -357,22 +364,7 @@ void Executor::call_method(Name name)
     }
     catch (Exception* e)
     {
-        Frame* orig_frame = f;
-
-        Frame* ff = f;
-
-        while (ff && ff->exc_handler == 0)
-            ff = ff->caller.get();
-
-        if (!ff)
-            throw;
-
-        Frame* nf = new Frame(ff->previous.get(), 0, new Code());
-
-        set_frame(nf);
-
-        deferred_method_call2(ff->exc_handler, "call", *e, *orig_frame);
-
+        handle_exception(e);
         return;
     }
 
@@ -380,4 +372,23 @@ void Executor::call_method(Name name)
 
     if (ret != error_object())
         old_frame->push(ret);
+}
+
+void Executor::handle_exception(Exception* e)
+{
+    Frame* orig_frame = f;
+
+    Frame* ff = f;
+
+    while (ff && ff->exc_handler == 0)
+        ff = ff->caller.get();
+
+    if (!ff)
+        throw e;
+
+    Frame* nf = new Frame(ff->previous.get(), 0, new Code());
+
+    set_frame(nf);
+
+    deferred_method_call2(ff->exc_handler, "call", *e, *orig_frame);
 }
