@@ -325,7 +325,7 @@ ObjP Std::compile_file_(ObjP pp)
 
     AST* ast = p->get_ast();
 
-    ast->debug_print();
+    //ast->debug_print();
 
     Code* code = new Code(ast, false);
 

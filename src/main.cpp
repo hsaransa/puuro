@@ -27,7 +27,7 @@ static void execute_file(const char* fn, List* args)
         Parser* p = new Parser(l);
 
         AST* ast = p->get_ast();
-#if 1
+#if 0
         ast->debug_print();
         std::cout << '\n';
 #endif
@@ -38,7 +38,7 @@ static void execute_file(const char* fn, List* args)
         dec_ref(p);
 
         Code* code = new Code(ast, false);
-#if 1
+#if 0
         code->debug_print();
         std::cout << '\n';
 #endif

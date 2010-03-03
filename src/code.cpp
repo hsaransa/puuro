@@ -58,8 +58,6 @@ Code::Code(AST* ast, bool args)
         compile(ast);
 
     emit(Return);
-
-    debug_print();
 }
 
 Code::Code()
@@ -188,7 +186,6 @@ void Code::compile(AST* ast)
     case N_Integer:
     case N_Symbol:
     case N_String:
-        printf("%d\n", ast->get_position().line);
         emit(Push, ast->get_object());
         break;
 
