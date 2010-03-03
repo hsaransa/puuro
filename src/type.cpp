@@ -10,7 +10,7 @@ using namespace pr;
 
 static ObjP get_object_type(ObjP p)
 {
-    return *get_type(p);
+    return inc_ref(*get_type(p));
 }
 
 static ObjP obj_eq(ObjP p, ObjP a)
@@ -64,10 +64,13 @@ void Type::gc_mark()
 
 void Type::add_method(Name n, Callable c)
 {
+    methods[n] = c;
+#if 0
     std::map<Name, Callable>::iterator iter = methods.find(n);
     if (iter != methods.end())
         methods.erase(iter);
     methods.insert(std::make_pair(n, c));
+#endif
 }
 
 Callable Type::get_method(Name n)
@@ -109,6 +112,8 @@ ObjP Type::set_method_(ObjP n, ObjP c)
         throw new Exception(Name("bad_argument"), n);
 
     Name name = symbol_to_name(n);
+
+    inc_ref(c);
 
     add_method(name, c);
 

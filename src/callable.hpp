@@ -41,12 +41,7 @@ namespace pr
         Callable(mptr2 m) : type(METHOD2), method2(m) { }
         Callable(mptrx m) : type(METHODX), methodx(m) { }
         Callable(ObjP o) : type(OBJECT), obj(o) { inc_ref(obj); }
-        Callable(const Callable& c)
-        {
-            memcpy(this, &c, sizeof(*this));
-            if (type == OBJECT)
-                inc_ref(obj);
-        }
+        Callable(const Callable& c) { *this = c; }
 
         ~Callable() { if (type == OBJECT) dec_ref(obj); }
 
@@ -59,6 +54,13 @@ namespace pr
         {
             if (type == OBJECT)
                 GC::mark(obj);
+        }
+
+        void operator=(const Callable& c)
+        {
+            memcpy(this, &c, sizeof(*this));
+            if (type == OBJECT)
+                inc_ref(obj);
         }
 
         CallType type;
@@ -76,9 +78,6 @@ namespace pr
             mptrx methodx;
             ObjP obj;
         };
-
-    private:
-        void operator=(const Callable&) {}
     };
 }
 

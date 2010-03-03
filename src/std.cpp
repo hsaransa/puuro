@@ -194,7 +194,7 @@ ObjP Std::new_type_(ObjP p)
     if (!is_symbol(p))
         throw new Exception("bad_type", p);
     Type* t = new Type(symbol_to_name(p));
-    GC::del_root(t);
+    //GC::del_root(t);
     t->add_method("new", new_typed_object);
     t->add_method("unbox", (Callable::mptr0)&TypedObject::get_boxed_object_);
     t->add_method("box", (Callable::mptr1)&TypedObject::set_boxed_object_);

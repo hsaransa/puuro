@@ -42,7 +42,7 @@ namespace pr
         };
 
         MiniCode(const Op* ops)
-        :   ops(ops), pos(0)
+        :   ops(ops), pos(0), func0(0), func1(0), counter(0)
         {
         }
 
@@ -54,7 +54,13 @@ namespace pr
 
         MiniCode* clone()
         {
-            return new MiniCode(*this);
+            MiniCode* mc = new MiniCode(ops);
+            mc->objects  = objects;
+            mc->pos      = pos;
+            mc->func0    = func0;
+            mc->func1    = func1;
+            mc->counter  = counter;
+            return mc;
         }
 
     public:

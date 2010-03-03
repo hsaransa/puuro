@@ -3,7 +3,6 @@
 std.pollute std;
 
 puuro_executable = args.first;
-std.print "JELLY" args;
 
 args = args.all_after 1;
 

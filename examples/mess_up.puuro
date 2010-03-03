@@ -5,14 +5,16 @@ mess_up = {
     3.type.set_method 'add {<a, b> orig (orig.rcall a b)};
 };
 
-print "100 + 50 = " 100 + 50; # Prints 100 + 50 = 150
+std.print "100 + 50 = " 100 + 50; # Prints 100 + 50 = 150
 
 mess_up();
 
-print "100 + 50 = " 100 + 50; # Prints 100 + 50 = 153
+std.print "100 + 50 = " 100 + 50; # Prints 100 + 50 = 153
 
 mess_up();
-mess_up();
+
+std.print "100 + 50 = " 100 + 50; # Prints 100 + 50 = 159
+
 mess_up();
 
-print "100 + 50 = " 100 + 50; # Prints 100 + 50 = 195
+std.print "100 + 50 = " 100 + 50; # Prints 100 + 50 = 171

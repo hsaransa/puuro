@@ -3,6 +3,7 @@
 
 #include "prdefs.hpp"
 #include "object.hpp"
+#include "gc.hpp"
 
 namespace pr
 {
@@ -20,7 +21,7 @@ namespace pr
 
     private:
         Type* type;
-        ObjP object;
+        Ref<ObjP> object;
     };
 }
 

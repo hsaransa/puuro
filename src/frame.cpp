@@ -127,7 +127,7 @@ ObjP Frame::set_local_(ObjP n, ObjP v)
     if (!is_symbol(n))
         throw new Exception("bad_argument", n);
     set_local(symbol_to_name(n), v);
-    return v;
+    return inc_ref(v);
 }
 
 ObjP Frame::set_(ObjP n, ObjP v)
@@ -135,7 +135,7 @@ ObjP Frame::set_(ObjP n, ObjP v)
     if (!is_symbol(n))
         throw new Exception("bad_argument", n);
     set(symbol_to_name(n), v);
-    return v;
+    return inc_ref(v);
 }
 
 ObjP Frame::set_exception_handler_(ObjP e)
@@ -213,6 +213,8 @@ Frame* Frame::clone_continuation()
     Frame* f = new Frame(previous.get(),
                          caller.get() ? caller->clone_continuation() : 0,
                          code.get());
+    if (f->caller)
+        f->caller->callee = f;
 
     f->position = position;
 
@@ -222,6 +224,7 @@ Frame* Frame::clone_continuation()
 
     f->stack = stack;
     f->args = args;
+    f->exc_handler = exc_handler;
     f->ret = ret;
     f->in_execution = in_execution;
     f->locals = locals;

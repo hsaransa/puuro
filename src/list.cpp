@@ -195,7 +195,6 @@ ObjP List::each_(ObjP p)
     MiniCode* mc = new MiniCode(ops);
     mc->objects.push_back((ObjP)*this);
     mc->objects.push_back(p);
-    mc->counter = 0;
 
     get_executor()->emit(mc);
 

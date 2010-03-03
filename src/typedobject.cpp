@@ -57,11 +57,11 @@ String* TypedObject::cast_string()
 
 ObjP TypedObject::get_boxed_object_()
 {
-    return object;
+    return inc_ref(object);
 }
 
 ObjP TypedObject::set_boxed_object_(ObjP o)
 {
     object = o;
-    return o;
+    return inc_ref(o);
 }

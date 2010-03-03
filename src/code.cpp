@@ -58,6 +58,8 @@ Code::Code(AST* ast, bool args)
         compile(ast);
 
     emit(Return);
+
+    //debug_print();
 }
 
 Code::Code()
