@@ -21,6 +21,7 @@ namespace pr
 
         virtual Type* get_type();
         virtual void gc_mark();
+        virtual Frame* cast_frame();
 
         void set_local(Name n, ObjP p);
         void set(Name n, ObjP p);
@@ -75,6 +76,13 @@ namespace pr
 
         std::map<Name, Ref<ObjP> > locals;
     };
+
+    inline Frame* to_frame(ObjP p)
+    {
+        if (is_object(p))
+            return to_object(p)->cast_frame();
+        throw new Exception("bad_type", p);
+    }
 }
 
 #endif

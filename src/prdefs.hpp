@@ -24,6 +24,8 @@ namespace pr
     typedef unsigned long ObjP;
 
     template<typename T> class Ref;
+
+    typedef long long int int64;
 }
 
 #endif

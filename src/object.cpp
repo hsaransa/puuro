@@ -60,3 +60,8 @@ Exception* Object::cast_exception()
 {
     throw new Exception("bad_type", *this);
 }
+
+Frame* Object::cast_frame()
+{
+    throw new Exception("bad_type", *this);
+}

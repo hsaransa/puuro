@@ -19,6 +19,7 @@ namespace pr
         virtual List*      cast_list();
         virtual String*    cast_string();
         virtual Exception* cast_exception();
+        virtual Frame*     cast_frame();
 
         void increment_reference() { ref_count += 2; }
 

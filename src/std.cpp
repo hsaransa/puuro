@@ -14,6 +14,8 @@
 #include "lexer.hpp"
 #include "parser.hpp"
 #include "ast.hpp"
+#include "selector.hpp"
+#include "integer.hpp"
 #include <stdio.h>
 
 using namespace pr;
@@ -53,6 +55,7 @@ Type* Std::get_type()
         type->add_method("raise", (Callable::mptr1)&Std::raise_);
         type->add_method("compile_file", (Callable::mptr1)&Std::compile_file_);
         type->add_method("exception", (Callable::mptr2)&Std::exception_);
+        type->add_method("sleep", (Callable::mptr2)&Std::sleep_);
     }
     return type;
 }
@@ -339,4 +342,27 @@ ObjP Std::exception_(ObjP a, ObjP b)
     if (!is_symbol(a))
         throw new Exception("bad_type", a);
     return *new Exception(symbol_to_name(a), b);
+}
+
+static void wake_up(void*, ObjP c)
+{
+    Frame* f = to_frame(c);
+    f->push(0);
+    get_executor()->set_frame(f);
+}
+
+ObjP Std::sleep_(ObjP p, ObjP next)
+{
+    int64 ms = int_value(p);
+
+    Frame* f = next ? to_frame(next) : 0;
+
+    if (f)
+        f->push(0);
+
+    get_selector()->add_sleeper(ms*1000, wake_up, 0, *get_executor()->get_caller_frame());
+
+    get_executor()->set_frame(f);
+
+    return error_object();
 }

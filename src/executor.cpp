@@ -42,7 +42,7 @@ void Executor::emit(MiniCode* mc)
 
 void Executor::set_frame(Frame* nf)
 {
-    assert(!nf->callee.get()); // make sure it's not inside a call
+    assert(!nf || !nf->callee.get()); // make sure it's not inside a call
     f = nf;
 }
 
@@ -59,11 +59,6 @@ void Executor::execute()
     assert(!f->in_execution);
     //if (f->in_execution)
     //    throw new Exception(Name("already_in_execution"), *this);
-
-    f->in_execution = true;
-    f->position = 0;
-
-    GC::gc();
 
     while (f.get())
     {

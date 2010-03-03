@@ -94,6 +94,11 @@ void Frame::gc_mark()
         GC::mark(iter->second);
 }
 
+Frame* Frame::cast_frame()
+{
+    return this;
+}
+
 void Frame::set_local(Name n, ObjP p)
 {
     locals[n] = p;

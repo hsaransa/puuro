@@ -1,5 +1,6 @@
 #include "gc.hpp"
 #include "type.hpp"
+#include "selector.hpp"
 #include <stdio.h>
 
 using namespace pr;
@@ -108,6 +109,8 @@ void GC::force_gc()
     // Mark.
 
     alive_bit ^= 1;
+
+    get_selector()->gc_mark();
 
     {
         std::set<Type*>::iterator iter;

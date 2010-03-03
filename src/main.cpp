@@ -12,6 +12,7 @@
 #include "gc.hpp"
 #include "executor.hpp"
 #include "list.hpp"
+#include "selector.hpp"
 #include <stdio.h>
 
 using namespace pr;
@@ -64,7 +65,11 @@ static void execute_file(const char* fn, List* args)
     executor->set_frame(frame);
     dec_ref(frame);
 
-    executor->execute();
+    do {
+        executor->execute();
+        get_selector()->select();
+    } while (!get_selector()->empty() || executor->get_caller_frame());
+
     dec_ref(executor);
 
     GC::del_root(executor);

@@ -34,6 +34,7 @@ namespace pr
         ObjP raise_(ObjP);
         ObjP compile_file_(ObjP);
         ObjP exception_(ObjP, ObjP);
+        ObjP sleep_(ObjP, ObjP);
 
         static Type* type;
     };
