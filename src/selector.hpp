@@ -14,9 +14,9 @@ namespace pr
     class Selector
     {
     public:
-        static const int READ = 1;
-        static const int WRITE = 1;
-        static const int EXCEPT = 1;
+        static const int READ  = 1;
+        static const int WRITE = 2;
+        static const int ERROR = 4;
 
         typedef void (*callback_func)(void*, ObjP);
 
@@ -30,6 +30,7 @@ namespace pr
         int64 get_current_time();
 
         void add_sleeper(int64 us, callback_func cb, void* user, ObjP obj);
+        void add_watcher(int fd, int mask, callback_func cb, void* user, ObjP obj);
 
         void select();
 
@@ -41,6 +42,7 @@ namespace pr
             void* user;
             Ref<ObjP> obj;
 
+#if 0
             bool operator<(const Sleeper& b) const
             {
                 if (wake_time == b.wake_time)
@@ -48,9 +50,20 @@ namespace pr
                 else
                     return wake_time < b.wake_time;
             }
+#endif
+        };
+
+        struct Watcher
+        {
+            int fd;
+            int mask;
+            callback_func callback;
+            void* user;
+            Ref<ObjP> obj;
         };
 
         std::vector<Sleeper> sleepers;
+        std::vector<Watcher> watchers;
 
         struct pollfd* pollfds;
     };

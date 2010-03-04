@@ -172,3 +172,30 @@ int Lexer::next()
     yylval.obj = object;
     return current_token;
 }
+
+String* pr::read_file(const char* fn)
+{
+    FILE* fp = fopen(fn, "rb");
+    if (!fp)
+        throw new Exception(Name("file_lolled"), *new String(fn));
+
+    fseek(fp, 0, SEEK_END);
+    int size = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+
+    char* tmp = new char [size];
+
+    int n = fread(tmp, size, 1, fp);
+    fclose(fp);
+
+    if (n <= 0)
+    {
+        delete [] tmp;
+        throw new Exception(Name("file_lolled_2"), *new String(fn));
+    }
+
+    String* str = new String(tmp, size);
+    delete [] tmp;
+
+    return str;
+}

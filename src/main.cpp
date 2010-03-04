@@ -22,8 +22,7 @@ static void execute_file(const char* fn, List* args)
     Frame* frame;
 
     {
-        File* f = new File(fn);
-        String* s = f->read_file();
+        String* s = read_file(fn);
         Lexer* l = new Lexer(fn, s);
         Parser* p = new Parser(l);
 
@@ -33,7 +32,6 @@ static void execute_file(const char* fn, List* args)
         std::cout << '\n';
 #endif
 
-        dec_ref(f);
         dec_ref(s);
         dec_ref(l);
         dec_ref(p);

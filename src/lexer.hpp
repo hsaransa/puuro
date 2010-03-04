@@ -31,6 +31,8 @@ namespace pr
         Name file;
         int line;
     };
+
+    String* read_file(const char* fn);
 }
 
 #endif

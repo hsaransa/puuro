@@ -56,6 +56,7 @@ Type* Std::get_type()
         type->add_method("compile_file", (Callable::mptr1)&Std::compile_file_);
         type->add_method("exception", (Callable::mptr2)&Std::exception_);
         type->add_method("sleep", (Callable::mptr2)&Std::sleep_);
+        type->add_method("file", (Callable::mptr0)&Std::file_);
     }
     return type;
 }
@@ -318,9 +319,7 @@ ObjP Std::compile_file_(ObjP pp)
 {
     String* fn = to_string(pp);
 
-    File* f = new File(fn->get_data());
-
-    String* s = f->read_file();
+    String* s = read_file(fn->get_data());
 
     Lexer* l = new Lexer(fn->get_data(), s);
 
@@ -365,4 +364,9 @@ ObjP Std::sleep_(ObjP p, ObjP next)
     get_executor()->set_frame(f);
 
     return error_object();
+}
+
+ObjP Std::file_()
+{
+    return *new File();
 }
