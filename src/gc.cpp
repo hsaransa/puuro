@@ -10,7 +10,7 @@ std::map<Object*, int> GC::roots;
 int GC::alive_bit;
 bool GC::in_progress;
 bool GC::blocked;
-bool GC::intensive_gc = false;
+bool GC::intensive_gc = true;
 
 static std::map<Type*, std::set<Object*> > objects;
 
@@ -88,7 +88,7 @@ int GC::get_object_count()
 
 void GC::gc()
 {
-    //if (magic_counter > 1024)
+    if (magic_counter > 1024 || intensive_gc)
         GC::force_gc();
 }
 

@@ -11,7 +11,7 @@
 using namespace pr;
 
 Object::Object(Type* t)
-:   ref_count(2)
+:   ref_count(1 << GC_BITS)
 {
     assert(t);
     GC::register_instance(t, this);

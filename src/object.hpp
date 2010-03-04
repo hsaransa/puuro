@@ -21,9 +21,9 @@ namespace pr
         virtual Exception* cast_exception();
         virtual Frame*     cast_frame();
 
-        void increment_reference() { ref_count += 2; }
+        void increment_reference() { ref_count += 1 << GC_BITS; }
 
-        inline int get_ref_count() const { return ref_count >> 1; }
+        inline int get_ref_count() const { return ref_count >> GC_BITS; }
 
         inline operator ObjP()
         {
@@ -42,7 +42,7 @@ namespace pr
         void destroy();
 
         // decrement_reference() is private for a reason, use dec_ref(obj) instead.
-        void decrement_reference() { ref_count -= 2; if (ref_count <= 1) destroy(); }
+        void decrement_reference() { ref_count -= 1 << GC_BITS; if (ref_count <= (1 << GC_BITS)-1) destroy(); }
 
     private:
         int ref_count; // NOTE: first bit is reserved for GC

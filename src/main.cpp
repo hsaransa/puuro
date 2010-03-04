@@ -66,7 +66,7 @@ static void execute_file(const char* fn, List* args)
     do {
         executor->execute();
         get_selector()->select();
-    } while (!get_selector()->empty() || executor->get_caller_frame());
+    } while (!get_selector()->empty() || executor->get_frame());
 
     dec_ref(executor);
 

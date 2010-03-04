@@ -22,11 +22,12 @@ namespace pr
 
         void emit(MiniCode* mc);
 
-        inline Frame* get_caller_frame() { return f; }
+        void handle_exception(Exception*);
+
+        inline Frame* get_frame() { return f; }
 
     private:
         void call_method(Name n);
-        void handle_exception(Exception*);
 
         Ref<Frame*> f;
     };

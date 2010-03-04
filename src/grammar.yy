@@ -1,5 +1,3 @@
-%defines
-
 %{
 #include "ast.hpp"
 #include "lexer.hpp"

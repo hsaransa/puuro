@@ -12,6 +12,7 @@ namespace pr
     {
     public:
         File();
+        File(const std::string& fn, int fd, Name mode);
         virtual ~File();
 
         virtual Type* get_type();

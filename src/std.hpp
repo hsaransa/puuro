@@ -21,11 +21,9 @@ namespace pr
         ObjP if_(List*);
         ObjP gc();
         ObjP while_(ObjP, ObjP);
-        ObjP types();
         ObjP new_type_(ObjP);
         ObjP apply_(ObjP, ObjP);
         ObjP assoc_();
-        ObjP try_(ObjP, ObjP);
         ObjP caller_();
         ObjP repeat_(ObjP);
         ObjP iter_(ObjP, ObjP);

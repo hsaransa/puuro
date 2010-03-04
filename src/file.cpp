@@ -97,7 +97,7 @@ static void read_cb(void* user, ObjP p)
 
 ObjP File::read_(ObjP p)
 {
-    Frame* f = get_executor()->get_caller_frame();
+    Frame* f = get_executor()->get_frame();
     int n = int_value(p);
 
     List* l = new List(3, (ObjP)*this, (ObjP)*f, p);

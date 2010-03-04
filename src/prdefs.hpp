@@ -26,6 +26,8 @@ namespace pr
     template<typename T> class Ref;
 
     typedef long long int int64;
+
+    static const int GC_BITS = 4;
 }
 
 #endif

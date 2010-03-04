@@ -48,6 +48,9 @@ namespace pr
         N_True,
         N_False,
         N_Null,
+        N_r,
+        N_w,
+        N_rw,
         N__MAX
     };
 

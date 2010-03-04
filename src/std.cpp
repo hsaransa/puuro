@@ -42,11 +42,10 @@ Type* Std::get_type()
         type->add_method("if", (Callable::mptrx)&Std::if_);
         type->add_method("gc", (Callable::mptr0)&Std::gc);
         type->add_method("while", (Callable::mptr2)&Std::while_);
-        type->add_method("types", (Callable::mptr0)&Std::types);
+        //type->add_method("types", (Callable::mptr0)&Std::types);
         type->add_method("new_type", (Callable::mptr1)&Std::new_type_);
         type->add_method("apply", (Callable::mptr2)&Std::apply_);
         type->add_method("assoc", (Callable::mptr0)&Std::assoc_);
-        type->add_method("try", (Callable::mptr2)&Std::try_);
         type->add_method("active_frame", (Callable::mptr0)&Std::caller_);
         type->add_method("repeat", (Callable::mptr1)&Std::repeat_);
         type->add_method("iter", (Callable::mptr2)&Std::iter_);
@@ -109,7 +108,7 @@ ObjP Std::struct_(ObjP)
 ObjP Std::pollute(ObjP obj)
 {
     Type* t = pr::get_type(obj);
-    Frame* f = get_executor()->get_caller_frame();
+    Frame* f = get_executor()->get_frame();
 
     std::map<Name, Callable>::iterator iter;
     for (iter = t->methods.begin(); iter != t->methods.end(); iter++)
@@ -174,6 +173,7 @@ ObjP Std::while_(ObjP a, ObjP b)
     return error_object();
 }
 
+#if 0
 ObjP Std::types()
 {
     List* l = new List();
@@ -186,6 +186,7 @@ ObjP Std::types()
 
     return *l;
 }
+#endif
 
 static ObjP new_typed_object(ObjP p, ObjP o)
 {
@@ -216,23 +217,9 @@ ObjP Std::assoc_()
     return *new Assoc();
 }
 
-ObjP Std::try_(ObjP a, ObjP b)
-{
-    get_executor()->get_caller_frame();
-
-    try
-    {
-        return method_call0(a, "call");
-    }
-    catch (Exception* e)
-    {
-        return method_call1(b, "call", *e);
-    }
-}
-
 ObjP Std::caller_()
 {
-    return inc_ref(*get_executor()->get_caller_frame());
+    return inc_ref(*get_executor()->get_frame());
 }
 
 ObjP Std::repeat_(ObjP c)
@@ -287,7 +274,7 @@ ObjP Std::iter_(ObjP s, ObjP c)
 
 ObjP Std::call_with_cloned_frame(ObjP p)
 {
-    Frame* f = get_executor()->get_caller_frame();
+    Frame* f = get_executor()->get_frame();
     Frame* cf = f->clone_continuation();
 
     deferred_method_call1(p, "call", *cf);
@@ -296,7 +283,7 @@ ObjP Std::call_with_cloned_frame(ObjP p)
 
 ObjP Std::new_continuation_(ObjP p)
 {
-    Frame* caller = get_executor()->get_caller_frame();
+    Frame* caller = get_executor()->get_frame();
     Frame* f = new Frame(caller->previous.get(), 0, new Code());
 
     get_executor()->set_frame(f);
@@ -359,7 +346,7 @@ ObjP Std::sleep_(ObjP p, ObjP next)
     if (f)
         f->push(0);
 
-    get_selector()->add_sleeper(ms*1000, wake_up, 0, *get_executor()->get_caller_frame());
+    get_selector()->add_sleeper(ms*1000, wake_up, 0, *get_executor()->get_frame());
 
     get_executor()->set_frame(f);
 

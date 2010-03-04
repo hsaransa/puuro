@@ -46,6 +46,9 @@ namespace
             MK_NAME(True)
             MK_NAME(False)
             MK_NAME(Null)
+            MK_NAME(r)
+            MK_NAME(w)
+            MK_NAME(rw)
 #undef MK_NAME
         }
 

@@ -2,6 +2,9 @@ import glob, os
 
 env = Environment()
 
+#env['YACC'] = 'byacc'
+env['YACCFLAGS'] = ['-d']
+
 refcount = int(ARGUMENTS.get('refcount', 1))
 gc = int(ARGUMENTS.get('gc', 1))
 
