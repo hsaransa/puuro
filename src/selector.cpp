@@ -105,6 +105,9 @@ void Selector::select()
             pollfds[i].events |= POLLERR;
     }
 
+    if (timeout < 0 && watchers.empty())
+        return;
+
     int n = poll(pollfds, watchers.size(), timeout);
 
     if (n < 0)
