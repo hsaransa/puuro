@@ -28,13 +28,19 @@ namespace pr
     private:
         ObjP set_filename_(ObjP);
         ObjP open_(ObjP);
+        ObjP socket_(ObjP, ObjP);
+        ObjP connect_(ObjP, ObjP);
         ObjP read_(ObjP);
         ObjP write_(ObjP);
         ObjP close_();
 
-        std::string filename;
         int fd;
-        Name mode;
+
+        std::string filename;
+        Name file_mode;
+
+        Name sock_domain;
+        Name sock_type;
     };
 }
 

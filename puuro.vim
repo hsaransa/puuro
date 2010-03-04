@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:	puuro
-" Maintainer:	Hannu Saransaari <hipo@nic.fi>
-" Last Change:	2004 Mar
+" Maintainer:	Hannu Saransaari <hsaransa@cc.hut.fi>
+" Last Change:	2009 Mar
 
 syn clear
 

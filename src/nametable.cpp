@@ -49,6 +49,11 @@ namespace
             MK_NAME(r)
             MK_NAME(w)
             MK_NAME(rw)
+            MK_NAME(inet)
+            MK_NAME(inet6)
+            MK_NAME(unix)
+            MK_NAME(stream)
+            MK_NAME(dgram)
 #undef MK_NAME
         }
 

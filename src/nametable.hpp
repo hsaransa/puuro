@@ -51,6 +51,11 @@ namespace pr
         N_r,
         N_w,
         N_rw,
+        N_unix,
+        N_inet,
+        N_inet6,
+        N_stream,
+        N_dgram,
         N__MAX
     };
 

@@ -1,0 +1,20 @@
+# Jelly
+
+done = \f;
+
+bg {
+    sock = std.file;
+    sock.socket 'inet 'stream;
+    sock.connect "74.125.77.104" 80;
+    sock.write "GET / HTTP/1.0\n\n";
+    print (sock.read 1024);
+    done = \t;
+};
+
+repeat
+{
+    print "Moi";
+    sleep 100;
+    !done;
+};
+

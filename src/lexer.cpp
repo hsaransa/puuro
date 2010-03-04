@@ -155,11 +155,30 @@ int Lexer::next()
         {
             p++;
             const char* s = p;
+
+            std::string ss;
+
             while (*p != '"' && p < end)
+            {
+                if (*p == '\\')
+                {
+                    p++;
+                    if (*p == 'n')
+                        ss += '\n';
+                    else
+                    {
+                        ss += '\\';
+                        ss += *p;
+                    }
+                }
+                else
+                    ss += *p;
+
                 p++;
+            }
 
             current_token = T_STRING;
-            object = (ObjP)*new String(s, p - s);
+            object = (ObjP)*new String(ss.c_str(), ss.length());
             dec_ref(object);
 
             if (p < end)
