@@ -63,12 +63,31 @@ int Lexer::next()
 
         if (*p == '#')
         {
-            while (*p != '\n' && p < end)
-                p++;
-            if (*p == '\n')
+            p++;
+            if (*p == '-')
             {
-                line++;
                 p++;
+                while (p < end)
+                {
+                    if (*p == '\n')
+                        line++;
+                    if (*p == '-' && *(p+1) == '#')
+                    {
+                        p+=2;
+                        break;
+                    }
+                    p++;
+                }
+            }
+            else
+            {
+                while (*p != '\n' && p < end)
+                    p++;
+                if (*p == '\n')
+                {
+                    line++;
+                    p++;
+                }
             }
             continue;
         }
