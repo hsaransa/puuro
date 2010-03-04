@@ -53,6 +53,7 @@ Type* List::get_type()
         type->add_method(Name("at"), (Callable::mptr1)&List::at_);
         type->add_method(Name("add"), (Callable::mptr1)&List::add_);
         type->add_method(Name("first"), (Callable::mptr0)&List::first_);
+        type->add_method(Name("second"), (Callable::mptr0)&List::second_);
         type->add_method(Name("all_before"), (Callable::mptr1)&List::all_before_);
         type->add_method(Name("all_after"), (Callable::mptr1)&List::all_after_);
     }
@@ -243,8 +244,15 @@ ObjP List::add_(ObjP p)
 ObjP List::first_()
 {
     if (items.empty())
-        throw new Exception("empty_list", *this);
+        throw new Exception("out_of_range", *this);
     return inc_ref(items[0]);
+}
+
+ObjP List::second_()
+{
+    if (items.size() < 2)
+        throw new Exception("out_of_range", *this);
+    return inc_ref(items[1]);
 }
 
 ObjP List::all_before_(ObjP p)

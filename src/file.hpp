@@ -29,6 +29,8 @@ namespace pr
         ObjP set_filename_(ObjP);
         ObjP open_(ObjP);
         ObjP read_(ObjP);
+        ObjP write_(ObjP);
+        ObjP close_();
 
         std::string filename;
         int fd;
