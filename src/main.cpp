@@ -14,6 +14,7 @@
 #include "list.hpp"
 #include "selector.hpp"
 #include <stdio.h>
+#include <signal.h>
 
 using namespace pr;
 
@@ -76,6 +77,15 @@ static void execute_file(const char* fn, List* args)
 
 int main(int argc, char* argv[])
 {
+    // Ignore SIGPIPE.
+
+    struct sigaction act;
+    memset(&act, 0, sizeof(act));
+    act.sa_handler = SIG_IGN;
+    sigaction(SIGPIPE, &act, 0);
+
+    // Init something.
+
     init_primitive_types();
 
     // Parse command line.

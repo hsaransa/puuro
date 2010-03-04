@@ -255,6 +255,7 @@ static void write_cb(void*, ObjP p)
     int ret = write(file->get_fd(), data->get_data(), data->get_size());
     if (ret < 0)
     {
+        file->close();
         get_executor()->handle_exception(new Exception("system_error", int_to_fixnum(errno)));
         return;
     }
