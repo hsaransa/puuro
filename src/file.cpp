@@ -83,7 +83,7 @@ static void read_cb(void* user, ObjP p)
     List* l = to_object(p)->cast_list();
     File* file = (File*)to_object(l->get(0));
     Frame* frame = (Frame*)to_object(l->get(1));
-    int n = (int)user;
+    int n = reinterpret_cast<int>(user);
 
     char* buf = new char [n];
     int ret = read(file->get_fd(), buf, n);
