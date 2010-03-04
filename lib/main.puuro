@@ -2,12 +2,13 @@
 
 std.pollute std;
 
-puuro_executable = args.first;
-
-args = args.all_after 1;
-
-args.empty.then
+(args.size < 2).then
 { raise (exception 'not_enough_arguments "give more arguments to the program"); };
+
+puuro_executable = args.first;
+script_file      = args.second;
+
+args = args.all_after 2;
 
 eh = {<e, c>
     print c.current_file.s " line " c.current_line ": exception " e.name.s " with " e.obj;
@@ -18,6 +19,7 @@ execute = {<fn>
   std.active_frame.set_exception_handler eh;
   f.pollute std;
   f.set_local 'std std;
+  f.set_local 'args args;
   f.execute;
 };
 
@@ -28,4 +30,4 @@ execute = {<fn>
     execute lib_dir + "/" + x
 };
 
-args.each execute;
+execute script_file;

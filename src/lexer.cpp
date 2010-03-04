@@ -73,7 +73,7 @@ int Lexer::next()
                         line++;
                     if (*p == '-' && *(p+1) == '#')
                     {
-                        p+=2;
+                        p += 2;
                         break;
                     }
                     p++;
