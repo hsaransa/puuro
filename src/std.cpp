@@ -228,7 +228,8 @@ ObjP Std::repeat_(ObjP c)
     static const MiniCode::Op ops[] = {
         { MiniCode::Push, 0 },
         { MiniCode::Call, 1 },
-        { MiniCode::IfTrue, 0 },
+        { MiniCode::IfFalse, 4 },
+        { MiniCode::Goto, 0 },
         { MiniCode::Push, 2 },
         { MiniCode::End, 0 },
     };

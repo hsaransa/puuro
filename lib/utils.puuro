@@ -1,11 +1,28 @@
 # Weird features
 
 std.type.set_method 'multi
-{<m, s, *r>
+{<std, m, s, *r>
     std.print m " " s " " ;
     r.each
     {<l>
         s = std.apply s.type.get_method(m):rcall [s] + r;
     };
     s;
-}
+};
+
+
+std.type.set_method 'bg
+{<std, code>
+    act = \f;
+
+    std.new_continuation {<orig>
+        act = std.active_frame;
+
+        std.sleep 0 orig;
+
+        act = \f;
+        code();
+    };
+
+    act;
+};

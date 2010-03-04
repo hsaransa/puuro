@@ -1,0 +1,19 @@
+# File utils
+
+std.type.set_method 'read_file {<std, fn>
+    f = std.file;
+    f.set_filename fn;
+    f.open 'r;
+
+    s = "";
+
+    std.repeat
+    {
+        r = f.read 1024;
+        (r != \n).then {s = s + r};
+    };
+
+    f.close;
+
+    s;
+};

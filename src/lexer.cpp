@@ -113,6 +113,14 @@ int Lexer::next()
                 throw new Exception(Name("lexer_error"), int_to_fixnum(get_line()));
             break;
         }
+        else if (*p == '\\' && *(p+1) == 'n')
+        {
+            current_token = T_NULL;
+            p += 2;
+            if (isalpha(*p) || *p == '_')
+                throw new Exception(Name("lexer_error"), int_to_fixnum(get_line()));
+            break;
+        }
         else if (strchr("(){}[]<>:;,=+-*/.'!%|&", *p))
         {
             current_token = *p;

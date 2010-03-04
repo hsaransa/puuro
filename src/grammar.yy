@@ -38,7 +38,7 @@ static void yyerror(const char* err)
 }
 
 %term T_INTEGER T_IDENTIFIER T_STRING
-%term T_EQ T_NE T_LE T_GE T_TRUE T_FALSE
+%term T_EQ T_NE T_LE T_GE T_TRUE T_FALSE T_NULL
 
 %type <ast> expr_list expr_list2 expr term_expr arg_list param param_list
 %type <ast> call_expr add_expr assign_target assign_list comma_arg_list
@@ -175,6 +175,9 @@ term_expr:
 
 	T_FALSE
 	{ NODE($$, False); } |
+
+	T_NULL
+	{ NODE($$, Null); } |
 
 	'\'' T_IDENTIFIER
 	{ NODEO($$, Symbol, $2); } |
