@@ -11,7 +11,7 @@ class = {<name, code>
       c.type.set_method ("set_" + k.s).to_symbol {<obj, v> obj.unbox.set k v };
     };
 
-    f.set_local 'method {<name, code>
+    f.set_local 'def {<name, code>
         c.type.set_method name {<obj>
             ff = code.call_frame;
             ff.set_local 'self obj;
@@ -34,7 +34,7 @@ class 'lol
     var 'b;
     var 'c;
 
-    method 'sum { self.a + self.b + self.c };
+    def 'sum { self.a + self.b + self.c };
 };
 
 plop = new 'lol;

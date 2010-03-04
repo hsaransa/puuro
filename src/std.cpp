@@ -56,6 +56,7 @@ Type* Std::get_type()
         type->add_method("exception", (Callable::mptr2)&Std::exception_);
         type->add_method("sleep", (Callable::mptr2)&Std::sleep_);
         type->add_method("file", (Callable::mptr0)&Std::file_);
+        type->add_method("compile_string", (Callable::mptr1)&Std::compile_string_);
     }
     return type;
 }
@@ -309,6 +310,25 @@ ObjP Std::compile_file_(ObjP pp)
     String* s = read_file(fn->get_data());
 
     Lexer* l = new Lexer(fn->get_data(), s);
+
+    Parser* p = new Parser(l);
+
+    AST* ast = p->get_ast();
+
+    //ast->debug_print();
+
+    Code* code = new Code(ast, false);
+
+    Frame* frame = new Frame(0, 0, code);
+
+    return *frame;
+}
+
+ObjP Std::compile_string_(ObjP pp)
+{
+    String* fn = to_string(pp);
+
+    Lexer* l = new Lexer("<inline>", fn);
 
     Parser* p = new Parser(l);
 

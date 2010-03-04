@@ -21,7 +21,9 @@ execute = {<fn>
   f.execute;
 };
 
-["exceptions.puuro" "list.puuro"].each {<x>
+["exceptions.puuro"
+ "list.puuro"
+ "utils.puuro"].each {<x>
     execute lib_dir + "/" + x
 };
 

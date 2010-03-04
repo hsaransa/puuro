@@ -5,7 +5,7 @@
 #include "parser.hpp"
 #include "exception.hpp"
 #include "primitives.hpp"
-#include "grammar.h"
+#include "grammar.hh"
 #include "gc.hpp"
 #include "type.hpp"
 #include <stdio.h>

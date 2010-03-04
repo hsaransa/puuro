@@ -1,0 +1,11 @@
+# Weird features
+
+std.type.set_method 'multi
+{<m, s, *r>
+    std.print m " " s " " ;
+    r.each
+    {<l>
+        s = std.apply s.type.get_method(m):rcall [s] + r;
+    };
+    s;
+}
