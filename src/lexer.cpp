@@ -184,6 +184,14 @@ int Lexer::next()
                     p++;
                     if (*p == 'n')
                         ss += '\n';
+                    else if (*p == 'r')
+                        ss += '\r';
+                    else if (*p == 't')
+                        ss += '\t';
+                    else if (*p == '\\')
+                        ss += '\\';
+                    else if (*p == '"')
+                        ss += '"';
                     else
                     {
                         ss += '\\';
