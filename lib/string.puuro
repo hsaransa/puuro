@@ -17,7 +17,6 @@ t.set_method 'split {<src, s, *n>
             pos = src.find s;
             (pos >= 0)
             {
-                print "MUUSIKALA " pos " src " src;
                 l.append (src.all_before pos);
                 src = src.all_after (pos + s.len);
             };
