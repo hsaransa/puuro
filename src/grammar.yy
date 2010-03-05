@@ -188,6 +188,9 @@ term_expr:
 	term_expr '.' T_IDENTIFIER '(' comma_arg_list ')'
 	{ NODEO($$, CallMethod, $3); $$->add_child($1); $$->add_child($5); } |
 
+	term_expr '[' expr ']'
+	{ NODE2($$, GetItem, $1, $3); } |
+
 	'[' ']'
 	{ NODE1($$, List, NEW_AST(ArgList)); } |
 

@@ -218,6 +218,7 @@ void Code::compile(AST* ast)
     case N_NE:
     case N_GE:
     case N_LE:
+    case N_GetItem:
         compile(ch0);
         compile(ch1);
         emit(Arg);
@@ -236,6 +237,7 @@ void Code::compile(AST* ast)
             case N_NE: m = "ne"; break;
             case N_GE: m = "ge"; break;
             case N_LE: m = "le"; break;
+            case N_GetItem: m = "at"; break;
             }
             assert(m);
             emit(CallMethod, name_to_symbol(m));

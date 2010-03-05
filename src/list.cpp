@@ -51,6 +51,7 @@ Type* List::get_type()
         type->add_method(Name("empty"), (Callable::mptr0)&List::empty_);
         type->add_method(Name("size"), (Callable::mptr0)&List::size_);
         type->add_method(Name("at"), (Callable::mptr1)&List::at_);
+        type->add_method(Name("set"), (Callable::mptr2)&List::set_);
         type->add_method(Name("add"), (Callable::mptr1)&List::add_);
         type->add_method(Name("first"), (Callable::mptr0)&List::first_);
         type->add_method(Name("second"), (Callable::mptr0)&List::second_);
@@ -228,6 +229,15 @@ ObjP List::at_(ObjP p)
     if (i < 0 || i >= (int)items.size())
         throw new Exception("out_of_range", p);
     return inc_ref(items[i]);
+}
+
+ObjP List::set_(ObjP p, ObjP v)
+{
+    int i = int_value(p);
+    if (i < 0 || i >= (int)items.size())
+        throw new Exception("out_of_range", p);
+    items[i] = v;
+    return inc_ref(v);
 }
 
 ObjP List::add_(ObjP p)

@@ -54,6 +54,7 @@ namespace
             MK_NAME(unix)
             MK_NAME(stream)
             MK_NAME(dgram)
+            MK_NAME(GetItem)
 #undef MK_NAME
         }
 

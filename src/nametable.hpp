@@ -56,6 +56,7 @@ namespace pr
         N_inet6,
         N_stream,
         N_dgram,
+        N_GetItem,
         N__MAX
     };
 
