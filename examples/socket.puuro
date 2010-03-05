@@ -1,20 +1,32 @@
 # Jelly
 
+connect = {<ip, port, code>
+    bg {
+        sock = std.file;
+        sock.socket 'inet 'stream;
+        sock.connect ip port;
+
+        f = code.call_frame;
+        f.set_local 'write {<x> sock.write x };
+        f.set_local 'read {<x> sock.read x };
+        f.execute;
+
+        sock.close;
+    };
+};
+    
 done = \f;
 
-bg {
-    sock = std.file;
-    sock.socket 'inet 'stream;
-    sock.connect "74.125.77.104" 80;
-    sock.write "GET / HTTP/1.0\n\n";
-    print (sock.read 1024);
+connect "74.125.77.104" 80
+{
+    print "Connected!";
     done = \t;
+    write "GET / HTTP/1.0\n\n";
+    print (read 1024);
 };
 
-repeat
-{
-    print "Moi";
+repeat {
+    print "Waiting...";
     sleep 100;
     !done;
 };
-

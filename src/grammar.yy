@@ -67,9 +67,6 @@ expr_list2:
 	expr_list2 ';' expr
 	{ $$ = $1; $$->add_child($3); } |
 
-	expr_list2 expr
-	{ $$ = $1; $$->add_child($2); } |
-
 	expr_list2 ';'
 	{ $$ = $1; } |
 

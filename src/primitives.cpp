@@ -162,6 +162,7 @@ void pr::init_primitive_types()
     bool_type->add_method("not", bool_not);
     bool_type->add_method("if", bool_if);
     bool_type->add_method("then", bool_then);
+    bool_type->add_method("call", bool_then);
     bool_type->add_method("else", bool_else);
     bool_type->add_method("pick", bool_pick);
     bool_type->add_method("to_string", bool_s);

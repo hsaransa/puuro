@@ -41,3 +41,19 @@ std.type.set_method 'range {<std, s, e>
   l;
 };
 
+std.type.set_method 'min {<std, *l>
+    v = l.first;
+    (l.all_after 1).each {<x>
+        (x < v) { v = x };
+    };
+    v;
+};
+
+
+std.type.set_method 'max {<std, *l>
+    v = l.first;
+    (l.all_after 1).each {<x>
+        (x > v) { v = x };
+    };
+    v;
+};
