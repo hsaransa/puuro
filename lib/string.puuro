@@ -5,3 +5,26 @@ t = "".type;
 t.set_method 'length {<l> l.len };
 t.set_method 'size {<l> l.len };
 
+t.set_method 'split {<src, s, *n>
+    l = [];
+    i = 0;
+    limit = n.empty.if {256*256*256} {n[0]};
+
+    repeat
+    {
+        (i < limit)
+        {
+            pos = src.find s;
+            (pos >= 0)
+            {
+                print "MUUSIKALA " pos " src " src;
+                l.append (src.all_before pos);
+                src = src.all_after (pos + s.len);
+            };
+        };
+    };
+
+    l.append(src);
+
+    l;
+};

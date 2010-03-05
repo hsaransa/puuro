@@ -11,13 +11,11 @@ t.set_method 'to_string {<l>
 
     i = 0;
 
-    std.repeat
+    while {i < l.size}
     {
         (i != 0).then { s = s + " " };
         s = s + (l.at i).to_string;
-
         i = i + 1;
-        i < l.size;
     };
 
     s = s + "]";

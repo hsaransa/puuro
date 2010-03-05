@@ -104,7 +104,7 @@ namespace pr
     inline int fixnum_to_int(ObjP p)
     {
         assert(is_fixnum(p));
-        return p >> 1;
+        return (long)p >> 1;
     }
 
 #if 0

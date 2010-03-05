@@ -32,6 +32,9 @@ namespace pr
         ObjP len_();
         ObjP eq_(ObjP p);
         ObjP lt_(ObjP p);
+        ObjP find_(ObjP p);
+        ObjP all_before_(ObjP);
+        ObjP all_after_(ObjP);
         ObjP to_symbol_();
 
     private:

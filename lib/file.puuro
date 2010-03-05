@@ -17,3 +17,6 @@ std.type.set_method 'read_file {<std, fn>
 
     s;
 };
+
+std.type.set_method 'read_lines {<std, fn>
+};
