@@ -49,7 +49,6 @@ std.type.set_method 'min {<std, *l>
     v;
 };
 
-
 std.type.set_method 'max {<std, *l>
     v = l.first;
     (l.all_after 1).each {<x>
