@@ -1,0 +1,110 @@
+
+pipe = {<code>
+    f = code.call_frame;
+
+    milled_data = \n;
+
+    plucked_data = \n;
+
+    return = \n;
+
+    f.set_local 'mill {<x>
+        milled_data = x;
+
+        new_continuation {<orig>
+            f = orig;
+            return.continue 'mill;
+        };
+
+        milled_data = \n;
+    };
+
+    f.set_local 'pluck {
+        (\n == plucked_data)
+        {
+            new_continuation {<orig>
+                f = orig;
+                return.continue 'pluck;
+            };
+        };
+
+        ret = plucked_data;
+        plucked_data = \n;
+        ret;
+    };
+
+    {<val>
+        plucked_data = val;
+
+        act = new_continuation {<orig>
+            return = orig;
+            f.continue val;
+        };
+
+        [act milled_data];
+    };
+};
+
+start_pipe = {<*x>
+    i = 0;
+
+    value = \n;
+
+    repeat
+    {
+        ret = x[i](value);
+        #print "HERE " i " " ret;
+        (ret[0] == 'mill)  { i = i + 1; };
+        (ret[0] == 'pluck) { i = i - 1; };
+        value = ret[1];
+        \t;
+    };
+};
+
+# Test it
+
+output_numbers = pipe {
+    i = 1;
+    repeat {
+        mill i;
+        i = i + 1;
+        \t
+    }
+};
+
+mul_by_three = pipe {
+    repeat {
+        v = pluck() * 3;
+        mill v;
+    };
+};
+
+add_two_numbers = pipe {
+    repeat {
+        v = pluck() + pluck();
+        mill v;
+    };
+};
+
+slow_down = pipe {
+    repeat
+    {
+        v = pluck();
+        sleep 300;
+        mill v;
+    };
+};
+
+print_stuff = pipe {
+    repeat {
+        print pluck();
+    };
+};
+
+start_pipe
+    output_numbers
+    mul_by_three
+    add_two_numbers
+    slow_down
+    print_stuff;
+
