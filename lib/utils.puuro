@@ -27,3 +27,17 @@ std.type.set_method 'bg
 
     act;
 };
+
+std.type.set_method 'range {<std, s, e>
+  i = s;
+  l = [];
+
+  std.while {i <= e}
+  {
+      l.append i;
+      i = i + 1;
+  };
+
+  l;
+};
+

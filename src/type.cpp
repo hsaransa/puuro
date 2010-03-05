@@ -4,6 +4,7 @@
 #include "gc.hpp"
 #include "method.hpp"
 #include "string.hpp"
+#include "integer.hpp"
 #include <stdio.h>
 
 using namespace pr;
@@ -23,6 +24,11 @@ static ObjP obj_ne(ObjP p, ObjP a)
     return p != a ? true_object() : false_object();
 }
 
+static ObjP obj_id(ObjP p)
+{
+    return *new Integer(p);
+}
+
 Type* Type::type;
 
 Type::Type(Name n)
@@ -31,6 +37,7 @@ Type::Type(Name n)
     add_method(Name("type"), get_object_type);
     add_method(Name("eq"), obj_eq);
     add_method(Name("ne"), obj_ne);
+    add_method(Name("id"), obj_id);
 
     GC::add_root(this);
     GC::add_type(this);
