@@ -15,8 +15,8 @@ eh = {<e, c>
 };
 
 execute = {<fn>
-  f = compile_file fn;
   std.active_frame.set_exception_handler eh;
+  f = compile_file fn;
   f.pollute std;
   f.set_local 'std std;
   f.set_local 'args args;

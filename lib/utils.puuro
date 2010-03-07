@@ -5,7 +5,7 @@ std.type.set_method 'multi
     std.print m " " s " " ;
     r.each
     {<l>
-        s = std.apply s.type.get_method(m):rcall [s] + r;
+        s = std.apply (s.type.get_method m):rcall [s] + r;
     };
     s;
 };

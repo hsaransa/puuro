@@ -123,6 +123,7 @@ int main(int argc, char* argv[])
     }
     catch (Exception* e)
     {
+        std::cerr << "fatal exception\n";
         String* s = e->to_string();
         std::cerr << "exception not catched: " << s->get_data() << '\n';
         return 1;

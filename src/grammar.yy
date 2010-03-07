@@ -1,6 +1,7 @@
 %{
 #include "ast.hpp"
 #include "lexer.hpp"
+#include "list.hpp"
 #include <stdio.h>
 #include <stdexcept>
 
@@ -26,8 +27,10 @@ static int yylex()
 
 static void yyerror(const char* err)
 {
-    fprintf(stderr, "error on line %d: %s\n", yy_lexer->get_line(), err);
-    throw std::runtime_error("parse error");
+    throw new Exception("syntax_error",
+        (ObjP)*new List(2, name_to_symbol(Name(yy_file)), int_to_fixnum(yy_lexer->get_line())));
+    //fprintf(stderr, "syntax error in %s on line %d: %s\n", Name(yy_file).s(), yy_lexer->get_line(), err);
+    //throw std::runtime_error("parse error");
 }
 %}
 
@@ -188,9 +191,6 @@ term_expr:
 	term_expr '.' T_IDENTIFIER
 	{ NODEO($$, CallMethod, $3); $$->add_child($1); $$->add_child(NEW_AST(ArgList)); } |
 
-	term_expr '.' T_IDENTIFIER '(' comma_arg_list ')'
-	{ NODEO($$, CallMethod, $3); $$->add_child($1); $$->add_child($5); } |
-
 	term_expr '[' expr ']'
 	{ NODE2($$, GetItem, $1, $3); } |
 
@@ -216,9 +216,6 @@ term_expr:
 
 	'!' term_expr
 	{ NODE1($$, Not, $2); } |
-
-	term_expr '(' comma_arg_list ')'
-	{ NODE2($$, Call, $1, $3); } |
 
 	term_expr '(' ')'
 	{ NODE2($$, Call, $1, NEW_AST(ArgList)); }
