@@ -244,6 +244,11 @@ void Code::compile(AST* ast)
         }
         break;
 
+    case N_Neg:
+        compile(ch0);
+        emit(CallMethod, name_to_symbol("neg"));
+        break;
+
     case N_Not:
         compile(ch0);
         emit(CallMethod, name_to_symbol("not"));

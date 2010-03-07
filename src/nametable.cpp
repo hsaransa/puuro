@@ -55,6 +55,7 @@ namespace
             MK_NAME(stream)
             MK_NAME(dgram)
             MK_NAME(GetItem)
+            MK_NAME(Neg)
 #undef MK_NAME
         }
 

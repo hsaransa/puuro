@@ -136,6 +136,9 @@ add_expr:
 	mul_expr '-' add_expr
 	{ NODE2($$, Sub, $1, $3); } |
 
+	'-' add_expr
+	{ NODE1($$, Neg, $2); } |
+
 	mul_expr
 	{ $$ = $1; }
 	;
