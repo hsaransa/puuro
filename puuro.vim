@@ -5,7 +5,7 @@
 
 syn clear
 
-syn keyword xFunctions print new_continuation while if then else
+syn keyword xFunctions print new_continuation while if then else repeat
 "syn keyword xFunctions Bignum Exception File Fixnum Socke
 
 syn keyword xPredefined std
@@ -18,7 +18,8 @@ syn region xString start=/"/ skip=/\\"/ end=/"/
 syn cluster xParenGroup contains=xParenError
 
 syn region xCode transparent start="{" end="}" contains=ALL
-syn region xList transparent start="(" end=")" contains=ALL
+syn region xList transparent start="\[" end="\]" contains=ALL
+syn region xParen transparent start="(" end=")" contains=ALL
 
 syn match xSpecialVariable "\$"
 syn match xSpecialVariable "\$[cenr]"

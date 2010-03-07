@@ -36,6 +36,7 @@ namespace pr
         ObjP all_before_(ObjP);
         ObjP all_after_(ObjP);
         ObjP to_symbol_();
+        ObjP to_integer_();
 
     private:
         std::string data;

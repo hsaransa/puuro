@@ -44,3 +44,9 @@ t.set_method 'has {<l, v>
     l.each {<x> (x == v).then {ret = \t} };
     ret;
 };
+
+t.set_method 'mul {<l, t>
+    l2 = [];
+    t.times { l2.append l };
+    l2;
+};

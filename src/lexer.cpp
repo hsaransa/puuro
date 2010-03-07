@@ -173,7 +173,6 @@ int Lexer::next()
         else if (*p == '"')
         {
             p++;
-            const char* s = p;
 
             std::string ss;
 

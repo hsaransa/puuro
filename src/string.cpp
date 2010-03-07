@@ -44,6 +44,7 @@ Type* String::get_type()
         type->add_method("find", (Callable::mptr1)&String::find_);
         type->add_method("all_before", (Callable::mptr1)&String::all_before_);
         type->add_method("all_after", (Callable::mptr1)&String::all_after_);
+        type->add_method("to_integer", (Callable::mptr1)&String::to_integer_);
     }
 
     return type;
@@ -126,7 +127,7 @@ ObjP String::to_symbol_()
 ObjP String::find_(ObjP p)
 {
     String* s2 = to_string(p);
-    int end = (int)data.length() - (int)s2->get_size();
+    int end = (int)data.length() - (int)s2->get_size() + 1;
 
     for (int i = 0; i < end; i++)
     {
@@ -145,7 +146,7 @@ ObjP String::find_(ObjP p)
 ObjP String::all_before_(ObjP p)
 {
     int i = int_value(p);
-    if (i < 0 || i >= (int)data.length())
+    if (i < 0 || i > (int)data.length())
         throw new Exception("out_of_range", p);
 
     String* s2 = new String(data.c_str(), i);
@@ -155,9 +156,14 @@ ObjP String::all_before_(ObjP p)
 ObjP String::all_after_(ObjP p)
 {
     int i = int_value(p);
-    if (i < 0 || i >= (int)data.length())
+    if (i < 0 || i > (int)data.length())
         throw new Exception("out_of_range", p);
 
     String* s2 = new String(data.c_str()+i, (int)data.length()-i);
     return *s2;
+}
+
+ObjP String::to_integer_()
+{
+    return *new Integer(data.c_str());
 }

@@ -20,7 +20,6 @@ namespace pr
 
         int int_value();
 
-    private:
         ObjP to_string_();
         ObjP add_(ObjP);
         ObjP sub_(ObjP);
@@ -38,6 +37,7 @@ namespace pr
         ObjP is_true_();
         ObjP times_(ObjP);
 
+    private:
         long long int value;
 
         static Type* type;
@@ -64,6 +64,12 @@ namespace pr
             if (is_fixnum(p))
                 return fixnum_to_int(p);
         throw new Exception("bad_integer", p);
+    }
+
+    inline Integer* int_to_object(int i)
+    {
+        // TODO: make fixnum when possible
+        return new Integer(i);
     }
 }
 

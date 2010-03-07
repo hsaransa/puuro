@@ -4,6 +4,7 @@ t = "".type;
 
 t.set_method 'length {<l> l.len };
 t.set_method 'size {<l> l.len };
+t.set_method 'empty {<l> l.len == 0 };
 
 t.set_method 'split {<src, s, *n>
     l = [];

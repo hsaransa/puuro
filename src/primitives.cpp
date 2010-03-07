@@ -49,12 +49,15 @@ static ObjP symbol_eq(ObjP a, ObjP b)
 
 /* Fixnum methods. */
 
-#if 0
-static ObjP fixnum_add(ObjP a, ObjP b)
+static ObjP fixnum_eq(ObjP a, ObjP b)
 {
-    return *new Integer(fixnum_to_int(a))->add(b);
+    return (new Integer(fixnum_to_int(a)))->eq_(b);
 }
-#endif
+
+static ObjP fixnum_ne(ObjP a, ObjP b)
+{
+    return (new Integer(fixnum_to_int(a)))->ne_(b);
+}
 
 static ObjP fixnum_s(ObjP p)
 {
@@ -151,7 +154,8 @@ void pr::init_primitive_types()
 
     fixnum_type = new Type("fixnum");
     GC::add_root(fixnum_type);
-//    fixnum_type->add_method("add", fixnum_add);
+    fixnum_type->add_method("eq", fixnum_eq);
+    fixnum_type->add_method("ne", fixnum_ne);
     fixnum_type->add_method("to_string", fixnum_s);
     fixnum_type->add_method("bad_method", fixnum_bad_method);
 
