@@ -205,40 +205,46 @@ ObjP Std2Function::call_(List* l)
         j++;
     }
 
+    ObjP ret_obj;
+
     switch (ret_type.type)
     {
     case STD2_INT32:
         {
             int ret;
-            std2_call(module, function, (void*)&ret, args, params.size());
-            return int_to_object(ret);
+            std2_call(module, function, (void*)&ret, args);
+            ret_obj = int_to_object(ret);
+            break;
         }
 
     case STD2_INT64:
         {
             std2_int64 ret;
-            std2_call(module, function, (void*)&ret, args, params.size());
-            return *new Integer(ret);
+            std2_call(module, function, (void*)&ret, args);
+            ret_obj = *new Integer(ret);
+            break;
         }
 
     case STD2_C_STRING:
         {
             const char* ret;
-            std2_call(module, function, (void*)&ret, args, params.size());
+            std2_call(module, function, (void*)&ret, args);
             if (ret)
-                return *new String(ret);
+                ret_obj = *new String(ret);
             else
-                return 0;
+                ret_obj = 0;
+            break;
         }
 
     case STD2_INSTANCE:
         {
             void* ret;
-            std2_call(module, function, (void*)&ret, args, params.size());
+            std2_call(module, function, (void*)&ret, args);
             if (ret)
-                return *new Std2Instance(ret_type.module_id, ret_type.class_id, ret);
+                ret_obj = *new Std2Instance(ret_type.module_id, ret_type.class_id, ret);
             else
-                return 0;
+                ret_obj = 0;
+            break;
         }
         break;
 
@@ -246,7 +252,7 @@ ObjP Std2Function::call_(List* l)
         throw new Exception("unsupported_std2_type", 0);
     }
 
-    return 0;
+    return ret_obj;
 }
 
 /*
