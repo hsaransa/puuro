@@ -70,7 +70,7 @@ output_numbers = pipe {
     repeat {
         mill i;
         i = i + 1;
-        \t
+        i < 50;
     }
 };
 

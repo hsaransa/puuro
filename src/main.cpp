@@ -29,7 +29,7 @@ static void execute_file(const char* fn, List* args)
         Parser* p = new Parser(l);
 
         AST* ast = p->get_ast();
-#if 0
+#if 1
         ast->debug_print();
         std::cout << '\n';
 #endif

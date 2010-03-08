@@ -21,7 +21,6 @@ Lexer::Lexer(Name f, String* s)
 {
     assert(s);
     line = 1;
-    allow_uminus = false;
 }
 
 Lexer::~Lexer()
@@ -143,8 +142,11 @@ int Lexer::next()
         }
         else if (strchr("(){}[]<>:;,=+-*/.'!%|&", *p))
         {
-            if (*p == '-' && allow_uminus)
-                current_token = T_UMINUS;
+            if (*p == '(' && *(p+1) == ')')
+            {
+                p++;
+                current_token = T_EMPTY_PARENS;
+            }
             else
                 current_token = *p;
             p++;

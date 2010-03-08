@@ -42,9 +42,8 @@ static void yyerror(const char* err)
 
 %term T_INTEGER T_IDENTIFIER T_STRING
 %term T_EQ T_NE T_LE T_GE T_TRUE T_FALSE T_NULL
-%term T_UMINUS
+%term T_EMPTY_PARENS
 
-%left T_UMINUS
 %left T_EQ T_NE
 %left T_LE T_GE '<' '>'
 %left '-' '+'
@@ -95,14 +94,11 @@ expr:
 	{ $$ = $1; }
 	;
 
-uminus_on: { yy_lexer->set_allow_uminus(true); } ;
-uminus_off: { yy_lexer->set_allow_uminus(false); } ;
-
 call_expr:
 	top_expr
 	{ $$ = $1; } |
 
-	term_expr arg_list
+	top_expr arg_list
 	{ NODE2($$, Call, $1, $2); } |
 
 	term_expr '.' T_IDENTIFIER arg_list
@@ -149,9 +145,6 @@ infix_expr:
 	infix_expr '%' infix_expr
 	{ NODE2($$, Mod, $1, $3); } |
 
-	T_UMINUS infix_expr
-	{ NODE1($$, Neg, $2); } |
-
 	term_expr '[' expr ']'
 	{ NODE2($$, GetItem, $1, $3); } |
 
@@ -162,6 +155,9 @@ infix_expr:
 term_expr:
 	'(' expr ')'
 	{ $$ = $2; } |
+
+	'-' infix_expr
+	{ NODE1($$, Neg, $2); } |
 
 	T_INTEGER
 	{ NODEO($$, Integer, $1); } |
@@ -213,7 +209,7 @@ term_expr:
 	'!' term_expr
 	{ NODE1($$, Not, $2); } |
 
-	term_expr '(' ')'
+	term_expr T_EMPTY_PARENS
 	{ NODE2($$, Call, $1, NEW_AST(ArgList)); }
 	;
 

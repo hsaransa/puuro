@@ -26,7 +26,10 @@ Parser::Parser(Lexer* l)
     yy_file = l->get_file().id();
 
     yy_lexer = lexer.get();
+
+    //yy_ast = parse();
     yyparse();
+
     yy_lexer = 0;
 
     ast = yy_ast;
