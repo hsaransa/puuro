@@ -1,0 +1,16 @@
+
+print "MODULES " std2.list_modules;
+
+libc = std2.get_module 'libc;
+time = libc.get_function 'time;
+localtime = libc.get_function 'localtime;
+strftime = libc.get_function 'strftime;
+
+l = (localtime time.call);
+
+s = " "*128;
+
+pos = (strftime s "%F %T" l);
+s = s.all_before pos;
+print "now: " s;
+
