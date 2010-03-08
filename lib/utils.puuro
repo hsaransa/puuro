@@ -22,7 +22,7 @@ std.type.set_method 'bg
         std.sleep 0 orig;
 
         act = \f;
-        code();
+        code.call;
     };
 
     act;

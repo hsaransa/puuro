@@ -42,10 +42,17 @@ static void yyerror(const char* err)
 
 %term T_INTEGER T_IDENTIFIER T_STRING
 %term T_EQ T_NE T_LE T_GE T_TRUE T_FALSE T_NULL
+%term T_UMINUS
+
+%left T_UMINUS
+%left T_EQ T_NE
+%left T_LE T_GE '<' '>'
+%left '-' '+'
+%left '*' '/' '%'
 
 %type <ast> expr_list expr_list2 expr term_expr arg_list param param_list
-%type <ast> call_expr add_expr assign_target assign_list comma_arg_list
-%type <ast> mul_expr cmp_expr eq_expr top_expr sink_param
+%type <ast> call_expr  assign_target assign_list comma_arg_list
+%type <ast>  top_expr sink_param infix_expr
 
 %type <obj> T_INTEGER T_IDENTIFIER T_STRING
 
@@ -88,73 +95,65 @@ expr:
 	{ $$ = $1; }
 	;
 
+uminus_on: { yy_lexer->set_allow_uminus(true); } ;
+uminus_off: { yy_lexer->set_allow_uminus(false); } ;
+
 call_expr:
+	top_expr
+	{ $$ = $1; } |
+
 	term_expr arg_list
 	{ NODE2($$, Call, $1, $2); } |
 
 	term_expr '.' T_IDENTIFIER arg_list
-	{ NODEO($$, CallMethod, $3); $$->add_child($1); $$->add_child($4); } |
+	{ NODEO($$, CallMethod, $3); $$->add_child($1); $$->add_child($4); }
 
-	top_expr
-	{ $$ = $1; }
 	;
 
 top_expr:
-	eq_expr
+	infix_expr
 	{ $$ = $1; }
 	;
 
-eq_expr:
-	cmp_expr T_EQ cmp_expr
+infix_expr:
+	infix_expr T_EQ infix_expr
 	{ NODE2($$, Eq, $1, $3); } |
 
-	cmp_expr T_NE cmp_expr
+	infix_expr T_NE infix_expr
 	{ NODE2($$, NE, $1, $3); } |
 
-	cmp_expr
-	{ $$ = $1; }
-	;
-
-cmp_expr:
-	add_expr '<' add_expr
+	infix_expr '<' infix_expr
 	{ NODE2($$, LT, $1, $3); } |
 
-	add_expr '>' add_expr
+	infix_expr '>' infix_expr
 	{ NODE2($$, GT, $1, $3); } |
 
-	add_expr T_LE add_expr
+	infix_expr T_LE infix_expr
 	{ NODE2($$, LE, $1, $3); } |
 
-	add_expr T_GE add_expr
+	infix_expr T_GE infix_expr
 	{ NODE2($$, GE, $1, $3); } |
 
-	add_expr
-	{ $$ = $1; }
-	;
-
-add_expr:
-	mul_expr '+' add_expr
+	infix_expr '+' infix_expr
 	{ NODE2($$, Add, $1, $3); } |
 
-	mul_expr '-' add_expr
+	infix_expr '-' infix_expr
 	{ NODE2($$, Sub, $1, $3); } |
 
-	'-' add_expr
-	{ NODE1($$, Neg, $2); } |
-
-	mul_expr
-	{ $$ = $1; }
-	;
-
-mul_expr:
-	term_expr '*' mul_expr
+	infix_expr '*' infix_expr
 	{ NODE2($$, Mul, $1, $3); } |
 
-	term_expr '/' mul_expr
+	infix_expr '/' infix_expr
 	{ NODE2($$, Div, $1, $3); } |
 
-	term_expr '%' mul_expr
+	infix_expr '%' infix_expr
 	{ NODE2($$, Mod, $1, $3); } |
+
+	T_UMINUS infix_expr
+	{ NODE1($$, Neg, $2); } |
+
+	term_expr '[' expr ']'
+	{ NODE2($$, GetItem, $1, $3); } |
 
 	term_expr
 	{ $$ = $1; }
@@ -190,9 +189,6 @@ term_expr:
 
 	term_expr '.' T_IDENTIFIER
 	{ NODEO($$, CallMethod, $3); $$->add_child($1); $$->add_child(NEW_AST(ArgList)); } |
-
-	term_expr '[' expr ']'
-	{ NODE2($$, GetItem, $1, $3); } |
 
 	'[' ']'
 	{ NODE1($$, List, NEW_AST(ArgList)); } |

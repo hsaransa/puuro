@@ -9,6 +9,6 @@ func = {<a>
   a * b
 };
 
-print "returns " func(111);
+print "returns " (func 111);
 
 (continuation != \f).then { continuation.continue 7 };

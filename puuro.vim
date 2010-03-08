@@ -31,6 +31,8 @@ syn match xNumber "\d*\.\d\d*"
 
 syn match xSymbol "\'\h\w*"
 
+syn match xVariable "\h\w*"
+
 syn match xOperator "::"
 syn match xOperator "\."
 syn match xOperator "??"

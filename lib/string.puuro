@@ -28,3 +28,9 @@ t.set_method 'split {<src, s, *n>
 
     l;
 };
+
+t.set_method 'mul {<s, n>
+    ss = "";
+    n.times { ss = ss + s; };
+    ss;
+};

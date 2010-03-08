@@ -13,6 +13,7 @@
 #include "executor.hpp"
 #include "list.hpp"
 #include "selector.hpp"
+#include "std2.hpp"
 #include <stdio.h>
 #include <signal.h>
 
@@ -48,7 +49,9 @@ static void execute_file(const char* fn, List* args)
         dec_ref(code);
 
         Std* std = new Std();
+        Std2* std2 = new Std2();
         frame->set_local("std", *std);
+        frame->set_local("std2", *std2);
         frame->set_local("args", args ? (ObjP)*args : 0);
         String* lib_dir = new String(LIB_DIR);
         frame->set_local("lib_dir", *lib_dir);

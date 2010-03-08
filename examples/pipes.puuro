@@ -52,10 +52,12 @@ start_pipe = {<*x>
 
     repeat
     {
-        ret = x[i](value);
+        ret = (x[i] value);
         #print "HERE " i " " ret;
         (ret[0] == 'mill)  { i = i + 1; };
+        print "YS" (ret[0] == 'pluck);
         (ret[0] == 'pluck) { i = i - 1; };
+        print "YE";
         value = ret[1];
         \t;
     };
@@ -74,14 +76,14 @@ output_numbers = pipe {
 
 mul_by_three = pipe {
     repeat {
-        v = pluck() * 3;
+        v = pluck.call * 3;
         mill v;
     };
 };
 
 add_two_numbers = pipe {
     repeat {
-        v = pluck() + pluck();
+        v = pluck.call + pluck.call;
         mill v;
     };
 };
@@ -89,7 +91,7 @@ add_two_numbers = pipe {
 slow_down = pipe {
     repeat
     {
-        v = pluck();
+        v = pluck.call;
         sleep 300;
         mill v;
     };
@@ -97,7 +99,7 @@ slow_down = pipe {
 
 print_stuff = pipe {
     repeat {
-        print pluck();
+        print pluck.call;
     };
 };
 

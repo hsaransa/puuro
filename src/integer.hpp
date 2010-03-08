@@ -66,10 +66,10 @@ namespace pr
         throw new Exception("bad_integer", p);
     }
 
-    inline Integer* int_to_object(int i)
+    inline ObjP int_to_object(int i)
     {
         // TODO: make fixnum when possible
-        return new Integer(i);
+        return *new Integer(i);
     }
 }
 

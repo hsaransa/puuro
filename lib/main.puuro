@@ -19,6 +19,7 @@ execute = {<fn>
   f = compile_file fn;
   f.pollute std;
   f.set_local 'std std;
+  f.set_local 'std2 std2;
   f.set_local 'args args;
   f.execute;
 };
