@@ -42,13 +42,22 @@ void Executor::emit(MiniCode* mc)
 
 void Executor::set_frame(Frame* nf)
 {
-    assert(!nf || !nf->callee.get()); // make sure it's not inside a call
+    assert(!nf || (nf->state == Frame::READY || nf->state == Frame::IN_EXECUTION));
+
     f = nf;
+
+    if (f && f->state == Frame::READY)
+        f->state = Frame::IN_EXECUTION;
 }
 
 void Executor::call(Frame* nf)
 {
-    f->callee = nf;
+    assert(nf);
+    assert(nf->state == Frame::READY);
+    assert(f);
+    assert(f->state == Frame::IN_EXECUTION);
+
+    f->state = Frame::IN_CALL;
     nf->caller = f;
 
     set_frame(nf);
@@ -56,12 +65,13 @@ void Executor::call(Frame* nf)
 
 void Executor::execute()
 {
-    assert(!f->in_execution);
-    //if (f->in_execution)
-    //    throw new Exception(Name("already_in_execution"), *this);
+    if (f->state == Frame::READY)
+        f->state = Frame::IN_EXECUTION;
 
     while (f.get())
     {
+        assert(f->state == Frame::IN_EXECUTION);
+
         GC::gc();
 
         // Execute ExecOp.
@@ -206,10 +216,10 @@ void Executor::execute()
             // TODO: clean up, it's messy due to intensive debugging
             Frame* old = f;
 
-            f->in_execution = false;
+            f->state = Frame::FINISHED;
             Ref<ObjP> ret = f->ret;
 
-            assert(!f->caller || f->caller->callee == f);
+            assert(!f->caller || f->caller->state == Frame::IN_CALL);
 
             Ref<Frame*> nf = f->caller.get();
             old->caller.set(0);
@@ -218,7 +228,7 @@ void Executor::execute()
 
             if (f)
             {
-                f->callee.set(0);
+                f->state = Frame::IN_EXECUTION;
                 f->push(ret);
             }
 

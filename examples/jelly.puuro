@@ -3,7 +3,7 @@
 i = 0;
 j = 0;
 
-std.while {i<2000}
+std.while {i<200}
 {
     std.if j == 5
     {

@@ -37,6 +37,11 @@ void Exception::gc_mark()
     GC::mark(obj);
 }
 
+Exception* Exception::cast_exception()
+{
+    return this;
+}
+
 String* Exception::to_string()
 {
     String* s = new String(name.s());

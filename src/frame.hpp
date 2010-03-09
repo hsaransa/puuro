@@ -16,6 +16,14 @@ namespace pr
         friend class Executor;
         friend class Std;
     public:
+        enum State
+        {
+            READY,
+            IN_EXECUTION,
+            IN_CALL,
+            FINISHED
+        };
+
         Frame(Frame* prev, Frame* caller, Code* ast);
         virtual ~Frame();
 
@@ -48,8 +56,8 @@ namespace pr
 
         ObjP previous_();
         ObjP caller_();
-        ObjP callee_();
         ObjP code_();
+        ObjP state_();
 
         ObjP current_file_();
         ObjP current_line_();
@@ -59,8 +67,8 @@ namespace pr
     private:
         Ref<Frame*> previous;
         Ref<Frame*> caller;
-        Ref<Frame*> callee;
         Ref<Code*> code;
+        State state;
         int position;
 
         std::list<MiniCode*> minicode_stack;
@@ -71,8 +79,6 @@ namespace pr
         Ref<ObjP> exc_handler;
 
         Ref<ObjP> ret;
-
-        bool in_execution;
 
         std::map<Name, Ref<ObjP> > locals;
     };

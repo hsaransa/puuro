@@ -17,10 +17,10 @@ Frame::Frame(Frame* previous, Frame* caller, Code* code)
     previous(previous),
     caller(caller),
     code(code),
+    state(READY),
     position(0),
     exc_handler(0),
-    ret(0),
-    in_execution(false)
+    ret(0)
 {
     assert(code);
 }
@@ -53,8 +53,8 @@ Type* Frame::get_type()
         type->add_method("get_exception_handler", (Callable::mptr0)&Frame::get_exception_handler_);
         type->add_method("previous", (Callable::mptr0)&Frame::previous_);
         type->add_method("caller", (Callable::mptr0)&Frame::caller_);
-        type->add_method("callee", (Callable::mptr0)&Frame::callee_);
         type->add_method("code", (Callable::mptr0)&Frame::code_);
+        type->add_method("state", (Callable::mptr0)&Frame::state_);
         type->add_method("cut_previous", (Callable::mptr0)&Frame::cut_previous_);
         type->add_method("pollute", (Callable::mptr1)&Frame::pollute_);
         type->add_method("current_file", (Callable::mptr0)&Frame::current_file_);
@@ -69,8 +69,6 @@ void Frame::gc_mark()
         GC::mark(previous);
     if (caller)
         GC::mark(caller);
-    if (callee)
-        GC::mark(callee);
     GC::mark(code);
 
     for (int i = 0; i < (int)stack.size(); i++)
@@ -191,7 +189,7 @@ ObjP Frame::lookup(Name n)
 
 ObjP Frame::execute()
 {
-    if (in_execution)
+    if (state != READY)
         throw new Exception("execute_failed", *this);
 
     get_executor()->call(this);
@@ -200,28 +198,30 @@ ObjP Frame::execute()
 
 ObjP Frame::continue_(ObjP p)
 {
-//    if (!in_execution)
-//        throw new Exception("continue_failed", *this);
+    // TODO: strictly speaking, frame can only be continued if
+    // it is IN_EXECUTION
 
-    Frame* f = this;
-    while (f->callee)
-        f = f->callee.get();
+    if (state != READY && state != IN_EXECUTION)
+        throw new Exception("continue_failed", *this);
 
-    f->push(p);
-    get_executor()->set_frame(f);
+    state = IN_EXECUTION;
 
+    push(p);
+
+    get_executor()->set_frame(this);
     return error_object();
 }
 
 Frame* Frame::clone_continuation()
 {
+    // TODO: state of the first cloned frame shouldn't be IN_CALL or FINISHED
+
     Frame* f = new Frame(previous.get(),
                          caller.get() ? caller->clone_continuation() : 0,
                          code.get());
-    if (f->caller)
-        f->caller->callee = f;
 
     f->position = position;
+    f->state = state;
 
     std::list<MiniCode*>::iterator iter;
     for (iter = minicode_stack.begin(); iter != minicode_stack.end(); iter++)
@@ -231,7 +231,6 @@ Frame* Frame::clone_continuation()
     f->args = args;
     f->exc_handler = exc_handler;
     f->ret = ret;
-    f->in_execution = in_execution;
     f->locals = locals;
 
     return f;
@@ -247,14 +246,21 @@ ObjP Frame::caller_()
     return caller ? inc_ref(*caller.get()) : 0;
 }
 
-ObjP Frame::callee_()
-{
-    return callee ? inc_ref(*callee.get()) : 0;
-}
-
 ObjP Frame::code_()
 {
     return code ? inc_ref(*code.get()) : 0;
+}
+
+ObjP Frame::state_()
+{
+    switch (state)
+    {
+    case READY:        return name_to_symbol("ready");
+    case IN_EXECUTION: return name_to_symbol("in_execution");
+    case IN_CALL:      return name_to_symbol("in_call");
+    case FINISHED:     return name_to_symbol("finished");
+    }
+    return 0;
 }
 
 ObjP Frame::cut_previous_()

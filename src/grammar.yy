@@ -25,7 +25,7 @@ static int yylex()
 	return yy_lexer->next();
 }
 
-static void yyerror(const char* err)
+static void yyerror(const char*)
 {
     throw new Exception("syntax_error",
         (ObjP)*new List(2, name_to_symbol(Name(yy_file)), int_to_fixnum(yy_lexer->get_line())));

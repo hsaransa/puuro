@@ -16,6 +16,8 @@ namespace pr
         virtual Type* get_type();
         virtual void gc_mark();
 
+        virtual Exception* cast_exception();
+
         String* to_string();
 
     private:

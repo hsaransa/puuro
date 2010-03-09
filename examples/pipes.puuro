@@ -52,13 +52,13 @@ start_pipe = {<*x>
 
     repeat
     {
-        ret = (x[i] value);
+        ret = (x.at i) value;
         #print "HERE " i " " ret;
-        (ret[0] == 'mill)  { i = i + 1; };
+        (ret.first == 'mill)  { i = i + 1; };
         #print "YS" (ret[0] == 'pluck);
-        (ret[0] == 'pluck) { i = i - 1; };
+        (ret.first == 'pluck) { i = i - 1; };
         #print "YE";
-        value = ret[1];
+        value = ret.second;
         \t;
     };
 };

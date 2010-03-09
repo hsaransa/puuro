@@ -11,4 +11,7 @@ func = {<a>
 
 print "returns " (func 111);
 
-(continuation != \f).then { continuation.continue 7 };
+(continuation != \f).then {
+    print "continuation state " continuation.state;
+    continuation.continue 7;
+};
