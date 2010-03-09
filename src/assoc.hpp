@@ -21,6 +21,7 @@ namespace pr
         ObjP get_(ObjP);
         ObjP set_(ObjP, ObjP);
         ObjP copy_();
+        ObjP items_();
 
         std::map<Name, Ref<ObjP> > assoc;
     };

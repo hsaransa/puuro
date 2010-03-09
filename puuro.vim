@@ -5,7 +5,7 @@
 
 syn clear
 
-syn keyword xFunctions print new_continuation while if then else repeat
+syn keyword xFunctions print new_continuation while if then else repeat iter
 "syn keyword xFunctions Bignum Exception File Fixnum Socke
 
 syn keyword xPredefined std

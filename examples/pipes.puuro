@@ -55,9 +55,9 @@ start_pipe = {<*x>
         ret = (x[i] value);
         #print "HERE " i " " ret;
         (ret[0] == 'mill)  { i = i + 1; };
-        print "YS" (ret[0] == 'pluck);
+        #print "YS" (ret[0] == 'pluck);
         (ret[0] == 'pluck) { i = i - 1; };
-        print "YE";
+        #print "YE";
         value = ret[1];
         \t;
     };

@@ -48,6 +48,7 @@ static void yyerror(const char* err)
 %left T_LE T_GE '<' '>'
 %left '-' '+'
 %left '*' '/' '%'
+%left UMINUS
 
 %type <ast> expr_list expr_list2 expr term_expr arg_list param param_list
 %type <ast> call_expr  assign_target assign_list comma_arg_list
@@ -145,8 +146,14 @@ infix_expr:
 	infix_expr '%' infix_expr
 	{ NODE2($$, Mod, $1, $3); } |
 
-	term_expr '[' expr ']'
-	{ NODE2($$, GetItem, $1, $3); } |
+	//term_expr '[' expr ']'
+	//{ NODE2($$, GetItem, $1, $3); } |
+
+	'-' infix_expr
+	{ NODE1($$, Neg, $2); } |
+
+	'!' term_expr
+	{ NODE1($$, Not, $2); } |
 
 	term_expr
 	{ $$ = $1; }
@@ -155,9 +162,6 @@ infix_expr:
 term_expr:
 	'(' expr ')'
 	{ $$ = $2; } |
-
-	'-' infix_expr
-	{ NODE1($$, Neg, $2); } |
 
 	T_INTEGER
 	{ NODEO($$, Integer, $1); } |
@@ -205,9 +209,6 @@ term_expr:
 
 	'{' expr_list '}'
 	{ NODE2($$, Code, NEW_AST(ParamList), $2); } |
-
-	'!' term_expr
-	{ NODE1($$, Not, $2); } |
 
 	term_expr T_EMPTY_PARENS
 	{ NODE2($$, Call, $1, NEW_AST(ArgList)); }

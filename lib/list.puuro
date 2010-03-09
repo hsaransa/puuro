@@ -50,3 +50,20 @@ t.set_method 'mul {<l, t>
     t.times { l2.append l };
     l2;
 };
+
+t.set_method 'pop_first_matching {<l, f>
+    i = 0;
+    j = -1;
+
+    while {(i < l.size).and j < 0}
+    {
+        (f (l.at i)).then { j = i };
+        i = i + 1;
+    };
+
+    (j >= 0).then {
+        ret = l.at j;
+        l.erase_at j;
+        ret;
+    };
+};

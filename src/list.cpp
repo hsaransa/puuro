@@ -51,12 +51,14 @@ Type* List::get_type()
         type->add_method(Name("empty"), (Callable::mptr0)&List::empty_);
         type->add_method(Name("size"), (Callable::mptr0)&List::size_);
         type->add_method(Name("at"), (Callable::mptr1)&List::at_);
+        type->add_method(Name("call"), (Callable::mptr1)&List::at_);
         type->add_method(Name("set"), (Callable::mptr2)&List::set_);
         type->add_method(Name("add"), (Callable::mptr1)&List::add_);
         type->add_method(Name("first"), (Callable::mptr0)&List::first_);
         type->add_method(Name("second"), (Callable::mptr0)&List::second_);
         type->add_method(Name("all_before"), (Callable::mptr1)&List::all_before_);
         type->add_method(Name("all_after"), (Callable::mptr1)&List::all_after_);
+        type->add_method(Name("erase_at"), (Callable::mptr1)&List::erase_at_);
     }
 
     return type;
@@ -286,3 +288,15 @@ ObjP List::all_after_(ObjP p)
         l2->append(items[j]);
     return *l2;
 }
+
+ObjP List::erase_at_(ObjP p)
+{
+    int i = int_value(p);
+    if (i < 0 || i >= (int)items.size())
+        throw new Exception("out_of_range", p);
+
+    ObjP obj = inc_ref(items[i]);
+    items.erase(items.begin() + i);
+    return obj;
+}
+

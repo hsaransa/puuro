@@ -2,6 +2,7 @@
 #include "type.hpp"
 #include "gc.hpp"
 #include "string.hpp"
+#include "list.hpp"
 
 using namespace pr;
 
@@ -23,6 +24,7 @@ Type* Assoc::get_type()
         type->add_method("to_string", (Callable::mptr0)&Assoc::to_string_);
         type->add_method("get", (Callable::mptr1)&Assoc::get_);
         type->add_method("set", (Callable::mptr2)&Assoc::set_);
+        type->add_method("items", (Callable::mptr2)&Assoc::items_);
         //type->add_method("copy", (Callable::mptr0)&Assoc::copy_);
     }
     return type;
@@ -47,7 +49,7 @@ ObjP Assoc::get_(ObjP s)
     Name n = symbol_to_name(s);
     if (assoc.find(n) == assoc.end())
         throw new Exception("key_not_found", s);
-    return assoc[n];
+    return inc_ref(assoc[n]);
 }
 
 ObjP Assoc::set_(ObjP s, ObjP v)
@@ -55,9 +57,8 @@ ObjP Assoc::set_(ObjP s, ObjP v)
     if (!is_symbol(s))
         throw new Exception("bad_type", s);
     Name n = symbol_to_name(s);
-    inc_ref(v);
     assoc[n] = v;
-    return v;
+    return inc_ref(v);
 }
 
 ObjP Assoc::copy_()
@@ -67,4 +68,15 @@ ObjP Assoc::copy_()
     //for (int i = 0; i < 
 
     return *a;
+}
+
+ObjP Assoc::items_()
+{
+    List* l = new List();
+
+    std::map<Name, Ref<ObjP> >::iterator iter;
+    for (iter = assoc.begin(); iter != assoc.end(); iter++)
+        l->append(*new List(2, name_to_symbol(iter->first), iter->second.get()));
+
+    return *l;
 }
