@@ -10,7 +10,7 @@ std::map<Object*, int> GC::roots;
 int GC::alive_bit;
 bool GC::in_progress;
 bool GC::blocked;
-bool GC::intensive_gc = false;
+bool GC::intensive_gc = true;
 
 static std::map<Type*, std::set<Object*> > objects;
 

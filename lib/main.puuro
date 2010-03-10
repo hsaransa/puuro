@@ -11,7 +11,13 @@ script_file      = args.second;
 args = args.all_after 2;
 
 eh = {<e, c>
-    print c.current_file.s " line " c.current_line ": exception " e.name.s " with " e.obj;
+    print "exception: " e.name.s ", " e.obj;
+    print "trace:";
+    repeat {
+        print "  " c.current_file.s ", " c.current_line;
+        c = c.caller;
+        c != \n;
+    };
 };
 
 execute = {<fn>
@@ -20,6 +26,7 @@ execute = {<fn>
   f.pollute std;
   f.set_local 'std std;
   f.set_local 'std2 std2;
+  f.set_local 'resolver resolver;
   f.set_local 'args args;
   f.execute;
 };

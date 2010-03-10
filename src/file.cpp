@@ -7,6 +7,7 @@
 #include "executor.hpp"
 #include "frame.hpp"
 #include "integer.hpp"
+#include "sockaddr.hpp"
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
@@ -39,7 +40,7 @@ Type* File::get_type()
         type->add_method("set_filename", (Callable::mptr1)&File::set_filename_);
         type->add_method("open", (Callable::mptr1)&File::open_);
         type->add_method("socket", (Callable::mptr2)&File::socket_);
-        type->add_method("connect", (Callable::mptr2)&File::connect_);
+        type->add_method("connect", (Callable::mptr1)&File::connect_);
         type->add_method("read", (Callable::mptr1)&File::read_);
         type->add_method("write", (Callable::mptr1)&File::write_);
         type->add_method("close", (Callable::mptr0)&File::close_);
@@ -167,37 +168,19 @@ static void connect_cb(void*, ObjP p)
     frame->push(0);
 }
 
-ObjP File::connect_(ObjP a, ObjP b)
+ObjP File::connect_(ObjP a)
 {
-    String* s = to_string(a);
-    int port = int_value(b);
+    SockAddr* sa = cast_object<SockAddr*>(a);
 
-#if 0
-    int ip0, ip1, ip2, ip3, port;
-    if (sscanf(s->get_data(), "%d.%d.%d.%d:%d", &ip0, &ip1, &ip2, &ip3, &port) != 5)
-        throw new Exception("bad_inetaddr", a);
-#endif
-
-    if (sock_domain.id() != N_inet)
-        throw new Exception("not_implemented", 0);
-
-    struct sockaddr_in sin;
-    sin.sin_family = AF_INET;
-    sin.sin_port = htons(port);
-    sin.sin_addr.s_addr = inet_addr(s->get_data());
-
-    int ret = ::connect(fd, (struct sockaddr*)&sin, sizeof(sin));
-    if (ret < 0)
+    int ret = ::connect(fd, sa->get_sockaddr(), sa->get_sockaddr_size());
+    if (ret < 0 && errno == EINPROGRESS)
     {
-        if (errno == EINPROGRESS)
-        {
-            Frame* f = get_executor()->get_frame();
-            List* l = new List(4, (ObjP)*this, (ObjP)*f, a, b);
-            get_selector()->add_watcher(fd, Selector::WRITE, connect_cb, 0, *l);
-            dec_ref(l);
-            get_executor()->set_frame(0);
-            return error_object();
-        }
+        Frame* f = get_executor()->get_frame();
+        List* l = new List(3, (ObjP)*this, (ObjP)*f, a);
+        get_selector()->add_watcher(fd, Selector::WRITE, connect_cb, 0, *l);
+        dec_ref(l);
+        get_executor()->set_frame(0);
+        return error_object();
     }
 
     throw new Exception("system_error", int_to_fixnum(errno));

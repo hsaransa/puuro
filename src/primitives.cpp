@@ -91,15 +91,20 @@ static ObjP bool_s(ObjP p)
 
 static ObjP bool_and(ObjP a, ObjP b)
 {
-    assert(is_bool(a) && is_bool(b));
+    assert(is_bool(a));
+    if (!is_bool(b))
+        return a;
     return a == true_object() && b == true_object() ? true_object() : false_object();
 }
 
 static ObjP bool_or(ObjP a, ObjP b)
 {
-    assert(is_bool(a) && is_bool(b));
+    assert(is_bool(a));
+    if (!is_bool(b))
+        return a;
     return a == true_object() || b == true_object() ? true_object() : false_object();
 }
+
 static ObjP bool_not(ObjP p)
 {
     assert(is_bool(p));

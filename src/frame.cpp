@@ -283,10 +283,14 @@ ObjP Frame::pollute_(ObjP obj)
 
 ObjP Frame::current_file_()
 {
+    if (state == FINISHED)
+        return 0;
     return name_to_symbol(Name(code->get_position(position).file));
 }
 
 ObjP Frame::current_line_()
 {
+    if (state == FINISHED)
+        return 0;
     return int_to_fixnum(code->get_position(position).line);
 }

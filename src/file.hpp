@@ -29,7 +29,8 @@ namespace pr
         ObjP set_filename_(ObjP);
         ObjP open_(ObjP);
         ObjP socket_(ObjP, ObjP);
-        ObjP connect_(ObjP, ObjP);
+        ObjP connect_(ObjP);
+        ObjP bind_(ObjP, ObjP);
         ObjP read_(ObjP);
         ObjP write_(ObjP);
         ObjP close_();

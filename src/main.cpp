@@ -14,6 +14,7 @@
 #include "list.hpp"
 #include "selector.hpp"
 #include "std2.hpp"
+#include "resolver.hpp"
 #include <stdio.h>
 #include <signal.h>
 
@@ -50,8 +51,10 @@ static void execute_file(const char* fn, List* args)
 
         Std* std = new Std();
         Std2* std2 = new Std2();
+        Resolver* resolver = new Resolver();
         frame->set_local("std", *std);
         frame->set_local("std2", *std2);
+        frame->set_local("resolver", *resolver);
         frame->set_local("args", args ? (ObjP)*args : 0);
         String* lib_dir = new String(LIB_DIR);
         frame->set_local("lib_dir", *lib_dir);

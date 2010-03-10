@@ -56,3 +56,15 @@ std.type.set_method 'max {<std, *l>
     };
     v;
 };
+
+std.type.set_method 'all {<std, *l>
+    v = \t;
+    l.each {<x> v = v.and x};
+    v;
+};
+
+std.type.set_method 'any {<std, *l>
+    v = \f;
+    l.each {<x> v = v.or x};
+    v;
+};

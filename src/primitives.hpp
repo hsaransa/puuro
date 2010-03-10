@@ -114,6 +114,17 @@ namespace pr
     }
 #endif
 
+    template<typename T>
+    T cast_object(ObjP p)
+    {
+        if (!is_object(p))
+            throw new Exception("bad_type", p);
+        T t = dynamic_cast<T>(to_object(p));
+        if (!t)
+            throw new Exception("bad_type", p);
+        return t;
+    }
+
     void init_primitive_types();
 }
 

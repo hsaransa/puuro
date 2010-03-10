@@ -30,9 +30,9 @@ env.Append(CPPPATH=[STD2_DIR + '/include'])
 env.Append(LIBPATH=[STD2_DIR])
 env.Append(LIBS=['std2'])
 
-# adns
+# udns
 
-#env.Append(LIBS=['adns'])
+#env.Append(LIBS=['udns'])
 
 # Sources
 

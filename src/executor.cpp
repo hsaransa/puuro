@@ -438,7 +438,7 @@ void Executor::call_method(Name name)
 
 void Executor::handle_exception(Exception* e)
 {
-    Frame* orig_frame = f;
+    Ref<Frame*> orig_frame = f;
 
     Frame* ff = f;
 
@@ -452,5 +452,5 @@ void Executor::handle_exception(Exception* e)
 
     set_frame(nf);
 
-    deferred_method_call2(ff->exc_handler, "call", *e, *orig_frame);
+    deferred_method_call2(ff->exc_handler, "call", *e, *orig_frame.get());
 }
