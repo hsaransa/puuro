@@ -65,6 +65,9 @@ Code::Code(AST* ast, bool args)
 Code::Code()
 :   Object(get_type())
 {
+    tmp_filepos.file = Name("<none>").id();
+    tmp_filepos.line = 0;
+    emit(Return);
 }
 
 Code::~Code()

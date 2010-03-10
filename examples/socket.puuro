@@ -1,10 +1,13 @@
 # Jelly
 
-connect = {<ip, port, code>
+connect = {<host, port, code>
     bg {
+        addr = (resolver.resolve host).first;
+        addr.set_port port;
+
         sock = std.file;
         sock.socket 'inet 'stream;
-        sock.connect ip port;
+        sock.connect addr;
 
         f = code.call_frame;
         f.set_local 'write {<x> sock.write x };
@@ -17,7 +20,7 @@ connect = {<ip, port, code>
     
 done = \f;
 
-connect "74.125.77.104" 80
+connect "www.google.com" 80
 {
     print "Connected!";
     done = \t;
