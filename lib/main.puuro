@@ -2,15 +2,11 @@
 
 std.pollute std;
 
-(args.size < 2).then
-{ raise (exception 'not_enough_arguments "give more arguments to the program"); };
+(args.size < 2).then {
+    raise (exception 'not_enough_arguments "give more arguments to the program");
+};
 
-puuro_executable = args.first;
-script_file      = args.second;
-
-args = args.all_after 2;
-
-eh = {<e c>
+std.active_frame.set_exception_handler {<e c>
     print "exception: " e.name.s ", " e.obj;
     print "trace:";
     repeat {
@@ -20,9 +16,13 @@ eh = {<e c>
     };
 };
 
+puuro_executable = args.first;
+script_file      = args.second;
+
+args = args.all_after 2;
+
 execute = {<fn>
-  std.active_frame.set_exception_handler eh;
-  f = compile_file fn;
+  f = std.compile_file fn;
   f.pollute std;
   f.set_local 'std std;
   f.set_local 'std2 std2;
@@ -35,7 +35,8 @@ execute = {<fn>
  "list.puuro"
  "utils.puuro"
  "file.puuro"
- "string.puuro"].each {<x>
+ "string.puuro"
+ "streams.puuro"].each {<x>
     execute lib_dir + "/" + x
 };
 

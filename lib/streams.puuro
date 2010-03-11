@@ -1,0 +1,114 @@
+# Stream objects
+
+streamer_root = std.new_type 'streamer;
+
+t = streamer_root.type;
+
+t.set_method 'to_string {<s> "<stream>"};
+
+# replace set and get with getters and setters
+t.set_method 'set {<s k v>
+    s.unbox.set k v;
+};
+
+t.set_method 'get {<s k>
+    s.unbox.get k;
+};
+
+t.set_method 'start {<s>
+    s.activate;
+    assert ((s.get 'state) == 'ready) "tried to start stream that is not ready";
+    (s.unbox.get 'cont).continue \n;
+};
+
+t.set_method 'connect {<s t>
+    connect s t;
+};
+
+t.set_method 'activate {<s>
+    ((s.get 'state) == 'inactive).then
+    {
+        args = [];
+        args = args + (s.get 'ins);
+        args = args + (s.get 'outs);
+        args = args + (s.get 'args);
+
+        new_continuation
+        {<orig>
+            s.set 'state 'ready;
+            s.set 'cont (apply (s.get 'code):call_frame args);
+            orig.continue \n;
+        };
+    };
+};
+
+std.type.set_method 'streamer {<std *args f>
+    s = std.assoc;
+    s.set 'code f;
+    s.set 'args args;
+    s.set 'cont \n;
+    s.set 'ins [];
+    s.set 'outs [];
+    s.set 'state 'inactive;
+
+    streamer_root.new s;
+};
+
+connect = {<producer consumer>
+    (producer.get 'outs).append {<value>
+        consumer.activate;
+
+        switch (consumer.get 'state)
+            # If consumer is ready, push object and start consumer
+            'ready {
+                new_continuation {<orig>
+                    producer.set 'state 'wait_read;
+                    producer.set 'read_obj value;
+                    producer.set 'cont  orig;
+                    (consumer.get 'cont).continue \n;
+                };
+            }
+
+            # If consumer is waiting for object, continue directly at consumer
+            'wait_input {
+                new_continuation {<orig>
+                    producer.set 'state 'ready;
+                    producer.set 'cont  orig;
+                    (consumer.get 'cont).continue value;
+                };
+            }
+
+            # TODO: cycles may cause 'wait_read, what to do then?
+
+            { assert \f "TODODODO consumer state = " (consumer.get 'state); };
+    };
+
+    (consumer.get 'ins).append {
+        producer.activate;
+
+        ret = \n;
+
+        switch (producer.get 'state)
+            # If producer is ready, go get the input
+            'ready {
+                ret = new_continuation {<orig>
+                    consumer.set 'state 'wait_input;
+                    consumer.set 'cont  orig;
+                    (producer.get 'cont).continue \n;
+                };
+            }
+
+            # If producer already has an object, keep going.
+            'wait_read {
+                ret = producer.get 'read_obj;
+                producer.set 'state 'ready;
+                producer.set 'read_obj \n;
+            }
+
+            # TODO: cycles may cause 'wait_input, what to do then?
+
+            { assert \f "TODO TODO TODO producer state = " (producer.get 'state) };
+
+        ret;
+    };
+};
