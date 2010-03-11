@@ -6,7 +6,7 @@ t.set_method 'length {<l> l.len };
 t.set_method 'size {<l> l.len };
 t.set_method 'empty {<l> l.len == 0 };
 
-t.set_method 'split {<src, s, *n>
+t.set_method 'split {<src s *n>
     l = [];
     i = 0;
     limit = n.empty.if {256*256*256} {n[0]};
@@ -29,7 +29,7 @@ t.set_method 'split {<src, s, *n>
     l;
 };
 
-t.set_method 'mul {<s, n>
+t.set_method 'mul {<s n>
     ss = "";
     n.times { ss = ss + s; };
     ss;

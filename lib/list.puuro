@@ -21,7 +21,7 @@ t.set_method 'to_string {<l>
     s = s + "]";
 };
 
-t.set_method 'filter {<l, proc>
+t.set_method 'filter {<l proc>
     ret = [];
     i = 0;
 
@@ -39,19 +39,19 @@ t.set_method 'filter {<l, proc>
     ret;
 };
 
-t.set_method 'has {<l, v>
+t.set_method 'has {<l v>
     ret = \f;
     l.each {<x> (x == v).then {ret = \t} };
     ret;
 };
 
-t.set_method 'mul {<l, t>
+t.set_method 'mul {<l t>
     l2 = [];
     t.times { l2.append l };
     l2;
 };
 
-t.set_method 'pop_first_matching {<l, f>
+t.set_method 'pop_first_matching {<l f>
     i = 0;
     j = -1;
 

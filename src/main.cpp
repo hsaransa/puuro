@@ -28,6 +28,7 @@ static void execute_file(const char* fn, List* args)
         String* s = read_file(fn);
         Lexer* l = new Lexer(fn, s);
         Parser* p = new Parser(l);
+        p->parse();
 
         AST* ast = p->get_ast();
 #if 0

@@ -37,7 +37,6 @@ Type* Std::get_type()
     {
         type = new Type("std");
         type->add_method("print", (Callable::mptrx)&Std::print);
-        type->add_method("struct", (Callable::mptr1)&Std::struct_);
         type->add_method("pollute", (Callable::mptr1)&Std::pollute);
         type->add_method("if", (Callable::mptrx)&Std::if_);
         type->add_method("gc", (Callable::mptr0)&Std::gc);
@@ -99,11 +98,6 @@ ObjP Std::print(List* l)
     get_executor()->emit(mc);
 
     return error_object();
-}
-
-ObjP Std::struct_(ObjP)
-{
-    return 0;
 }
 
 ObjP Std::pollute(ObjP obj)
@@ -313,6 +307,7 @@ ObjP Std::compile_file_(ObjP pp)
     Lexer* l = new Lexer(fn->get_data(), s);
 
     Parser* p = new Parser(l);
+    p->parse();
 
     AST* ast = p->get_ast();
 
@@ -332,6 +327,7 @@ ObjP Std::compile_string_(ObjP pp)
     Lexer* l = new Lexer("<inline>", fn);
 
     Parser* p = new Parser(l);
+    p->parse();
 
     AST* ast = p->get_ast();
 

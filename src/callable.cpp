@@ -61,6 +61,7 @@ ObjP Callable::callx(ObjP obj, List* l)
     }
 
     assert(0);
+    return 0;
 }
 
 ObjP Callable::call0(ObjP obj)

@@ -19,10 +19,6 @@ namespace pr
         static void add_root(Object* obj);
         static void del_root(Object* obj);
 
-        // TODO: make temp roots O(1) (add and remove is structured)
-        static void add_temp_root(Object* obj);
-        static void del_temp_root(Object* obj);
-
         static void gc();
         static void force_gc();
 
@@ -30,12 +26,12 @@ namespace pr
 
         static inline void mark_alive(Object* obj)
         {
-            obj->ref_count = (obj->ref_count & ~1) | alive_bit;
+            obj->ref_count = (obj->ref_count & ~alive_mask) | alive_bits;
         }
 
         static inline bool is_marked(Object* obj)
         {
-            return !!((obj->ref_count & 1) == alive_bit);
+            return !!((obj->ref_count & alive_mask) == alive_bits);
         }
 
         static inline bool is_in_progress()
@@ -67,6 +63,9 @@ namespace pr
         static inline void mark(Object* p)
         {
             assert(p);
+#ifdef OUTPUT_GC_GRAPH
+            gc_graph_out << "n" << gc_parent << " -> n" << p << '\n';
+#endif
             if (!GC::is_marked(p))
             {
                 GC::mark_alive(p);
@@ -92,7 +91,8 @@ namespace pr
     private:
         static std::set<Type*> types;
         static std::map<Object*, int> roots;
-        static int alive_bit;
+        static int alive_bits;
+        static int alive_mask;
         static bool in_progress;
         static bool blocked;
         static bool intensive_gc;
@@ -184,6 +184,7 @@ namespace pr
         T obj;
     };
 
+#if 0
     class LocalRef
     {
     public:
@@ -215,6 +216,7 @@ namespace pr
 #define PUURO_CONCAT(a, b) a##b
 #define PUURO_MAKE_TEMP(l) PUURO_CONCAT(_local_ref_, l)
 #define PR_LOCAL_REF(var) LocalRef PUURO_MAKE_TEMP(__LINE__)(var);
+#endif
 }
 
 #endif

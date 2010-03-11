@@ -22,20 +22,6 @@ Parser::Parser(Lexer* l)
     ast(0)
 {
     assert(lexer);
-
-    yy_file = l->get_file().id();
-
-    yy_lexer = lexer.get();
-
-    //yy_ast = parse();
-    yyparse();
-
-    yy_lexer = 0;
-
-    ast = yy_ast;
-    dec_ref(yy_ast);
-
-    yy_ast = 0;
 }
 
 Parser::~Parser()
@@ -56,6 +42,21 @@ void Parser::gc_mark()
 {
     GC::mark(lexer);
     GC::mark(ast);
+}
+
+void Parser::parse()
+{
+    yy_file = lexer->get_file().id();
+    yy_lexer = lexer.get();
+
+    //yy_ast = parse();
+    yyparse();
+
+    yy_lexer = 0;
+
+    ast = yy_ast;
+    dec_ref(yy_ast);
+    yy_ast = 0;
 }
 
 AST* Parser::get_ast()

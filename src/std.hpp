@@ -16,7 +16,6 @@ namespace pr
 
     private:
         ObjP print(List*);
-        ObjP struct_(ObjP p);
         ObjP pollute(ObjP);
         ObjP if_(List*);
         ObjP gc();

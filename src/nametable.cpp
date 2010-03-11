@@ -69,6 +69,7 @@ NameTable::NameTable()
     for (int i = 1; i < N__MAX; i++)
     {
         int id = getId(standardIdToName(i));
+        (void)id;
         assert(id == i);
     }
 }

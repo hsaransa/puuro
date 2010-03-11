@@ -16,6 +16,7 @@ namespace pr
         virtual Type* get_type();
         virtual void gc_mark();
 
+        void parse();
         AST* get_ast();
 
     private:

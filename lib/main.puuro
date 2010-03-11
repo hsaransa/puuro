@@ -10,7 +10,7 @@ script_file      = args.second;
 
 args = args.all_after 2;
 
-eh = {<e, c>
+eh = {<e c>
     print "exception: " e.name.s ", " e.obj;
     print "trace:";
     repeat {

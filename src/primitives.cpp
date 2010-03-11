@@ -21,6 +21,7 @@ namespace pr
 
 static ObjP null_s(ObjP p)
 {
+    (void)p;
     assert(!p);
     return *new String("null");
 }

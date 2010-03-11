@@ -1,7 +1,7 @@
 # Weird features
 
 std.type.set_method 'multi
-{<std, m, s, *r>
+{<std m s *r>
     std.print m " " s " " ;
     r.each
     {<l>
@@ -12,7 +12,7 @@ std.type.set_method 'multi
 
 
 std.type.set_method 'bg
-{<std, code>
+{<std code>
     act = \f;
 
     std.new_continuation {<orig>
@@ -28,7 +28,7 @@ std.type.set_method 'bg
     act;
 };
 
-std.type.set_method 'range {<std, s, e>
+std.type.set_method 'range {<std s e>
   i = s;
   l = [];
 
@@ -41,7 +41,7 @@ std.type.set_method 'range {<std, s, e>
   l;
 };
 
-std.type.set_method 'min {<std, *l>
+std.type.set_method 'min {<std *l>
     v = l.first;
     (l.all_after 1).each {<x>
         (x < v) { v = x };
@@ -49,7 +49,7 @@ std.type.set_method 'min {<std, *l>
     v;
 };
 
-std.type.set_method 'max {<std, *l>
+std.type.set_method 'max {<std *l>
     v = l.first;
     (l.all_after 1).each {<x>
         (x > v) { v = x };
@@ -57,13 +57,13 @@ std.type.set_method 'max {<std, *l>
     v;
 };
 
-std.type.set_method 'all {<std, *l>
+std.type.set_method 'all {<std *l>
     v = \t;
     l.each {<x> v = v.and x};
     v;
 };
 
-std.type.set_method 'any {<std, *l>
+std.type.set_method 'any {<std *l>
     v = \f;
     l.each {<x> v = v.or x};
     v;

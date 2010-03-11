@@ -9,7 +9,7 @@ mint = {
     };
 
     c.type.set_method 'bad_method
-    {<obj, name, args>
+    {<obj name args>
         obj = obj.unbox;
 
         args = args.map {<x> (x.type.name == 'mint).if {x.unbox} {x} };

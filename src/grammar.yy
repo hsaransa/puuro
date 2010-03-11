@@ -264,7 +264,10 @@ param_list:
 	{ NODE1($$, ParamList, $1); } |
 
 	param_list ',' param
-	{ $$ = $1; $$->add_child($3); }
+	{ $$ = $1; $$->add_child($3); } |
+
+	param_list param
+	{ $$ = $1; $$->add_child($2); }
 	;
 
 %%

@@ -27,7 +27,7 @@ namespace pr
 
     typedef long long int int64;
 
-    static const int GC_BITS = 4;
+    static const int GC_BITS = 8;
 }
 
 #endif

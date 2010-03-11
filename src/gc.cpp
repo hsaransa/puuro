@@ -7,7 +7,8 @@ using namespace pr;
 
 std::set<Type*> GC::types;
 std::map<Object*, int> GC::roots;
-int GC::alive_bit;
+int GC::alive_bits;
+int GC::alive_mask;
 bool GC::in_progress;
 bool GC::blocked;
 bool GC::intensive_gc = true;
@@ -67,16 +68,6 @@ void GC::del_root(Object* obj)
     dec_ref(obj);
 }
 
-void GC::add_temp_root(Object* obj)
-{
-    add_root(obj);
-}
-
-void GC::del_temp_root(Object* obj)
-{
-    del_root(obj);
-}
-
 int GC::get_object_count()
 {
     int n = 0;
@@ -108,7 +99,8 @@ void GC::force_gc()
 
     // Mark.
 
-    alive_bit ^= 1;
+    alive_bits ^= 1;
+    alive_mask = (1 << GC_BITS) - 1;
 
     get_selector()->gc_mark();
 

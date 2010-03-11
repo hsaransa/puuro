@@ -1,6 +1,6 @@
 # File utils
 
-std.type.set_method 'read_file {<std, fn>
+std.type.set_method 'read_file {<std fn>
     f = std.file;
     f.set_filename fn;
     f.open 'r;
@@ -18,5 +18,5 @@ std.type.set_method 'read_file {<std, fn>
     s;
 };
 
-std.type.set_method 'read_lines {<std, fn>
+std.type.set_method 'read_lines {<std fn>
 };
