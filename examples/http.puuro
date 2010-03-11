@@ -1,0 +1,69 @@
+# TCP streamer returns output and input streams
+
+tcp_stream = {<host port>
+    sock = std.file;
+    sock.socket 'inet 'stream;
+    addr = (resolver.resolve host).first;
+    addr.set_port port;
+    sock.connect addr;
+
+    outs = streamer {<out>
+        repeat
+        {
+            s = sock.read 1024;
+            out s;
+            s != \n;
+        };
+        sock.close;
+    };
+
+    ins = streamer {<in>
+        repeat
+        {
+            s = in();
+            (s != \n).then { sock.write s };
+            s != \n;
+        };
+        sock.close;
+    };
+
+    [outs ins];
+};
+
+# HTTP streamer gets input and output of TCP streamer
+# and one additional output for data
+
+http_stream = {<magic>
+    streamer {<tcp_in, tcp_out, out>
+        tcp_out "GET / HTTP/1.0\r\n";
+        tcp_out "Host: " + magic + "\r\n";
+        tcp_out "\r\n";
+
+        repeat
+        {
+            s = tcp_in();
+            out s;
+        };
+    };
+};
+
+# This stremaer just prints chunks of data.
+
+output = streamer {<in>
+    repeat
+    {
+        s = in();
+        (s != \n).then { print "got chunk of " s.length " bytes" };
+    };
+};
+
+# Construct streaming pipe.
+
+tcp = tcp_stream "www.google.fi" 80;
+http = http_stream "www.google.fi";
+
+tcp.first.connect  http;
+http.connect       tcp.second;
+http.connect       output;
+
+http.start;
