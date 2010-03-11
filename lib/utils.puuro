@@ -68,3 +68,7 @@ std.type.set_method 'any {<std *l>
     l.each {<x> v = v.or x};
     v;
 };
+
+std.type.set_method 'assert {<std c *o>
+    c.else { raise (exception 'assertion_failed o); }
+};

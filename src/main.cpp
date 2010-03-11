@@ -133,6 +133,17 @@ int main(int argc, char* argv[])
         std::cerr << "fatal exception\n";
         String* s = e->to_string();
         std::cerr << "exception not catched: " << s->get_data() << '\n';
+
+        Frame* f = executor->get_frame();
+        if (!f)
+            std::cerr << "BUG in puuro: no current frame!\n";
+
+        while (f)
+        {
+            std::cerr << "TRACE " << f->get_current_file() << " line " << f->get_current_line() << '\n';
+            f = f->get_caller();
+        }
+
         return 1;
     }
 

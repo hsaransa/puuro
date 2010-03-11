@@ -1,0 +1,148 @@
+
+com_obj = {<f>
+    a = assoc();
+    a.set 'code f;
+    a.set 'cont \n;
+    a.set 'ins [];
+    a.set 'outs [];
+    a.set 'state 'ready;
+    a;
+};
+
+com = {<producer consumer *name>
+    obj = [];
+
+    (producer.get 'outs).append {<value>
+        #print "OUTPUT " name " " value;
+
+        ((consumer.get 'state) == 'wait_input).if {
+            new_continuation {<orig>
+                producer.set 'state 'ready;
+                producer.set 'cont  orig;
+                (consumer.get 'cont).continue value;
+            };
+        }
+        {
+            ((consumer.get 'state) == 'ready).if {
+                new_continuation {<orig>
+                    producer.set 'state 'wait_read;
+                    producer.set 'read_obj value;
+                    producer.set 'cont  orig;
+                    (consumer.get 'cont).continue \n;
+                };
+            }
+            {
+                assert \f "TODODODO consumer state = " (consumer.get 'state);
+            };
+        };
+    };
+
+    (consumer.get 'ins).append {
+        #print "INPUT " name;
+
+        # If producer is ready, go get the input
+
+        ret = \n;
+
+        ((producer.get 'state) == 'ready).if {
+            ret = new_continuation {<orig>
+                consumer.set 'state 'wait_input;
+                consumer.set 'cont  orig;
+                (producer.get 'cont).continue \n;
+            };
+        }
+        {
+            ((producer.get 'state) == 'wait_read).if {
+                ret = producer.get 'read_obj;
+                producer.set 'state 'ready;
+                producer.set 'read_obj \n;
+            }
+            {
+                assert \f "TODO TODO TODO procuder state = " (producer.get 'state);
+            };
+        };
+
+        ret;
+    };
+
+    obj;
+};
+
+activate = {<obj>
+    ((obj.get 'state) != 'ready).then { raise 'not_ready "com object is not ready" };
+
+    args = [];
+    args = args + (obj.get 'ins);
+    args = args + (obj.get 'outs);
+    new_continuation
+    {<orig>
+        obj.set 'cont (apply (obj.get 'code):call_frame args);
+        orig.continue \n;
+    };
+};
+
+go = {<obj>
+    (obj.get 'cont).continue \n;
+};
+
+# Test code
+
+gen1 = com_obj {<out>
+    i = 0;
+    repeat {
+        i = i + 1;
+        out i;
+        \t
+    };
+};
+
+gen2 = com_obj {<out>
+    i = 0;
+    repeat {
+        i = i + 2;
+        out i;
+        \t
+    };
+};
+
+mid = com_obj {<in1 in2 out1 out2>
+    i = 0;
+    repeat {
+        v = in1() + in2();
+        (v % 2 == 0).then { out1 v };
+        (v % 3 == 0).then { out2 v };
+
+        i = i + 1;
+        i < 12;
+    };
+    print "mid com exits now";
+};
+
+pr1 = com_obj {<in>
+    repeat {
+        print "divisible by two   " in();
+    }
+};
+
+pr2 = com_obj {<in>
+    repeat {
+        print "divisible by three " in();
+    }
+};
+
+# Last param is just for debugging
+com gen1 mid "gen1 -> mid";
+com gen2 mid "gen2 -> mid";
+com mid  pr1 "mid -> pr1";
+com mid  pr2 "mid -> pr2";
+
+activate gen1;
+activate gen2;
+activate mid;
+activate pr1;
+activate pr2;
+
+bg { go pr2; };
+
+print "main ends";
+

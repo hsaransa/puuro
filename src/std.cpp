@@ -40,6 +40,7 @@ Type* Std::get_type()
         type->add_method("pollute", (Callable::mptr1)&Std::pollute);
         type->add_method("if", (Callable::mptrx)&Std::if_);
         type->add_method("gc", (Callable::mptr0)&Std::gc);
+        type->add_method("gc_obj_count", (Callable::mptr0)&Std::gc_obj_count_);
         type->add_method("while", (Callable::mptr2)&Std::while_);
         //type->add_method("types", (Callable::mptr0)&Std::types);
         type->add_method("new_type", (Callable::mptr1)&Std::new_type_);
@@ -137,6 +138,11 @@ ObjP Std::gc()
 {
     GC::force_gc();
     return 0;
+}
+
+ObjP Std::gc_obj_count_()
+{
+    return int_to_fixnum(GC::get_object_count());
 }
 
 ObjP Std::while_(ObjP a, ObjP b)
@@ -281,6 +287,9 @@ ObjP Std::new_continuation_(ObjP p)
 {
     Frame* caller = get_executor()->get_frame();
     Frame* f = new Frame(caller->previous.get(), 0, new Code());
+
+    ObjP exc = caller->get_exception_handler_();
+    f->set_exception_handler_(exc);
 
     get_executor()->set_frame(f);
 

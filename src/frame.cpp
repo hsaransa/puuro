@@ -204,6 +204,12 @@ ObjP Frame::continue_(ObjP p)
     if (state != READY && state != IN_EXECUTION)
         throw new Exception("continue_failed", *this);
 
+    if (state == READY)
+    {
+        get_executor()->call(this);
+        return error_object();
+    }
+
     state = IN_EXECUTION;
 
     push(p);
@@ -279,6 +285,20 @@ ObjP Frame::pollute_(ObjP obj)
         f->set_local(iter->first, *new Method(obj, iter->second));
 
     return 0;
+}
+
+const char* Frame::get_current_file()
+{
+    if (state == FINISHED)
+        return 0;
+    return Name(code->get_position(position).file).s();
+}
+
+int Frame::get_current_line()
+{
+    if (state == FINISHED)
+        return 0;
+    return code->get_position(position).line;
 }
 
 ObjP Frame::current_file_()

@@ -42,6 +42,14 @@ namespace pr
 
         Frame* clone_continuation();
 
+        const char* get_current_file();
+        int get_current_line();
+
+        ObjP set_exception_handler_(ObjP);
+        ObjP get_exception_handler_();
+
+        Frame* get_caller() { return caller.get(); }
+
     private:
         ObjP lookup(Name n);
 
@@ -50,9 +58,6 @@ namespace pr
         ObjP set_(ObjP, ObjP);
 
         ObjP pollute_(ObjP p);
-
-        ObjP set_exception_handler_(ObjP);
-        ObjP get_exception_handler_();
 
         ObjP previous_();
         ObjP caller_();

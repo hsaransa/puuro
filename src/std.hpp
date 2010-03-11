@@ -19,6 +19,7 @@ namespace pr
         ObjP pollute(ObjP);
         ObjP if_(List*);
         ObjP gc();
+        ObjP gc_obj_count_();
         ObjP while_(ObjP, ObjP);
         ObjP new_type_(ObjP);
         ObjP apply_(ObjP, ObjP);
