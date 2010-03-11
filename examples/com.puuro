@@ -15,15 +15,8 @@ com = {<producer consumer *name>
     (producer.get 'outs).append {<value>
         #print "OUTPUT " name " " value;
 
-        ((consumer.get 'state) == 'wait_input).if {
-            new_continuation {<orig>
-                producer.set 'state 'ready;
-                producer.set 'cont  orig;
-                (consumer.get 'cont).continue value;
-            };
-        }
-        {
-            ((consumer.get 'state) == 'ready).if {
+        switch (consumer.get 'state)
+            'ready {
                 new_continuation {<orig>
                     producer.set 'state 'wait_read;
                     producer.set 'read_obj value;
@@ -31,36 +24,45 @@ com = {<producer consumer *name>
                     (consumer.get 'cont).continue \n;
                 };
             }
-            {
-                assert \f "TODODODO consumer state = " (consumer.get 'state);
-            };
-        };
+
+            'wait_input {
+                new_continuation {<orig>
+                    producer.set 'state 'ready;
+                    producer.set 'cont  orig;
+                    (consumer.get 'cont).continue value;
+                };
+            }
+
+            # TODO: cycles may cause 'wait_read, what to do then?
+
+            { assert \f "TODODODO consumer state = " (consumer.get 'state); };
     };
 
     (consumer.get 'ins).append {
         #print "INPUT " name;
 
-        # If producer is ready, go get the input
-
         ret = \n;
 
-        ((producer.get 'state) == 'ready).if {
-            ret = new_continuation {<orig>
-                consumer.set 'state 'wait_input;
-                consumer.set 'cont  orig;
-                (producer.get 'cont).continue \n;
-            };
-        }
-        {
-            ((producer.get 'state) == 'wait_read).if {
+        switch (producer.get 'state)
+            # If producer is ready, go get the input
+            'ready {
+                ret = new_continuation {<orig>
+                    consumer.set 'state 'wait_input;
+                    consumer.set 'cont  orig;
+                    (producer.get 'cont).continue \n;
+                };
+            }
+
+            # If producer already has an object, keep going.
+            'wait_read {
                 ret = producer.get 'read_obj;
                 producer.set 'state 'ready;
                 producer.set 'read_obj \n;
             }
-            {
-                assert \f "TODO TODO TODO procuder state = " (producer.get 'state);
-            };
-        };
+
+            # TODO: cycles may cause 'wait_input, what to do then?
+
+            { assert \f "TODO TODO TODO producer state = " (producer.get 'state) };
 
         ret;
     };
@@ -87,6 +89,7 @@ go = {<obj>
 
 # Test code
 
+# gen1 produces all numbers starting from 1
 gen1 = com_obj {<out>
     i = 0;
     repeat {
@@ -96,6 +99,7 @@ gen1 = com_obj {<out>
     };
 };
 
+# gen2 produces all numbers starting from 2
 gen2 = com_obj {<out>
     i = 0;
     repeat {
@@ -105,6 +109,8 @@ gen2 = com_obj {<out>
     };
 };
 
+# mid takes two numbers, sums them and produces mod2 numbers to out1 and mod3
+# numbers to out2
 mid = com_obj {<in1 in2 out1 out2>
     i = 0;
     repeat {
@@ -118,12 +124,14 @@ mid = com_obj {<in1 in2 out1 out2>
     print "mid com exits now";
 };
 
+# prints objects
 pr1 = com_obj {<in>
     repeat {
         print "divisible by two   " in();
     }
 };
 
+# prints objects, too
 pr2 = com_obj {<in>
     repeat {
         print "divisible by three " in();
@@ -142,7 +150,37 @@ activate mid;
 activate pr1;
 activate pr2;
 
-bg { go pr2; };
+bg { go gen2; };
+
+
+#-
+f0 = com_obj {<in, out>
+    out 17;
+    repeat {
+        v = in();
+        print "f0 got " v;
+        v = v / 2 + 1;
+        out v;
+    };
+};
+
+f1 = com_obj {<in, out>
+    repeat {
+        v = in();
+        print "f1 got " v;
+        v = v * 2;
+        out v;
+    };
+};
+
+com f0 f1;
+com f1 f0;
+
+activate f0;
+activate f1;
+
+bg { go f0; };
+-#
 
 print "main ends";
 

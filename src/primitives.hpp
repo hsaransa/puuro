@@ -96,15 +96,17 @@ namespace pr
     }
 #endif
 
-    inline ObjP int_to_fixnum(int i)
-    {
-        return (i << 1) | 1;
-    }
-
     inline int fixnum_to_int(ObjP p)
     {
         assert(is_fixnum(p));
         return (long)p >> 1;
+    }
+
+    inline ObjP int_to_fixnum(int i)
+    {
+        ObjP p = (i << 1) | 1;
+        assert(fixnum_to_int(p) == i);
+        return p;
     }
 
 #if 0

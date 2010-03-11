@@ -1,0 +1,13 @@
+f = {<v>
+    switch v
+        1 {"one"}
+        2 {"two"}
+        3 {"three"}
+        4 {"four"}
+          {"none"};
+};
+
+print 1 " -> " (f 1);
+print 3 " -> " (f 3);
+print 4 " -> " (f 4);
+print 7 " -> " (f 7);

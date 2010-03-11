@@ -72,3 +72,30 @@ std.type.set_method 'any {<std *l>
 std.type.set_method 'assert {<std c *o>
     c.else { raise (exception 'assertion_failed o); }
 };
+
+std.type.set_method 'switch {<std value *cases>
+    ret = \f;
+
+    repeat
+    {
+        (cases.len < 2).if
+        {
+            ret = cases.first();
+            cases = [];
+        }
+        {
+            (value == cases.first).if
+            {
+                ret = cases.second();
+                cases = [];
+            }
+            {
+                cases = cases.all_after 2;
+            };
+        };
+
+        !cases.empty;
+    };
+
+    ret;
+};
