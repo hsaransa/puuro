@@ -45,6 +45,7 @@ Type* String::get_type()
         type->add_method("find", (Callable::mptr1)&String::find_);
         type->add_method("all_before", (Callable::mptr1)&String::all_before_);
         type->add_method("all_after", (Callable::mptr1)&String::all_after_);
+        type->add_method("last", (Callable::mptr0)&String::last_);
         type->add_method("to_integer", (Callable::mptr1)&String::to_integer_);
     }
 
@@ -99,6 +100,16 @@ ObjP String::at(ObjP p)
         throw new Exception("out_of_range", p);
     char buf[2];
     buf[0] = data[v];
+    buf[1] = '\0';
+    return *new String(buf);
+}
+
+ObjP String::last_()
+{
+    if (data.empty())
+        throw new Exception("out_of_range", 0);
+    char buf[2];
+    buf[0] = data[data.length()-1];
     buf[1] = '\0';
     return *new String(buf);
 }

@@ -42,6 +42,10 @@ t.set_method 'activate {<s>
     };
 };
 
+t.set_method 'call {<s obj>
+    (s.get 'out) obj;
+};
+
 connect = {<producer consumer>
     (producer.get 'outs).append {<value>
         consumer.activate;
@@ -101,7 +105,7 @@ connect = {<producer consumer>
     };
 };
 
-make_stream = {<*args f>
+make_streamer = {<*args f>
     s = std.assoc;
     s.set 'code f;
     s.set 'args args;
@@ -112,6 +116,43 @@ make_stream = {<*args f>
     streamer_root.new s;
 };
 
+make_line_splitter = {
+    make_streamer {<in, out>
+        buf = "";
+        repeat
+        {
+            while {(buf.find "\n") >= 0}
+            {
+                l = buf.split "\n" 1;
+                s = l.first;
+                (s.last == "\r").then { s = s.all_before ((s.size) - 1) };
+                out s;
+                buf = l.second;
+            };
+            s = in();
+            (s != \n).then { buf = buf + s; };
+        };
+        out buf;
+    };
+};
+
+bidirectional_connect = {<a, b>
+    a.second.connect b.first;
+    b.second.connect a.first;
+};
+
+out_streamer = {<s2>
+    s = make_streamer {<out>
+        s.set 'out out;
+    };
+    s.connect s2;
+    s.start;
+    s;
+};
+
 module 'streams {
-    pollute 'streamer make_stream;
+    pollute 'streamer               make_streamer;
+    pollute 'out_streamer           out_streamer;
+    pollute 'bidirectional_connect  bidirectional_connect;
+    pollute 'line_splitter          make_line_splitter;
 };

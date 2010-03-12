@@ -1,0 +1,108 @@
+require 'streams 'net;
+
+irc_reader = {
+    s = streamer {<in, out>
+        repeat
+        {
+            line = in();
+
+            from = \n;
+
+            ((line.at 0) == ":").then {
+                l = line.split " " 1;
+                from = l.first;
+                line = l.second;
+            };
+
+            last = \n;
+
+            ((line.find ":") >= 0).then {
+                l = line.split ":" 1;
+                line = l.first;
+                last = l.second;
+            };
+
+            args = line.split " ";
+            (last != \n).then { args.append last };
+
+            cmd = args.pop_first;
+
+            out [from cmd args];
+
+            \t
+        };
+    };
+
+    ls = line_splitter();
+    ls.connect s;
+
+    [ls s];
+};
+
+irc_writer = {
+    s = streamer {<in, out>
+        repeat {
+            v = in();
+            print "SEND " v;
+            out v + "\n";
+        };
+    };
+
+    [s s];
+};
+
+irc_streamers = {
+    [irc_reader() irc_writer()];
+};
+
+decode_msg = {<a, b, c>
+    switch b
+        "PING"    { ['ping] }
+        "JOIN"    { ['join a c.first] }
+        "MODE"    { ['mode a] + c }
+        "PRIVMSG" { ['privmsg a c.first c.second] }
+        "ERROR"   { ['error c.first] }
+        "NOTICE"  { ['notice a c.first c.second] }
+                  { ['other a b c] };
+};
+
+irc_client = {<host, port, *l>
+    tcp = tcp_streamers host port;
+    irc = irc_streamers();
+
+    tcp.second.connect irc.first.first;
+    irc.second.second.connect tcp.first;
+
+    client_in = streamer {<in>
+        repeat {
+            m = std.apply decode_msg in();
+            k = m.pop_first;
+
+            i = 0;
+         
+            while {i<l.size}
+            {
+                ((l.at i) == k).then { std.apply (l.at i + 1) m };
+                i = i + 2;
+            };
+
+            \t;
+        }
+    };
+
+    irc.first.second.connect client_in;
+
+    client_out = out_streamer irc.second.first;
+
+    bg { client_in.start; };
+
+    client_out;
+};
+
+module 'irc
+{
+    pollute 'irc_reader irc_reader;
+    pollute 'irc_writer irc_writer;
+    pollute 'irc_streamers irc_streamers;
+    pollute 'irc_client irc_client;
+};

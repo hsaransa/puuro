@@ -36,6 +36,7 @@ namespace pr
         ObjP find_(ObjP p);
         ObjP all_before_(ObjP);
         ObjP all_after_(ObjP);
+        ObjP last_();
         ObjP to_symbol_();
         ObjP to_integer_();
 

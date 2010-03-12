@@ -11,8 +11,6 @@ start_web_server = {<port, client_code>
     f.bind addr;
     f.listen 5;
 
-    print "listening " addr;
-
     repeat {
         c = f.accept.first;
         bg { handle_client c client_code };

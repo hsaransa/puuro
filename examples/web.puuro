@@ -2,8 +2,20 @@ require 'web;
 
 web_server 1234
 {<in out>
-    print "Got a client";
-    print in() in();
+    path = in();
+    headers = in();
+
+    print "Hei " path;
+
+    (path != "/")
+    {
+        out "HTTP/1.0 404 File not found\r\n";
+        out "Content-type: text/html\r\n";
+        out "\r\n";
+        out "File not found.\r\n";
+        out \n;
+        raise (exception 'failed 0);
+    };
 
     out "HTTP/1.0 200 OK\r\n";
     out "Content-type: text/html\r\n";

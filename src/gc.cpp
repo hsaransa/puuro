@@ -11,7 +11,7 @@ int GC::alive_bits;
 int GC::alive_mask;
 bool GC::in_progress;
 bool GC::blocked;
-bool GC::intensive_gc = true;
+bool GC::intensive_gc = false;
 
 static std::map<Type*, std::set<Object*> > objects;
 

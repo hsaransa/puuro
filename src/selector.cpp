@@ -70,7 +70,7 @@ void Selector::add_watcher(int fd, int mask, callback_func cb, void* user, ObjP 
 
     watchers.push_back(w);
 
-    pollfds = (struct pollfd*)realloc(pollfds, watchers.size() * sizeof(struct pollfd*));
+    pollfds = (struct pollfd*)realloc(pollfds, watchers.size() * sizeof(struct pollfd));
     if (!pollfds)
         throw new Exception("out_of_memory", 0);
 }

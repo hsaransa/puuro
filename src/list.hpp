@@ -42,6 +42,7 @@ namespace pr
         ObjP add_(ObjP);
         ObjP first_();
         ObjP second_();
+        ObjP third_();
         ObjP all_before_(ObjP);
         ObjP all_after_(ObjP);
         ObjP erase_at_(ObjP);

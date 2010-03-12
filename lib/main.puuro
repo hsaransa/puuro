@@ -41,7 +41,9 @@ execute = {<fn>
  "file.puuro"
  "string.puuro"
  "streams.puuro"
- "web.puuro"].each {<x>
+ "web.puuro"
+ "net.puuro"
+ "irc.puuro"].each {<x>
     execute lib_dir + "/" + x
 };
 

@@ -1,0 +1,36 @@
+require 'streams;
+
+make_tcp_streamers = {<host, port>
+    sock = std.file;
+    sock.socket 'inet 'stream;
+    addr = (resolver.resolve host).first;
+    addr.set_port port;
+    sock.connect addr;
+
+    outs = streamer {<out>
+        repeat
+        {
+            s = sock.read 2048;
+            out s;
+            s != \n;
+        };
+        sock.close;
+    };
+
+    ins = streamer {<in>
+        repeat
+        {
+            s = in();
+            (s != \n).then { sock.write s };
+            s != \n;
+        };
+        sock.close;
+    };
+
+    [ins outs];
+};
+
+module 'net
+{
+    pollute 'tcp_streamers make_tcp_streamers;
+};
