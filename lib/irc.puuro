@@ -5,6 +5,7 @@ irc_reader = {
         repeat
         {
             line = in();
+            print "GOT " line;
 
             from = \n;
 
@@ -16,8 +17,8 @@ irc_reader = {
 
             last = \n;
 
-            ((line.find ":") >= 0).then {
-                l = line.split ":" 1;
+            ((line.find " :") >= 0).then {
+                l = line.split " :" 1;
                 line = l.first;
                 last = l.second;
             };
