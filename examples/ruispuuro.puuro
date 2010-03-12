@@ -1,0 +1,21 @@
+irc_out "NICK ruispuuro";
+irc_out "USER a a a :tehty aidosta rukiista";
+irc_out "JOIN #";
+
+handler {<msg, args>
+    print "MSG " msg " " args;
+
+    (msg == 'privmsg).then {
+        text = args.at 2;
+        l = text.split " ";
+        (l.first == "ruispuuro:").then {
+            (l.second == "reload").then { reload(); };
+
+            (l.second == "run").then {
+                f = compile_string ((text.split " " 2).at 2);
+                f.set_local 'say {<x> irc_out "PRIVMSG " + args.second + " :" + x.to_string };
+                f.execute;
+            };
+        };
+    };
+};

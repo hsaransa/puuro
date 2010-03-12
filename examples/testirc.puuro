@@ -1,34 +1,26 @@
 require 'streams 'net 'irc;
 
-irc_out = irc_client "ikuturso.dyns.be" 6667
-    'privmsg
-    {<src, dst, msg>
-        print "NAA " src " " dst " M" msg "X";
-        ((msg.length > 10).and ((msg.all_before 10) == "ruispuuro:")).then
-        {
-            try
-            {
-                s = compile_string (msg.all_after 10);
-                s.set_local 'say {<x> irc_out "PRIVMSG " + dst + " :" + x.to_string};
-                s.execute;
-            }
-            {<e c> irc_out "PRIVMSG " + dst + " :ei onnaa: " + e.to_string };
-        };
-    }
+ruispuuro = \n;
 
-    'join {<who, chan> print "joinas " who }
-
-    'ping { irc_out "PONG" }
-
-    'error {<msg> print "ERROR " msg }
-;
-
-irc_out "NICK ruispuuro";
-irc_out "USER a a a :tehty aidosta rukiista";
-irc_out "JOIN #";
-
-repeat
-{
-    #irc_out "PRIVMSG #puuro :ruista!";
-    sleep 60000;
+reload = {
+    f = compile_file "examples/ruispuuro.puuro";
+    f.pollute std;
+    f.set_local 'require require;
+    f.set_local 'irc_out irc_out;
+    f.set_local 'reload reload;
+    f.set_local 'handler {<x> ruispuuro = x; };
+    f.execute;
 };
+
+irc_out = irc_client "ikuturso.dyns.be" 6667
+    {<msg, args>
+        try
+        {
+            ruispuuro msg args;
+        }
+        {<e c>
+            print "error in bot: " e;
+        };
+    };
+
+reload();

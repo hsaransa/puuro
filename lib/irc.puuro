@@ -67,7 +67,7 @@ decode_msg = {<a, b, c>
                   { ['other a b c] };
 };
 
-irc_client = {<host, port, *l>
+irc_client = {<host, port, handler>
     tcp = tcp_streamers host port;
     irc = irc_streamers();
 
@@ -78,14 +78,14 @@ irc_client = {<host, port, *l>
         repeat {
             m = std.apply decode_msg in();
             k = m.pop_first;
-
-            i = 0;
-         
-            while {i<l.size}
-            {
-                ((l.at i) == k).then { std.apply (l.at i + 1) m };
-                i = i + 2;
-            };
+            handler k m;
+            #k = m.pop_first;
+            #i = 0;
+            #while {i<l.size}
+            #{
+            #    ((l.at i) == k).then { std.apply (l.at i + 1) m };
+            #    i = i + 2;
+            #};
 
             \t;
         }
