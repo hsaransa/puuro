@@ -26,6 +26,11 @@ File::File()
     fd = -1;
 }
 
+File::File(int fd)
+:   Object(get_type()), fd(fd)
+{
+}
+
 File::~File()
 {
     close();
@@ -37,10 +42,14 @@ Type* File::get_type()
     if (!type)
     {
         type = new Type(Name("file"));
+        type->add_method("to_string", (Callable::mptr0)&File::to_string_);
         type->add_method("set_filename", (Callable::mptr1)&File::set_filename_);
         type->add_method("open", (Callable::mptr1)&File::open_);
         type->add_method("socket", (Callable::mptr2)&File::socket_);
         type->add_method("connect", (Callable::mptr1)&File::connect_);
+        type->add_method("listen", (Callable::mptr1)&File::listen_);
+        type->add_method("bind", (Callable::mptr1)&File::bind_);
+        type->add_method("accept", (Callable::mptr0)&File::accept_);
         type->add_method("read", (Callable::mptr1)&File::read_);
         type->add_method("write", (Callable::mptr1)&File::write_);
         type->add_method("close", (Callable::mptr0)&File::close_);
@@ -82,6 +91,11 @@ void File::close()
     if (fd >= 0)
         ::close(fd);
     fd = -1;
+}
+
+ObjP File::to_string_()
+{
+    return *new String("<file>");
 }
 
 ObjP File::set_filename_(ObjP p)
@@ -186,6 +200,23 @@ ObjP File::connect_(ObjP a)
     throw new Exception("system_error", int_to_fixnum(errno));
 }
 
+ObjP File::bind_(ObjP p)
+{
+    SockAddr* sa = cast_object<SockAddr*>(p);
+    int ret = bind(fd, sa->get_sockaddr(), sa->get_sockaddr_size());
+    if (ret < 0)
+        throw new Exception("system_error", int_to_fixnum(errno));
+    return 0;
+}
+
+ObjP File::listen_(ObjP p)
+{
+    int ret = listen(fd, int_value(p));
+    if (ret < 0)
+        throw new Exception("system_error", int_to_fixnum(errno));
+    return 0;
+}
+
 static void read_cb(void* user, ObjP p)
 {
     List* l = to_object(p)->cast_list();
@@ -253,6 +284,46 @@ ObjP File::write_(ObjP p)
 
     List* l = new List(3, (ObjP)*this, (ObjP)*f, (ObjP)*str);
     get_selector()->add_watcher(fd, Selector::WRITE, write_cb, 0, *l);
+    dec_ref(l);
+
+    get_executor()->set_frame(0);
+
+    return error_object();
+}
+
+static void accept_cb(void* user, ObjP p)
+{
+    (void)user;
+
+    List* l = to_object(p)->cast_list();
+    File* file = (File*)to_object(l->get(0));
+    Frame* frame = (Frame*)to_object(l->get(1));
+
+    get_executor()->set_frame(frame);
+
+    char addr[1024];
+    socklen_t size = sizeof(addr);
+
+    int ret = accept(file->get_fd(), (struct sockaddr*)&addr, &size);
+    if (ret < 0)
+    {
+        get_executor()->handle_exception(new Exception("system_error", int_to_fixnum(errno)));
+        return;
+    }
+
+    File* nfile = new File(ret);
+
+    SockAddr* addr2 = new SockAddr(&addr, size);
+
+    frame->push(*new List(2, (ObjP)*nfile, (ObjP)*addr2));
+}
+
+ObjP File::accept_()
+{
+    Frame* f = get_executor()->get_frame();
+
+    List* l = new List(2, (ObjP)*this, (ObjP)*f);
+    get_selector()->add_watcher(fd, Selector::READ, accept_cb, 0, *l);
     dec_ref(l);
 
     get_executor()->set_frame(0);

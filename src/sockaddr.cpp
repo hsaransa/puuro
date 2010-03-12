@@ -17,14 +17,22 @@ SockAddr::SockAddr(int family, void* a)
     switch (family)
     {
     case AF_INET:
-        memcpy(&addr_in.sin_addr, a, sizeof(struct sockaddr_in));
+        memcpy(&addr_in.sin_addr, a, sizeof(addr_in.sin_addr));
         break;
 
     case AF_INET6:
-        memcpy(&addr_in6.sin6_addr, a, sizeof(struct sockaddr_in6));
+        memcpy(&addr_in6.sin6_addr, a, sizeof(addr_in6.sin6_addr));
         break;
 //    case AF_UNIX: memcpy(&addr, a, sizeof(struct sockaddr_un)); break;
     }
+}
+
+SockAddr::SockAddr(void* a, int size)
+:   Object(get_type())
+{
+    memset(&addr_un, 0, sizeof(sockaddr));
+    assert(size <= sizeof(addr_un));
+    memcpy(&addr_un, a, size);
 }
 
 SockAddr::~SockAddr()
@@ -39,6 +47,7 @@ Type* SockAddr::get_type()
         type = new Type("sockaddr");
         type->add_method("to_string", (Callable::mptr0)&SockAddr::to_string_);
         type->add_method("family", (Callable::mptr0)&SockAddr::family_);
+        type->add_method("set_addr", (Callable::mptr1)&SockAddr::set_addr_);
         type->add_method("set_port", (Callable::mptr1)&SockAddr::set_port_);
     }
     return type;
@@ -67,6 +76,12 @@ ObjP SockAddr::family_()
     case AF_INET6: return name_to_symbol("AF_INET6"); break;
     case AF_UNIX: return name_to_symbol("AF_UNIX"); break;
     }
+    return 0;
+}
+
+ObjP SockAddr::set_addr_(ObjP p)
+{
+    String* s = to_string(p);
     return 0;
 }
 

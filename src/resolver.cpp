@@ -23,6 +23,8 @@ Type* Resolver::get_type()
     {
         type = new Type("resolver");
         type->add_method("resolve", (Callable::mptr1)&Resolver::resolve_);
+        type->add_method("inaddr_any", (Callable::mptr0)&Resolver::inaddr_any_);
+        type->add_method("inaddr_none", (Callable::mptr0)&Resolver::inaddr_none_);
     }
     return type;
 }
@@ -42,4 +44,18 @@ ObjP Resolver::resolve_(ObjP p)
     }
 
     return *l;
+}
+
+ObjP Resolver::inaddr_any_()
+{
+    struct in_addr addr;
+    addr.s_addr = INADDR_ANY;
+    return *new SockAddr(AF_INET, &addr);
+}
+
+ObjP Resolver::inaddr_none_()
+{
+    struct in_addr addr;
+    addr.s_addr = INADDR_NONE;
+    return *new SockAddr(AF_INET, &addr);
 }

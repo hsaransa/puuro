@@ -12,7 +12,7 @@ namespace pr
     {
     public:
         File();
-        File(const std::string& fn, int fd, Name mode);
+        File(int fd);
         virtual ~File();
 
         virtual Type* get_type();
@@ -26,11 +26,14 @@ namespace pr
         int get_fd() { return fd; }
 
     private:
+        ObjP to_string_();
         ObjP set_filename_(ObjP);
         ObjP open_(ObjP);
         ObjP socket_(ObjP, ObjP);
         ObjP connect_(ObjP);
-        ObjP bind_(ObjP, ObjP);
+        ObjP bind_(ObjP);
+        ObjP listen_(ObjP);
+        ObjP accept_();
         ObjP read_(ObjP);
         ObjP write_(ObjP);
         ObjP close_();

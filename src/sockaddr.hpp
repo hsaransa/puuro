@@ -12,6 +12,7 @@ namespace pr
     {
     public:
         SockAddr(int family, void*);
+        SockAddr(void*, int size);
         virtual ~SockAddr();
 
         virtual Type* get_type();
@@ -22,6 +23,7 @@ namespace pr
     private:
         ObjP family_();
         ObjP to_string_();
+        ObjP set_addr_(ObjP);
         ObjP set_port_(ObjP);
         ObjP a_();
         ObjP b_();

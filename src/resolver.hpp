@@ -16,6 +16,8 @@ namespace pr
 
     private:
         ObjP resolve_(ObjP);
+        ObjP inaddr_any_();
+        ObjP inaddr_none_();
     };
 }
 

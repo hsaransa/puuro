@@ -1,0 +1,25 @@
+# Jelly
+
+print resolver.inaddr_any;
+print resolver.inaddr_none;
+
+f = std.file;
+f.socket 'inet 'stream;
+addr = resolver.inaddr_any;
+addr.set_port 1235;
+print addr;
+f.bind addr;
+f.listen 5;
+
+bg
+{
+    print "waiting";
+    sleep 1000;
+};
+
+s = f.accept;
+
+print "hooray1 " s;
+
+s.first.write "hello\n";
+

@@ -8,6 +8,9 @@ std.pollute std;
 
 std.active_frame.set_exception_handler {<e c>
     print "exception: " e.name.s ", " e.obj;
+    (e.name == 'system_error).then {
+        print "system error: " (((std2.get_module 'libc).get_function 'strerror) e.obj);
+    };
     print "trace:";
     repeat {
         print "  " c.current_file.s ", " c.current_line;
