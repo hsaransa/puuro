@@ -32,6 +32,8 @@ namespace pr
         void add_sleeper(int64 us, callback_func cb, void* user, ObjP obj);
         void add_watcher(int fd, int mask, callback_func cb, void* user, ObjP obj);
 
+        void clean_fd(int fd);
+
         void select();
 
     private:

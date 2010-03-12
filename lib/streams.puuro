@@ -6,7 +6,7 @@ t = streamer_root.type;
 
 t.set_method 'to_string {<s> "<stream>"};
 
-# replace set and get with getters and setters
+# TODO: replace set and get with getters and setters
 t.set_method 'set {<s k v>
     s.unbox.set k v;
 };
@@ -40,18 +40,6 @@ t.set_method 'activate {<s>
             orig.continue \n;
         };
     };
-};
-
-std.type.set_method 'streamer {<std *args f>
-    s = std.assoc;
-    s.set 'code f;
-    s.set 'args args;
-    s.set 'cont \n;
-    s.set 'ins [];
-    s.set 'outs [];
-    s.set 'state 'inactive;
-
-    streamer_root.new s;
 };
 
 connect = {<producer consumer>
@@ -111,4 +99,19 @@ connect = {<producer consumer>
 
         ret;
     };
+};
+
+make_stream = {<*args f>
+    s = std.assoc;
+    s.set 'code f;
+    s.set 'args args;
+    s.set 'cont \n;
+    s.set 'ins [];
+    s.set 'outs [];
+    s.set 'state 'inactive;
+    streamer_root.new s;
+};
+
+module 'streams {
+    pollute 'streamer make_stream;
 };

@@ -31,6 +31,7 @@ namespace pr
         ObjP at(ObjP);
         ObjP len_();
         ObjP eq_(ObjP p);
+        ObjP ne_(ObjP p);
         ObjP lt_(ObjP p);
         ObjP find_(ObjP p);
         ObjP all_before_(ObjP);

@@ -1,0 +1,119 @@
+# Simple streaming web server.
+
+require 'streams;
+
+start_web_server = {<port, client_code>
+    f = std.file;
+    f.socket 'inet 'stream;
+    f.setsockopt 'reuseaddr \t;
+    addr = resolver.inaddr_any;
+    addr.set_port 1234;
+    f.bind addr;
+    f.listen 5;
+
+    print "listening " addr;
+
+    repeat {
+        c = f.accept.first;
+        bg { handle_client c client_code };
+    };
+};
+
+handle_client = {<s, client_code>
+    socket_in = streamer {<in>
+        repeat {
+            a = in();
+            (a != \n).then { s.write a; };
+        };
+        s.close;
+    };
+
+    socket_out = streamer {<out>
+        repeat {
+            out (s.read 1024);
+        };
+    };
+
+    http = streamer {<in din out dout>
+        buf = "";
+        repeat
+        {
+            ss = in();
+            (ss == \n).then { raise (exception 'failed 0) };
+            buf = buf + ss;
+            (buf.find "\r\n") < 0;
+        };
+
+        l = buf.split "\r\n" 1;
+        line = l.first;
+        buf = l.second;
+
+        l = line.split " ";
+        (l.pop_first != "GET") { raise (exception 'failed 0) };
+        dout l.pop_first;
+        ((l.pop_first.all_before 6) != "HTTP/1") { raise (exception 'failed 0) };
+
+        headers = [];
+
+        repeat
+        {
+            while {(buf.find "\r\n") > 0}
+            {
+                l = buf.split "\r\n" 1;
+                buf = l.second;
+                headers.append (l.first.split ": ");
+            };
+            ((buf.find "\r\n") != 0).then
+            {
+                ss = in();
+                (ss == \n).then { raise (exception 'failed 0) };
+                buf = buf + ss;
+            }
+        };
+
+        dout headers;
+
+        repeat
+        {
+            a = din();
+            (a != \n).then { out a };
+        };
+
+        out \n;
+    };
+
+#-
+    lollo = streamer {<in dout>
+        path = in();
+        headers = in();
+
+        dout "HTTP/1.0 200 OK\r\n";
+        dout "Content-type: text/html\r\n";
+        dout "\r\n";
+        dout "Ei muuta\r\n";
+        dout \n;
+    };
+-#
+
+    client = streamer client_code;
+
+    http.connect socket_in;
+    socket_out.connect http;
+    http.connect client;
+    client.connect http;
+
+    try
+    {
+        http.start;
+    }
+    {<e c>
+        s.close;
+        (std.active_frame.get_exception_handler) e c;
+    };
+};
+
+
+module 'web
+{
+    pollute 'web_server start_web_server;
+};

@@ -48,6 +48,7 @@ Type* List::get_type()
         type->add_method(Name("each"), (Callable::mptr1)&List::each_);
         type->add_method(Name("to_string"), (Callable::mptr0)&List::to_string_);
         type->add_method(Name("pop"), (Callable::mptr0)&List::pop_);
+        type->add_method(Name("pop_first"), (Callable::mptr0)&List::pop_first_);
         type->add_method(Name("empty"), (Callable::mptr0)&List::empty_);
         type->add_method(Name("size"), (Callable::mptr0)&List::size_);
         type->add_method(Name("at"), (Callable::mptr1)&List::at_);
@@ -212,6 +213,16 @@ ObjP List::pop_()
     ObjP ret = items[items.size()-1];
     inc_ref(ret);
     items.pop_back();
+    return ret;
+}
+
+ObjP List::pop_first_()
+{
+    if (items.empty())
+        throw new Exception("list_empty", *this);
+    ObjP ret = items[0];
+    inc_ref(ret);
+    items.erase(items.begin());
     return ret;
 }
 

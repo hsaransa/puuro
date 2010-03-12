@@ -47,7 +47,7 @@ http_stream = {<magic>
     };
 };
 
-# This stremaer just prints chunks of data.
+# This streamer just prints chunks of data.
 
 output = streamer {<in>
     repeat

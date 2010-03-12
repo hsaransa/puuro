@@ -20,6 +20,7 @@ namespace pr
         ObjP to_string_();
         ObjP get_(ObjP);
         ObjP set_(ObjP, ObjP);
+        ObjP has_(ObjP);
         ObjP copy_();
         ObjP items_();
 

@@ -24,6 +24,7 @@ Type* Assoc::get_type()
         type->add_method("to_string", (Callable::mptr0)&Assoc::to_string_);
         type->add_method("get", (Callable::mptr1)&Assoc::get_);
         type->add_method("set", (Callable::mptr2)&Assoc::set_);
+        type->add_method("has", (Callable::mptr1)&Assoc::has_);
         type->add_method("items", (Callable::mptr2)&Assoc::items_);
         //type->add_method("copy", (Callable::mptr0)&Assoc::copy_);
     }
@@ -59,6 +60,14 @@ ObjP Assoc::set_(ObjP s, ObjP v)
     Name n = symbol_to_name(s);
     assoc[n] = v;
     return inc_ref(v);
+}
+
+ObjP Assoc::has_(ObjP s)
+{
+    if (!is_symbol(s))
+        throw new Exception("bad_type", s);
+    Name n = symbol_to_name(s);
+    return assoc.count(n) ? true_object() : false_object();
 }
 
 ObjP Assoc::copy_()

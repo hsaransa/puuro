@@ -70,9 +70,20 @@ void Selector::add_watcher(int fd, int mask, callback_func cb, void* user, ObjP 
 
     watchers.push_back(w);
 
-    pollfds = (struct pollfd*)realloc(pollfds, watchers.size());
+    pollfds = (struct pollfd*)realloc(pollfds, watchers.size() * sizeof(struct pollfd*));
     if (!pollfds)
         throw new Exception("out_of_memory", 0);
+}
+
+void Selector::clean_fd(int fd)
+{
+    for (int i = 0; i < (int)watchers.size(); )
+    {
+        if (watchers[i].fd == fd)
+            watchers.erase(watchers.begin() + i);
+        else
+            i++;
+    }
 }
 
 void Selector::select()

@@ -34,6 +34,7 @@ namespace pr
         ObjP append_(ObjP p);
         ObjP prepend_(ObjP p);
         ObjP pop_();
+        ObjP pop_first_();
         ObjP empty_();
         ObjP size_();
         ObjP at_(ObjP);

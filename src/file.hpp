@@ -37,6 +37,7 @@ namespace pr
         ObjP read_(ObjP);
         ObjP write_(ObjP);
         ObjP close_();
+        ObjP setsockopt_(ObjP, ObjP);
 
         int fd;
 

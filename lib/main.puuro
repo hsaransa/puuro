@@ -35,11 +35,13 @@ execute = {<fn>
 };
 
 ["exceptions.puuro"
+ "module.puuro"
  "list.puuro"
  "utils.puuro"
  "file.puuro"
  "string.puuro"
- "streams.puuro"].each {<x>
+ "streams.puuro"
+ "web.puuro"].each {<x>
     execute lib_dir + "/" + x
 };
 

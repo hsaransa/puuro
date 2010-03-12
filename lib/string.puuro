@@ -9,11 +9,12 @@ t.set_method 'empty {<l> l.len == 0 };
 t.set_method 'split {<src s *n>
     l = [];
     i = 0;
-    limit = n.empty.if {256*256*256} {n[0]};
+    limit = n.empty.if {256*256*256} {n.first};
 
     repeat
     {
-        (i < limit)
+        i = i + 1;
+        (i <= limit)
         {
             pos = src.find s;
             (pos >= 0)

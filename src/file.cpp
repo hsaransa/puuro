@@ -53,6 +53,7 @@ Type* File::get_type()
         type->add_method("read", (Callable::mptr1)&File::read_);
         type->add_method("write", (Callable::mptr1)&File::write_);
         type->add_method("close", (Callable::mptr0)&File::close_);
+        type->add_method("setsockopt", (Callable::mptr2)&File::setsockopt_);
     }
     return type;
 }
@@ -89,7 +90,10 @@ void File::open(Name mode)
 void File::close()
 {
     if (fd >= 0)
+    {
+        get_selector()->clean_fd(fd);
         ::close(fd);
+    }
     fd = -1;
 }
 
@@ -334,5 +338,25 @@ ObjP File::accept_()
 ObjP File::close_()
 {
     close();
+    return 0;
+}
+
+ObjP File::setsockopt_(ObjP a, ObjP b)
+{
+    if (!is_symbol(a))
+        throw new Exception("bad_type", a);
+
+    Name name = symbol_to_name(a);
+    if (name == Name("reuseaddr"))
+    {
+        if (!is_bool(b))
+            throw new Exception("bad_type", b);
+        int val = (b == true_object()) ? 1 : 0;
+        if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val)) < 0)
+            throw new Exception("system_error", int_to_fixnum(errno));
+    }
+    else
+        throw new Exception("bad_sockopt", a);
+
     return 0;
 }

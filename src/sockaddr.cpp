@@ -31,7 +31,7 @@ SockAddr::SockAddr(void* a, int size)
 :   Object(get_type())
 {
     memset(&addr_un, 0, sizeof(sockaddr));
-    assert(size <= sizeof(addr_un));
+    assert(size <= (int)sizeof(addr_un));
     memcpy(&addr_un, a, size);
 }
 
@@ -82,6 +82,8 @@ ObjP SockAddr::family_()
 ObjP SockAddr::set_addr_(ObjP p)
 {
     String* s = to_string(p);
+    (void)s;
+    assert(0);
     return 0;
 }
 

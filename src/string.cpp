@@ -39,6 +39,7 @@ Type* String::get_type()
         type->add_method("at", (Callable::mptr1)&String::at);
         type->add_method("len", (Callable::mptr0)&String::len_);
         type->add_method("eq", (Callable::mptr1)&String::eq_);
+        type->add_method("ne", (Callable::mptr1)&String::ne_);
         type->add_method("lt", (Callable::mptr1)&String::lt_);
         type->add_method("to_symbol", (Callable::mptr0)&String::to_symbol_);
         type->add_method("find", (Callable::mptr1)&String::find_);
@@ -109,8 +110,18 @@ ObjP String::len_()
 
 ObjP String::eq_(ObjP p)
 {
+    if (!is_object(p))
+        return false_object();
     String* s = to_string(p);
     return s->data == data ? true_object() : false_object();
+}
+
+ObjP String::ne_(ObjP p)
+{
+    if (!is_object(p))
+        return true_object();
+    String* s = to_string(p);
+    return s->data != data ? true_object() : false_object();
 }
 
 ObjP String::lt_(ObjP p)
