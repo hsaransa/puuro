@@ -10,7 +10,7 @@ irc_reader = {
             from = \n;
 
             ((line.at 0) == ":").then {
-                l = line.split " " 1;
+                l = (line.all_after 1).split " " 1;
                 from = l.first;
                 line = l.second;
             };
@@ -58,7 +58,7 @@ irc_streamers = {
 
 decode_msg = {<a, b, c>
     switch b
-        "PING"    { ['ping] }
+        "PING"    { ['ping c.first] }
         "JOIN"    { ['join a c.first] }
         "MODE"    { ['mode a] + c }
         "PRIVMSG" { ['privmsg a c.first c.second] }

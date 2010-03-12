@@ -18,4 +18,11 @@ handler {<msg, args>
             };
         };
     };
+
+    (msg == 'ping).then { irc_out "PONG :" + args.first };
+
+    (msg == 'join).then {
+        n = (args.first.split "!").first;
+        irc_out "PRIVMSG " + (args.second) + " :tere " + n;
+    };
 };
