@@ -25,7 +25,6 @@ script_file      = args.second;
 args = args.all_after 2;
 
 execute = {<fn>
-    print "doing " fn;
   f = std.compile_file fn;
   f.pollute std;
   f.set_local 'std std;
