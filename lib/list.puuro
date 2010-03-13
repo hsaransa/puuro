@@ -7,7 +7,7 @@ t.set_method 'length {<l> l.size };
 t.set_method 'len {<l> l.size };
 
 # Work-around for ambiguous foo[index] operator.
-t.type.set_method 'call {<a, b> a.at b.first};
+t.set_method 'call {<a, b> a.at b.first};
 
 t.set_method 'to_string {<l>
     s = "[";
