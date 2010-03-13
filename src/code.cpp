@@ -104,7 +104,7 @@ void Code::compile(AST* ast, bool args)
 
     emit(Return);
 
-    debug_print();
+    //debug_print();
 }
 
 void Code::emit(Op op, ObjP obj)
