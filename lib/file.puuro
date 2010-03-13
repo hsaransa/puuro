@@ -1,15 +1,22 @@
 # File utils
 
-std.type.set_method 'read_file {<std fn>
+require 'streams;
+
+open_file = {<fn, mode>
     f = std.file;
     f.set_filename fn;
-    f.open 'r;
+    f.open mode;
+    f;
+};
+
+read_file = {<fn>
+    f = open_file fn 'r;
 
     s = "";
 
     std.repeat
     {
-        r = f.read 1024;
+        r = f.read 16384;
         (r != \n).then {s = s + r};
     };
 
@@ -18,5 +25,41 @@ std.type.set_method 'read_file {<std fn>
     s;
 };
 
-std.type.set_method 'read_lines {<std fn>
+file_in_streamer = {<fn>
+    streamer {<out>
+        f = open_file fn 'r;
+
+        s = "";
+
+        std.repeat
+        {
+            r = f.read 4096;
+            out r;
+            (r != \n).then {s = s + r};
+        };
+
+        f.close;
+    };
+};
+
+file_out_streamer = {<fn>
+    streamer {<in>
+        f = open_file fn 'w;
+
+        std.repeat
+        {
+            r = in();
+            (r != \n).then { f.write r; };
+        };
+
+        f.close;
+    };
+};
+
+module 'file
+{
+    pollute 'open_file         open_file;
+    pollute 'read_file         read_file;
+    pollute 'file_in_streamer  file_in_streamer;
+    pollute 'file_out_streamer file_out_streamer;
 };

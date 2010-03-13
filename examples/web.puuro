@@ -1,4 +1,4 @@
-require 'web;
+require 'web 'file;
 
 web_server 1234
 {<in out>
@@ -7,27 +7,30 @@ web_server 1234
 
     print "Hei " path;
 
-    (path != "/")
+    (path == "/")
     {
-        out "HTTP/1.0 404 File not found\r\n";
+        out "HTTP/1.0 200 OK\r\n";
         out "Content-type: text/html\r\n";
+        out "Set-Cookie: id=jeesus\r\n";
         out "\r\n";
-        out "File not found.\r\n";
+        out (read_file "examples/puuroweb.html");
         out \n;
         raise (exception 'failed 0);
     };
 
-    out "HTTP/1.0 200 OK\r\n";
-    out "Content-type: text/html\r\n";
-    out "\r\n";
-
-    i = 0;
-    repeat
+    (path == "/puuroweb.js")
     {
-        out "Jellyfish " + i.to_string + "<br>\r\n";
-        i = i + 1;
-        i < 10;
+        out "HTTP/1.0 200 OK\r\n";
+        out "Content-type: text/html\r\n";
+        out "\r\n";
+        out (read_file "examples/puuroweb.js");
+        out \n;
+        raise (exception 'failed 0);
     };
 
+    out "HTTP/1.0 404 File not found\r\n";
+    out "Content-type: text/html\r\n";
+    out "\r\n";
+    out "File not found.\r\n";
     out \n;
 };

@@ -11,10 +11,13 @@ handler {<msg, args>
         (l.first == "ruispuuro:").then {
             (l.second == "reload").then { reload(); };
 
+            (l.second == "joinaa").then { irc_out "JOIN " + (l.at 2); };
+
             (l.second == "run").then {
                 f = compile_string ((text.split " " 2).at 2);
+                f.set_local 'sleep sleep;
                 f.set_local 'say {<x> irc_out "PRIVMSG " + args.second + " :" + x.to_string };
-                f.execute;
+                bg { f.execute; };
             };
         };
     };

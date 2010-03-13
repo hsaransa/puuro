@@ -38,9 +38,9 @@ execute = {<fn>
  "module.puuro"
  "list.puuro"
  "utils.puuro"
- "file.puuro"
  "string.puuro"
  "streams.puuro"
+ "file.puuro"
  "web.puuro"
  "net.puuro"
  "irc.puuro"].each {<x>

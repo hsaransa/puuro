@@ -16,6 +16,7 @@ env.Append(CPPFLAGS=['-g', '-Wall', '-W'])
 refcount = int(ARGUMENTS.get('refcount', 1))
 gc = int(ARGUMENTS.get('gc', 1))
 optimized = int(ARGUMENTS.get('optimized', 0))
+profile = int(ARGUMENTS.get('profile', 0))
 
 if not refcount:
   env.Append(CPPDEFINES=[('NO_REFCOUNT')])
@@ -27,6 +28,10 @@ if optimized:
   env.Append(CPPFLAGS=['-O3', '-fomit-frame-pointer'])
   env.Append(CPPDEFINES=[('NDEBUG')])
   env.Append(CPPDEFINES=[('OPTIMIZED')])
+
+if profile:
+  env.Append(CPPFLAGS=['-pg'])
+  env.Append(LINKFLAGS=['-pg'])
 
 env.Append(CPPDEFINES=[('LIB_DIR', '"\\"%s/lib\\""' % os.getcwd())])
 
