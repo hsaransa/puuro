@@ -79,12 +79,12 @@ ObjP Closure::call_frame_(List* args)
     if (sink.valid())
     {
         if (args->get_size() < (int)(pre.size() + post.size()))
-            throw new Exception(Name("bad_parameter_count"), 0);
+            throw new Exception(Name("bad_parameter_count"), *args);
     }
     else
     {
         if (args->get_size() != (int)(pre.size() + post.size()))
-            throw new Exception(Name("bad_parameter_count"), 0);
+            throw new Exception(Name("bad_parameter_count"), *args);
     }
 
     // Make frame and set local variables.
