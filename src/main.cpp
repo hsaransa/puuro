@@ -34,7 +34,7 @@ static void execute_file(const char* fn, List* args)
         p->parse();
 
         AST* ast = p->get_ast();
-#if 1
+#if 0
         ast->debug_print();
         std::cout << '\n';
 #endif
