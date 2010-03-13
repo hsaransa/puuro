@@ -16,6 +16,8 @@ namespace
             MK_NAME(Assign)
             MK_NAME(AssignMember)
             MK_NAME(AssignVariable)
+            MK_NAME(AssignSinkMember)
+            MK_NAME(AssignSinkVariable)
             MK_NAME(call)
             MK_NAME(Call)
             MK_NAME(CallMethod)

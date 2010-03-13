@@ -346,6 +346,67 @@ void Executor::execute()
                 dec_ref(l);
             }
             break;
+
+        case Code::CopyList:
+            try {
+                printf("KOPI\n");
+                ObjP p = f->pop();
+                List* l = to_list(p);
+                f->push(*l->copy());
+                dec_ref(p);
+            } catch (Exception* e)
+            {
+                handle_exception(e);
+            };
+            break;
+
+        case Code::ExtractFirst:
+            try {
+                printf("EXTRA\n");
+                ObjP p = f->pop();
+                List* l = to_list(p);
+                ObjP p2 = l->pop_first_();
+                f->push(p);
+                f->push(p2);
+                dec_ref(p2);
+                dec_ref(p);
+            } catch (Exception* e)
+            {
+                handle_exception(e);
+            };
+            break;
+
+        case Code::ExtractSink:
+            try {
+                ObjP p = f->pop();
+                List* l = to_list(p);
+                int n = l->get_size() - int_value(arg);
+                ObjP p2 = l->all_after_(int_to_fixnum(n));
+                f->push(p2);
+                ObjP p3 = l->all_before_(int_to_fixnum(n));
+                f->push(p3);
+                dec_ref(p3);
+                dec_ref(p2);
+                dec_ref(p);
+            } catch (Exception* e)
+            {
+                handle_exception(e);
+            };
+            break;
+
+        case Code::PopEmptyList:
+            try {
+                ObjP p = f->pop();
+                List* l = to_list(p);
+                printf("LISTIS ON %d\n", l->get_size());
+                if (l->get_size())
+                    throw new Exception("too_many_items", 0);
+                dec_ref(p);
+            } catch (Exception* e)
+            {
+                handle_exception(e);
+            };
+            break;
         }
     }
 }

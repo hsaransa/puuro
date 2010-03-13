@@ -1,6 +1,6 @@
 require 'streams;
 
-make_tcp_streamers = {<host, port>
+make_tcp_streamers = {<host port>
     sock = std.file;
     sock.socket 'inet 'stream;
     addr = (resolver.resolve host).first;

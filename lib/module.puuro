@@ -1,13 +1,13 @@
 modules = std.assoc;
 
 std.type.set_method 'module
-{<std, m, code>
+{<std m code>
     (modules.has m).then { raise (exception 'bad_module "already exists") };
 
     mod = [[] []]; #std.new_type ("module_" + m.s).to_symbol;
 
     f = code.call_frame;
-    f.set_local 'pollute {<name, obj>
+    f.set_local 'pollute {<name obj>
         mod.first.append [name obj];
     };
     f.execute;
@@ -16,7 +16,7 @@ std.type.set_method 'module
 };
 
 std.type.set_method 'require
-{<std, *mods>
+{<std *mods>
     f = std.active_frame.caller;
 
     mods.each {<m>

@@ -117,7 +117,7 @@ make_streamer = {<*args f>
 };
 
 make_line_splitter = {
-    make_streamer {<in, out>
+    make_streamer {<in out>
         buf = "";
         repeat
         {
@@ -136,7 +136,7 @@ make_line_splitter = {
     };
 };
 
-bidirectional_connect = {<a, b>
+bidirectional_connect = {<a b>
     a.second.connect b.first;
     b.second.connect a.first;
 };

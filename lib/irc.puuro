@@ -1,7 +1,7 @@
 require 'streams 'net;
 
 irc_reader = {
-    s = streamer {<in, out>
+    s = streamer {<in out>
         repeat
         {
             line = in();
@@ -41,7 +41,7 @@ irc_reader = {
 };
 
 irc_writer = {
-    s = streamer {<in, out>
+    s = streamer {<in out>
         repeat {
             v = in();
             print "SEND " v;
@@ -56,7 +56,7 @@ irc_streamers = {
     [irc_reader() irc_writer()];
 };
 
-decode_msg = {<a, b, c>
+decode_msg = {<a b c>
     switch b
         "PING"    { ['ping c.first] }
         "JOIN"    { ['join a c.first] }
@@ -67,7 +67,7 @@ decode_msg = {<a, b, c>
                   { ['other a b c] };
 };
 
-irc_client = {<host, port, handler>
+irc_client = {<host port handler>
     tcp = tcp_streamers host port;
     irc = irc_streamers();
 

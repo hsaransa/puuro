@@ -2,7 +2,7 @@
 
 require 'streams;
 
-start_web_server = {<port, client_code>
+start_web_server = {<port client_code>
     f = std.file;
     f.socket 'inet 'stream;
     f.setsockopt 'reuseaddr \t;
@@ -17,7 +17,7 @@ start_web_server = {<port, client_code>
     };
 };
 
-handle_client = {<s, client_code>
+handle_client = {<s client_code>
     socket_in = streamer {<in>
         repeat {
             a = in();

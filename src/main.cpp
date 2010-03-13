@@ -22,6 +22,9 @@ using namespace pr;
 
 static void execute_file(const char* fn, List* args)
 {
+    executor = new Executor();
+    GC::add_root(executor);
+
     Frame* frame;
 
     {
@@ -31,7 +34,7 @@ static void execute_file(const char* fn, List* args)
         p->parse();
 
         AST* ast = p->get_ast();
-#if 0
+#if 1
         ast->debug_print();
         std::cout << '\n';
 #endif
@@ -40,7 +43,8 @@ static void execute_file(const char* fn, List* args)
         dec_ref(l);
         dec_ref(p);
 
-        Code* code = new Code(ast, false);
+        Code* code = new Code();
+        code->compile(ast, false);
 #if 0
         code->debug_print();
         std::cout << '\n';
@@ -64,9 +68,6 @@ static void execute_file(const char* fn, List* args)
         dec_ref(args);
         dec_ref(std);
     }
-
-    executor = new Executor();
-    GC::add_root(executor);
 
     executor->set_frame(frame);
     dec_ref(frame);
@@ -136,7 +137,7 @@ int main(int argc, char* argv[])
 
         Frame* f = executor->get_frame();
         if (!f)
-            std::cerr << "BUG in puuro: no current frame!\n";
+            std::cerr << "exception happened outside user code!\n";
 
         while (f)
         {

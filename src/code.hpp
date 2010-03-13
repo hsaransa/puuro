@@ -27,15 +27,20 @@ namespace pr
             Method,
             Closure,
             List,
+            CopyList,
+            PopEmptyList,
+            ExtractFirst,
+            ExtractSink,
         };
 
-        Code(AST*, bool args);
         Code();
         virtual ~Code();
 
         virtual Type* get_type();
         virtual void gc_mark();
         virtual Code* cast_code();
+
+        void compile(AST* ast, bool args);
 
         const std::vector<Name>& get_pre_params() const { return pre_params; }
         const Name get_sink_param() const { return sink_param; }

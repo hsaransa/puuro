@@ -82,6 +82,7 @@ namespace pr
 
     inline ObjP name_to_symbol(Name n)
     {
+        assert(n.valid());
         return (n.id() << 4) | 2;
     }
 

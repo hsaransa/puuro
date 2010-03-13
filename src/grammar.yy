@@ -51,7 +51,7 @@ static void yyerror(const char*)
 %left UMINUS
 
 %type <ast> expr_list expr_list2 expr term_expr arg_list param param_list
-%type <ast> call_expr  assign_target assign_list comma_arg_list
+%type <ast> call_expr  assign_target assign_list
 %type <ast>  top_expr sink_param infix_expr
 
 %type <obj> T_INTEGER T_IDENTIFIER T_STRING
@@ -88,7 +88,7 @@ expr_list2:
 	;
 
 expr:
-	assign_list '=' comma_arg_list
+	assign_list '=' call_expr
 	{ NODE2($$, Assign, $1, $3); } |
 
 	call_expr
@@ -218,8 +218,14 @@ assign_target:
 	T_IDENTIFIER
 	{ NODEO($$, AssignVariable, $1); } |
 
+	'*' T_IDENTIFIER
+	{ NODEO($$, AssignSinkVariable, $2); } |
+
 	term_expr '.' T_IDENTIFIER
-	{ NODEO($$, AssignMember, $3); $$->add_child($1); }
+	{ NODEO($$, AssignMember, $3); $$->add_child($1); } |
+
+	'*' term_expr '.' T_IDENTIFIER
+	{ NODEO($$, AssignSinkMember, $4); $$->add_child($2); }
 	;
 
 assign_list:
@@ -238,6 +244,7 @@ arg_list:
 	{ $$ = $1; $$->add_child($2); }
 	;
 
+/*
 comma_arg_list:
 	expr
 	{ NODE1($$, ArgList, $1); } |
@@ -245,6 +252,7 @@ comma_arg_list:
 	comma_arg_list ',' expr
 	{ $$ = $1; $$->add_child($3); }
 	;
+*/
 
 sink_param:
 	'*' T_IDENTIFIER
@@ -262,9 +270,6 @@ param:
 param_list:
 	param
 	{ NODE1($$, ParamList, $1); } |
-
-	param_list ',' param
-	{ $$ = $1; $$->add_child($3); } |
 
 	param_list param
 	{ $$ = $1; $$->add_child($2); }

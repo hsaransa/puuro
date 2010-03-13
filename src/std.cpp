@@ -322,7 +322,8 @@ ObjP Std::compile_file_(ObjP pp)
 
     //ast->debug_print();
 
-    Code* code = new Code(ast, false);
+    Code* code = new Code();
+    code->compile(ast, false);
 
     Frame* frame = new Frame(0, 0, code);
 
@@ -342,7 +343,8 @@ ObjP Std::compile_string_(ObjP pp)
 
     //ast->debug_print();
 
-    Code* code = new Code(ast, false);
+    Code* code = new Code();
+    code->compile(ast, false);
 
     Frame* frame = new Frame(0, 0, code);
 

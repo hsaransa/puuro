@@ -2,7 +2,7 @@
 
 require 'streams;
 
-open_file = {<fn, mode>
+open_file = {<fn mode>
     f = std.file;
     f.set_filename fn;
     f.open mode;

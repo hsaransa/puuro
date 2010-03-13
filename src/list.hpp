@@ -26,7 +26,6 @@ namespace pr
         int get_size() { return (int)items.size(); }
         ObjP get(int i) { assert(i >= 0 && i < get_size()); return items[i]; }
 
-    private:
         ObjP to_string_();
         ObjP map_(ObjP p);
         ObjP filter_(ObjP p);

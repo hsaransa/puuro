@@ -12,9 +12,54 @@
 
 using namespace pr;
 
-Code::Code(AST* ast, bool args)
+Code::Code()
 :   Object(get_type())
 {
+    tmp_filepos.file = Name("<none>").id();
+    tmp_filepos.line = 0;
+    emit(Return);
+}
+
+Code::~Code()
+{
+}
+
+Type* Code::get_type()
+{
+    static Type* type;
+
+    if (!type)
+    {
+        type = new Type("code");
+        type->add_method("to_string", (Callable::mptr0)&Code::to_string_);
+        type->add_method("pre_params", (Callable::mptr0)&Code::pre_params_);
+        type->add_method("sink_param", (Callable::mptr0)&Code::sink_param_);
+        type->add_method("post_params", (Callable::mptr0)&Code::post_params_);
+    }
+
+    return type;
+}
+
+void Code::gc_mark()
+{
+    for (int i = 0; i < (int)arguments.size(); i++)
+        GC::mark(arguments[i]);
+}
+
+Code* Code::cast_code()
+{
+    return this;
+}
+
+void Code::compile(AST* ast, bool args)
+{
+    pre_params.clear();
+    sink_param = Name();
+    post_params.clear();
+    operators.clear();
+    arguments.clear();
+    positions.clear();
+
     tmp_filepos.file = Name("<none>").id();
     tmp_filepos.line = 0;
 
@@ -59,46 +104,7 @@ Code::Code(AST* ast, bool args)
 
     emit(Return);
 
-    //debug_print();
-}
-
-Code::Code()
-:   Object(get_type())
-{
-    tmp_filepos.file = Name("<none>").id();
-    tmp_filepos.line = 0;
-    emit(Return);
-}
-
-Code::~Code()
-{
-}
-
-Type* Code::get_type()
-{
-    static Type* type;
-
-    if (!type)
-    {
-        type = new Type("code");
-        type->add_method("to_string", (Callable::mptr0)&Code::to_string_);
-        type->add_method("pre_params", (Callable::mptr0)&Code::pre_params_);
-        type->add_method("sink_param", (Callable::mptr0)&Code::sink_param_);
-        type->add_method("post_params", (Callable::mptr0)&Code::post_params_);
-    }
-
-    return type;
-}
-
-void Code::gc_mark()
-{
-    for (int i = 0; i < (int)arguments.size(); i++)
-        GC::mark(arguments[i]);
-}
-
-Code* Code::cast_code()
-{
-    return this;
+    debug_print();
 }
 
 void Code::emit(Op op, ObjP obj)
@@ -135,22 +141,77 @@ void Code::compile(AST* ast)
         break;
 
     case N_Assign:
-        if (ch0->get_children().size() != ch1->get_children().size())
-            throw std::runtime_error("todo error message here");
-
+        if (ch0->get_children().size() == 1 &&
+            ch0->get_children()[0]->get_node_type().id() == N_AssignVariable)
         {
+            compile(ch1);
+            emit(Assign, ch0->get_children()[0]->get_object());
+            emit(Pop);
+            emit(Push, 0);
+        }
+        else
+        {
+            // Compile member objects.
+
             int members_left = 0;
 
             for (int i = 0; i < (int)ch0->get_children().size(); i++)
             {
                 int n = ch0->get_children()[i]->get_node_type().id();
-                if (n != N_AssignMember)
+                if (n != N_AssignMember && n != N_AssignSinkMember)
                     continue;
 
                 compile(ch0->get_children()[i]->get_children()[0].get());
                 members_left++;
             }
 
+            // Compile assigned object.
+
+            compile(ch1);
+            emit(CopyList);
+
+            // Compile assignments.
+
+            bool sinked = false;
+            for (int i = 0; i < (int)ch0->get_children().size(); i++)
+            {
+                int n = ch0->get_children()[i]->get_node_type().id();
+                switch (n)
+                {
+                    case N_AssignVariable:
+                        emit(ExtractFirst, 0);
+                        emit(Assign, ch0->get_children()[i]->get_object());
+                        emit(Pop);
+                        break;
+
+#if 0
+                    case N_AssignMember:
+                        emit(Push, ch0->get_children()[i]->get_object());
+                        emit(Arg);
+                        emit(ExtractFirst, 0);
+                        emit(Arg);
+                        emit(Peek, int_to_fixnum(members_left));
+                        members_left--;
+                        emit(CallMethod, name_to_symbol("set_attribute"));
+                        emit(Pop);
+                        break;
+#endif
+
+                    case N_AssignSinkVariable:
+                        if (sinked)
+                            throw new Exception("double_sink", 0);
+                        emit(ExtractSink, int_to_fixnum((int)ch0->get_children().size() - i - 1));
+                        emit(Assign, ch0->get_children()[i]->get_object());
+                        emit(Pop);
+                        sinked = true;
+                        break;
+                }
+            }
+
+            emit(PopEmptyList);
+            emit(Push, 0);
+
+#if 0
             for (int i = 0; i < (int)ch1->get_children().size(); i++)
             {
 
@@ -172,7 +233,7 @@ void Code::compile(AST* ast)
                     emit(Pop);
                 }
                 else
-                    throw std::runtime_error("what?");
+                    throw new Exception("ast_error", 0);
             }
 
 #if 0
@@ -182,6 +243,7 @@ void Code::compile(AST* ast)
                 if (n == N_AssignMember)
                     emit(Pop);
             }
+#endif
 #endif
         }
 
@@ -288,7 +350,8 @@ void Code::compile(AST* ast)
 
     case N_Code:
         {
-            Code* code = new Code(ast, true);
+            Code* code = new Code();
+            code->compile(ast, true);
             emit(Closure, *code);
             dec_ref(code);
         }
@@ -316,17 +379,21 @@ void Code::debug_print()
 
         switch (op)
         {
-        case Return:     printf("return      "); break;
-        case Assign:     printf("assign      "); break;
-        case Push:       printf("push        "); break;
-        case Pop:        printf("pop         "); break;
-        case Peek:       printf("peek        "); break;
-        case Lookup:     printf("lookup      "); break;
-        case Method:     printf("method      "); break;
-        case CallMethod: printf("callmethod  "); break;
-        case Arg:        printf("arg         "); break;
-        case Closure:    printf("closure     "); break;
-        case List:       printf("list        "); break;
+        case Return:       printf("return       "); break;
+        case Assign:       printf("assign       "); break;
+        case Push:         printf("push         "); break;
+        case Pop:          printf("pop          "); break;
+        case Peek:         printf("peek         "); break;
+        case Lookup:       printf("lookup       "); break;
+        case Method:       printf("method       "); break;
+        case CallMethod:   printf("callmethod   "); break;
+        case Arg:          printf("arg          "); break;
+        case Closure:      printf("closure      "); break;
+        case List:         printf("list         "); break;
+        case CopyList:     printf("copylist     "); break;
+        case ExtractFirst: printf("extractfirst "); break;
+        case ExtractSink:  printf("extractsink  "); break;
+        case PopEmptyList: printf("popemptylist "); break;
         }
 
         if (op != Pop && op != Arg && op != Return)

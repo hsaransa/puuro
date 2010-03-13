@@ -18,6 +18,8 @@ namespace pr
         N_Assign,
         N_AssignMember,
         N_AssignVariable,
+        N_AssignSinkMember,
+        N_AssignSinkVariable,
         N_call,
         N_Call,
         N_CallMethod,
