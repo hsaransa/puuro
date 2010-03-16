@@ -1,0 +1,58 @@
+<html>
+<head>
+<title>Puuro example</title>
+<script type="text/ecmascript" language="javascript" src="puuroweb.js">
+</script>
+<style type="text/css">
+
+body {
+        background: #FDD;
+}
+
+div#field {
+        background: #DED;
+}
+
+div#msgs {
+        background: #CDC;
+}
+
+div#border {
+        background: #EFE;
+        padding: 3px 3px 3px 3px;
+        width: 600px;
+}
+
+div#debug {
+        background: #DDF;
+        width: 600px;
+}
+
+</style>
+</head>
+
+<body onload="on_load()">
+<h2>Hei</h2>
+
+<div id="border">
+<div id="field" contenteditable="true">
+jelly
+fish
+</div>
+<span onclick="send();">send</span>
+</div>
+
+<div id="border">
+<div id="msgs">
+</div>
+</div>
+
+<h2>Debug</h2>
+
+<div id="debug" contenteditable="true">
+this is debug console
+</div>
+
+</body>
+
+</html>

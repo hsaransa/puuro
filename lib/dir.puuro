@@ -3,12 +3,31 @@ glob       = glob_module.get_function 'glob;
 glob_error = glob_module.get_function 'glob_error;
 glob_count = glob_module.get_function 'glob_count;
 glob_path  = glob_module.get_function 'glob_path;
+flag_mark  = glob_module.get_const 'MARK;
+flag_err   = glob_module.get_const 'ERR;
+nospace    = glob_module.get_const 'NOSPACE;
+aborted    = glob_module.get_const 'ABORTED;
+nomatch    = glob_module.get_const 'NOMATCH;
 
-dir = {<p>
-    g = glob p 0;
-    ((glob_error g) != 0).then
+dir = {<*f p>
+    flags = flag_err;
+
+    f.each {<x>
+        switch x
+            'mark { flags = flags.or flag_mark; }
+            { raise (exception 'bad_glob_flag x) };
+    };
+    
+    g = glob p flags;
+    err = glob_error g;
+    (err != 0).then
     {
-        raise (exception 'glob_error g);
+        raise (exception 'glob_error
+            (switch err
+                nospace {'nospace}
+                aborted {'aborted}
+                nomatch {'nomatch}
+                {'unknown_error}));
     };
 
     l = [];

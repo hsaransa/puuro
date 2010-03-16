@@ -7,13 +7,20 @@ start_web_server = {<port client_code>
     f.socket 'inet 'stream;
     f.setsockopt 'reuseaddr \t;
     addr = resolver.inaddr_any;
-    addr.set_port 1234;
+    addr.set_port port;
     f.bind addr;
     f.listen 5;
 
     repeat {
         c = f.accept.first;
-        bg { handle_client c client_code };
+        bg {
+            #try {
+                handle_client c client_code
+            #} {<e c>
+            #    print "exception " e.name " " e.obj;
+            #};
+            #print "keep going.";
+        };
     };
 };
 
@@ -42,14 +49,16 @@ handle_client = {<s client_code>
             (buf.find "\r\n") < 0;
         };
 
-        l = buf.split "\r\n" 1;
-        line = l.first;
-        buf = l.second;
+        line, buf = buf.split "\r\n" 1;
 
-        l = line.split " ";
-        (l.pop_first != "GET") { raise (exception 'failed 0) };
-        dout l.pop_first;
-        ((l.pop_first.all_before 6) != "HTTP/1") { raise (exception 'failed 0) };
+        print "LINE " line;
+
+        method, path, version = line.split " ";
+        ((method != "GET").and method != "POST") { raise (exception 'failed 0) };
+        method = method.to_symbol;
+        dout method;
+        dout path;
+        ((version.all_before 6) != "HTTP/1") { raise (exception 'failed 0) };
 
         headers = [];
 
@@ -57,9 +66,8 @@ handle_client = {<s client_code>
         {
             while {(buf.find "\r\n") > 0}
             {
-                l = buf.split "\r\n" 1;
-                buf = l.second;
-                headers.append (l.first.split ": ");
+                l, buf = buf.split "\r\n" 1;
+                headers.append (l.split ": ");
             };
             ((buf.find "\r\n") != 0).then
             {
@@ -70,6 +78,22 @@ handle_client = {<s client_code>
         };
 
         dout headers;
+
+        buf = buf.all_after 2;
+
+        (method == 'POST).then {
+            cl = headers.filter {<p> p.first == "Content-Length" };
+            len = cl.first.second.to_integer;
+
+            while {buf.size < len}
+            {
+                dout buf;
+                ss = in();
+                buf = buf + ss;
+            };
+
+            dout buf;
+        };
 
         repeat
         {

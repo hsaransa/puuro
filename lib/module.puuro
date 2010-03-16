@@ -4,7 +4,7 @@ std.type.set_method 'module
 {<std m code>
     (modules.has m).then { raise (exception 'bad_module "already exists") };
 
-    mod = [[] []]; #std.new_type ("module_" + m.s).to_symbol;
+    mod = [[] []];
 
     f = code.call_frame;
     f.set_local 'pollute {<name obj>

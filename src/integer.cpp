@@ -51,6 +51,9 @@ Type* Integer::get_type()
         type->add_method("ne", (Callable::mptr1)&Integer::ne_);
         type->add_method("gt", (Callable::mptr1)&Integer::gt_);
         type->add_method("ge", (Callable::mptr1)&Integer::ge_);
+        type->add_method("or", (Callable::mptr1)&Integer::or_);
+        type->add_method("and", (Callable::mptr1)&Integer::and_);
+        type->add_method("xor", (Callable::mptr1)&Integer::xor_);
         type->add_method("abs", (Callable::mptr0)&Integer::abs_);
         type->add_method("neg", (Callable::mptr0)&Integer::neg_);
         type->add_method("is_true", (Callable::mptr1)&Integer::is_true_);
@@ -139,6 +142,24 @@ ObjP Integer::gt_(ObjP p)
 {
     Integer* i = pr::to_integer(p);
     return value > i->value ? true_object() : false_object();
+}
+
+ObjP Integer::or_(ObjP p)
+{
+    Integer* i = pr::to_integer(p);
+    return *new Integer(value | i->value);
+}
+
+ObjP Integer::and_(ObjP p)
+{
+    Integer* i = pr::to_integer(p);
+    return *new Integer(value & i->value);
+}
+
+ObjP Integer::xor_(ObjP p)
+{
+    Integer* i = pr::to_integer(p);
+    return *new Integer(value ^ i->value);
 }
 
 ObjP Integer::abs_()

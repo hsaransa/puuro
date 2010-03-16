@@ -1,36 +1,108 @@
 require 'web 'file;
 
-web_server 1234
+next_client_id = 7;
+foofo = 1;
+
+waiters = [];
+
+get_message = {
+    new_continuation {<orig>
+        waiters.append orig;
+    };
+};
+
+push_message = {<msg>
+    w = waiters.map {<x> x};
+    waiters = [];
+    w.each {<x> bg { x.continue msg } };
+};
+
+web_server 8080
 {<in out>
+    # Get request
+
+    method = in();
     path = in();
+    query = \n;
+    ((path.find "?") >= 0).then { path, query = path.split "?" };
     headers = in();
+    data = (method == 'POST).then {in()};
 
-    print "Hei " path;
+    # Parse cookie
 
-    (path == "/")
+    c = headers.filter {<x> x.first == "Cookie" };
+    id = c.empty.if
+        {next_client_id = next_client_id + 1; next_client_id}
+        {(c.first.second.split "id=").second.to_integer};
+
+    print "DATA " data;
+
+    block
     {
-        out "HTTP/1.0 200 OK\r\n";
-        out "Content-type: text/html\r\n";
-        out "Set-Cookie: id=jeesus\r\n";
-        out "\r\n";
-        out (read_file "examples/puuroweb.html");
-        out \n;
-        raise (exception 'failed 0);
-    };
+        (path == "/")
+        {
+            out "HTTP/1.0 200 OK\r\n";
+            out "Content-type: text/html\r\n";
+            out "Set-Cookie: id=" + id.to_string + "\r\n";
+            out "\r\n";
+            out (read_file "examples/puuroweb.html");
+            out \n;
+            break;
+        };
 
-    (path == "/puuroweb.js")
-    {
-        out "HTTP/1.0 200 OK\r\n";
-        out "Content-type: text/html\r\n";
-        out "\r\n";
-        out (read_file "examples/puuroweb.js");
-        out \n;
-        raise (exception 'failed 0);
-    };
+        (path == "/push")
+        {
+            print "PUSSATTU";
+            out "HTTP/1.0 200 OK\r\n";
+            out "Content-type: text/plain\r\n";
+            out "\r\n";
+            #repeat
+            #{
+                s = foofo.to_string + " " + get_message();
+                foofo = foofo + 1;
+                x = "new;" + s.len.to_string + ";" + s;
+                print "MENEE " x;
+                out x;
+                out \n;
+            #    \t;
+            #};
+            break;
+        };
 
-    out "HTTP/1.0 404 File not found\r\n";
-    out "Content-type: text/html\r\n";
-    out "\r\n";
-    out "File not found.\r\n";
-    out \n;
+        (path == "/act")
+        {
+            while {data.empty.not}
+            {
+                print "TO BE PARSED " data;
+                cmd, data = data.split ";" 1;
+                (cmd == "msg")
+                {
+                    msg, data = data.split ";end;" 1;
+                    push_message msg;
+                };
+            };
+
+            out "HTTP/1.0 200 OK\r\n";
+            out "\r\n";
+            out \n;
+
+            break;
+        };
+
+        (path == "/puuroweb.js")
+        {
+            out "HTTP/1.0 200 OK\r\n";
+            out "Content-type: text/html\r\n";
+            out "\r\n";
+            out (read_file "examples/puuroweb.js");
+            out \n;
+            break;
+        };
+
+        out "HTTP/1.0 404 File not found\r\n";
+        out "Content-type: text/plain\r\n";
+        out "\r\n";
+        out "File " + path + " not found.\r\n";
+        out \n;
+    };
 };

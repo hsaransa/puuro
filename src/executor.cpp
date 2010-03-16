@@ -349,7 +349,6 @@ void Executor::execute()
 
         case Code::CopyList:
             try {
-                printf("KOPI\n");
                 ObjP p = f->pop();
                 List* l = to_list(p);
                 f->push(*l->copy());
@@ -362,7 +361,6 @@ void Executor::execute()
 
         case Code::ExtractFirst:
             try {
-                printf("EXTRA\n");
                 ObjP p = f->pop();
                 List* l = to_list(p);
                 ObjP p2 = l->pop_first_();
@@ -398,7 +396,6 @@ void Executor::execute()
             try {
                 ObjP p = f->pop();
                 List* l = to_list(p);
-                printf("LISTIS ON %d\n", l->get_size());
                 if (l->get_size())
                     throw new Exception("too_many_items", 0);
                 dec_ref(p);

@@ -140,11 +140,9 @@ void Selector::select()
         if (!pollfds[i].revents)
             continue;
 
-        Watcher& w = watchers[i];
-
-        w.callback(w.user, w.obj);
-
+        Watcher w = watchers[i];
         watchers.erase(watchers.begin() + i);
+        w.callback(w.user, w.obj);
         break;
     }
 }

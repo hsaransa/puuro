@@ -84,6 +84,7 @@ Type* Std2Module::get_type()
     {
         type = new Type("std2module");
         type->add_method("get_function", (Callable::mptr1)&Std2Module::get_function_);
+        type->add_method("get_const", (Callable::mptr1)&Std2Module::get_const_);
     }
     return type;
 }

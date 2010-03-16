@@ -32,6 +32,9 @@ namespace pr
         ObjP ge_(ObjP);
         ObjP gt_(ObjP);
         ObjP ne_(ObjP);
+        ObjP or_(ObjP);
+        ObjP and_(ObjP);
+        ObjP xor_(ObjP);
         ObjP abs_();
         ObjP neg_();
         ObjP is_true_();
