@@ -100,6 +100,25 @@ ObjP Std2Module::get_function_(ObjP s)
     return *new Std2Function(module, ret);
 }
 
+ObjP Std2Module::get_const_(ObjP s)
+{
+    if (!is_symbol(s))
+        throw new Exception("bad_type", s);
+
+    int ret = std2_find_const(module, symbol_to_name(s).s());
+    if (ret < 0)
+        throw new Exception("bad_function", s);
+
+    enum std2_const_type t = std2_get_const_type(module, ret);
+    const void* ptr = std2_get_const(module, ret);
+    switch (t)
+    {
+    case STD2_CONST_INT: return int_to_object(*(const int*)ptr);
+    default:
+        return 0;
+    }
+}
+
 /*
  * Std2Function
  */
@@ -194,6 +213,9 @@ ObjP Std2Function::call_(List* l)
                     throw new Exception("bad_type", arg);
                 }
 
+                if (inst->is_freed())
+                    throw new Exception("instance_already_freed", arg);
+
                 args[i] = inst->get_ptr();
             }
             break;
@@ -260,13 +282,14 @@ ObjP Std2Function::call_(List* l)
  */
 
 Std2Instance::Std2Instance(int mod, int clas, void* ptr)
-:   Object(get_type()), module(mod), clas(clas), ptr(ptr)
+:   Object(get_type()), freed(false), module(mod), clas(clas), ptr(ptr)
 {
 }
 
 Std2Instance::~Std2Instance()
 {
-    std2_unrefer(module, clas, ptr);
+    if (!freed)
+        std2_unrefer(module, clas, ptr);
 }
 
 Type* Std2Instance::get_type()
@@ -275,6 +298,23 @@ Type* Std2Instance::get_type()
     if (!type)
     {
         type = new Type("std2instance");
+        type->add_method("to_string", (Callable::mptr0)&Std2Instance::to_string_);
+        type->add_method("free", (Callable::mptr0)&Std2Instance::free_);
     }
     return type;
+}
+
+ObjP Std2Instance::to_string_()
+{
+    return *new String("<std2instance>");
+}
+
+ObjP Std2Instance::free_()
+{
+    if (!freed)
+    {
+        std2_unrefer(module, clas, ptr);
+        freed = true;
+    }
+    return 0;
 }

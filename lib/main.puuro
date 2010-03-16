@@ -43,7 +43,8 @@ execute = {<fn>
  "file.puuro"
  "web.puuro"
  "net.puuro"
- "irc.puuro"].each {<x>
+ "irc.puuro"
+ "dir.puuro"].each {<x>
     execute lib_dir + "/" + x
 };
 

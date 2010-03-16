@@ -36,6 +36,7 @@ namespace pr
         ObjP file_();
         ObjP compile_string_(ObjP);
         ObjP sockaddr_(ObjP);
+        ObjP break_(ObjP);
 
         static Type* type;
     };

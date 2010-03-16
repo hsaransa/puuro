@@ -63,11 +63,16 @@ namespace pr
 
         virtual Type* get_type();
 
+        bool is_freed() { return freed; };
         int get_module() { return module; }
         int get_class() { return clas; }
         void* get_ptr() { return ptr; }
 
     private:
+        ObjP to_string_();
+        ObjP free_();
+
+        bool freed;
         int module;
         int clas;
         void* ptr;

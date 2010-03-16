@@ -99,3 +99,28 @@ std.type.set_method 'switch {<std value *cases>
 
     ret;
 };
+
+std.type.set_method 'break {<std obj>
+    raise (exception 'break obj);
+};
+
+std.type.set_method 'block {<std c>
+    f = std.active_frame;
+    prev = f.get_exception_handler;
+
+    ret = new_continuation {<orig>
+        ff = c.call_frame;
+
+        ff.set_exception_handler {<e c>
+            (e.name == 'break).then {
+                orig.continue e.obj;
+            };
+            prev e c;
+        };
+
+        ff.execute;
+        orig.continue \n;
+    };
+
+    ret;
+};

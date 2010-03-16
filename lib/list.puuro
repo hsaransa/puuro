@@ -1,5 +1,5 @@
 # List extensions
-# TODO: any, all, foldr, foldl = fold, zip, unzip
+# TODO: any, all, foldr, foldl = fold, zip, unzip, enum_each, enum_map
 
 t = [].type;
 

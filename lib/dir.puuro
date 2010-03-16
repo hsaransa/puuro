@@ -1,0 +1,32 @@
+glob_module = std2.get_module 'glob;
+glob       = glob_module.get_function 'glob;
+glob_error = glob_module.get_function 'glob_error;
+glob_count = glob_module.get_function 'glob_count;
+glob_path  = glob_module.get_function 'glob_path;
+
+dir = {<p>
+    g = glob p 0;
+    ((glob_error g) != 0).then
+    {
+        raise (exception 'glob_error g);
+    };
+
+    l = [];
+    i = 0;
+    c = glob_count g;
+    repeat
+    {
+        l.append (glob_path g i);
+        i = i + 1;
+        i < c;
+    };
+
+    g.free;
+
+    l;
+};
+
+module 'dir
+{
+    pollute 'dir dir;
+};

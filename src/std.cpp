@@ -52,6 +52,7 @@ Type* Std::get_type()
         type->add_method("call_with_cloned_frame", (Callable::mptr1)&Std::call_with_cloned_frame);
         type->add_method("new_continuation", (Callable::mptr1)&Std::new_continuation_);
         type->add_method("raise", (Callable::mptr1)&Std::raise_);
+        type->add_method("break", (Callable::mptr1)&Std::break_);
         type->add_method("compile_file", (Callable::mptr1)&Std::compile_file_);
         type->add_method("exception", (Callable::mptr2)&Std::exception_);
         type->add_method("sleep", (Callable::mptr2)&Std::sleep_);
@@ -305,6 +306,19 @@ ObjP Std::raise_(ObjP p)
         throw new Exception("bad_exception", p);
 
     throw exc;
+}
+
+ObjP Std::break_(ObjP p)
+{
+    Frame* f = get_executor()->get_frame();
+
+    while (f && f->get_control_handler_() == 0)
+        f = f->get_caller();
+
+    if (!f)
+        throw new Exception("no_control_handler", p);
+
+    return 0;
 }
 
 ObjP Std::compile_file_(ObjP pp)
