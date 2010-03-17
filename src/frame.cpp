@@ -21,7 +21,6 @@ Frame::Frame(Scope* scope, Frame* caller, Code* code)
     state(READY),
     position(0),
     exc_handler(0),
-    control_handler(0),
     ret(0)
 {
     assert(scope);
@@ -54,8 +53,6 @@ Type* Frame::get_type()
         type->add_method("clone_continuation", (Callable::mptr0)&Frame::clone_continuation);
         type->add_method("set_exception_handler", (Callable::mptr1)&Frame::set_exception_handler_);
         type->add_method("get_exception_handler", (Callable::mptr0)&Frame::get_exception_handler_);
-        type->add_method("set_control_handler", (Callable::mptr1)&Frame::set_control_handler_);
-        type->add_method("get_control_handler", (Callable::mptr0)&Frame::get_control_handler_);
         type->add_method("scope", (Callable::mptr0)&Frame::scope_);
         type->add_method("caller", (Callable::mptr0)&Frame::caller_);
         type->add_method("code", (Callable::mptr0)&Frame::code_);
@@ -81,7 +78,6 @@ void Frame::gc_mark()
         GC::mark(args[i]);
 
     GC::mark(exc_handler);
-    GC::mark(control_handler);
 
     GC::mark(ret);
 
@@ -110,21 +106,6 @@ ObjP Frame::get_exception_handler_()
     while (f && f->exc_handler == 0)
         f = f->caller.get();
     return f ? inc_ref(f->exc_handler.get()) : 0;
-}
-
-ObjP Frame::set_control_handler_(ObjP e)
-{
-    ObjP prev = inc_ref(control_handler);
-    control_handler = e;
-    return prev;
-}
-
-ObjP Frame::get_control_handler_()
-{
-    Frame* f = this;
-    while (f && f->control_handler == 0)
-        f = f->caller.get();
-    return f ? inc_ref(f->control_handler.get()) : 0;
 }
 
 void Frame::push(ObjP p)

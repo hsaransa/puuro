@@ -46,9 +46,6 @@ namespace pr
         ObjP set_exception_handler_(ObjP);
         ObjP get_exception_handler_();
 
-        ObjP set_control_handler_(ObjP);
-        ObjP get_control_handler_();
-
         Frame* get_caller() { return caller.get(); }
 
     private:
@@ -77,7 +74,6 @@ namespace pr
         std::vector<Ref<ObjP> > args;
 
         Ref<ObjP> exc_handler;
-        Ref<ObjP> control_handler;
 
         Ref<ObjP> ret;
     };
