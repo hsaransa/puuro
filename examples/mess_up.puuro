@@ -2,7 +2,7 @@
 
 mess_up = {
     orig = 3:add;
-    3.type.set_method 'add {<a, b> orig (orig.rcall a b)};
+    3.type.set_method 'add {<a b> orig (orig.rcall a b)};
 };
 
 std.print "100 + 50 = " 100 + 50; # Prints 100 + 50 = 150

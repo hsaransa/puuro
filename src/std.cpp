@@ -17,6 +17,7 @@
 #include "selector.hpp"
 #include "integer.hpp"
 #include "scope.hpp"
+#include "closure.hpp"
 #include <stdio.h>
 
 using namespace pr;
@@ -287,15 +288,17 @@ ObjP Std::call_with_cloned_frame(ObjP p)
 
 ObjP Std::new_continuation_(ObjP p)
 {
-    Ref<Frame*> caller = get_executor()->get_frame();
-    Frame* f = new Frame(caller->scope.get(), 0, new Code());
+    Closure* closure = cast_object<Closure*>(p);
+    Frame* caller = get_executor()->get_frame();
+
+    List* l = new List(1, (ObjP)*caller);
+    Frame* f = closure->call_frame(l);
+    dec_ref(l);
 
     ObjP exc = caller->get_exception_handler_();
     f->set_exception_handler_(exc);
 
     get_executor()->set_frame(f);
-
-    deferred_method_call1(p, "call", *caller);
 
     return error_object();
 }
@@ -389,13 +392,11 @@ ObjP Std::sleep_(ObjP p, ObjP next)
 {
     int64 ms = int_value(p);
 
-    Frame* f = next ? to_frame(next) : 0;
-
-    if (f)
-        f->push(0);
-
     get_selector()->add_sleeper(ms*1000, wake_up, 0, *get_executor()->get_frame());
 
+    Frame* f = next ? to_frame(next) : 0;
+    if (f)
+        f->push(0);
     get_executor()->set_frame(f);
 
     return error_object();

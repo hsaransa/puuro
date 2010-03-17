@@ -3,6 +3,7 @@
 launch = {<t>
     std.new_continuation
     {<orig>
+        std.print "Jahuu.";
         std.sleep t orig;
 
         i = 0;

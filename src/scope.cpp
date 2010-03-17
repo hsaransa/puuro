@@ -28,6 +28,8 @@ Type* Scope::get_type()
 
 void Scope::gc_mark()
 {
+    GC::mark(parent);
+
     std::map<Name, Ref<ObjP> >::iterator iter;
     for (iter = locals.begin(); iter != locals.end(); iter++)
         GC::mark(iter->second);

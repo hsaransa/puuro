@@ -1,3 +1,4 @@
+# See lib/streams.puuro, it's much more robust
 
 com_obj = {<f>
     a = assoc();

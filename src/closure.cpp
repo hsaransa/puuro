@@ -61,16 +61,14 @@ ObjP Closure::code_()
 
 ObjP Closure::call_(List* args)
 {
-    Frame* f = (Frame*)to_object(call_frame_(args));
-
+    Frame* f = call_frame(args);
     get_executor()->call(f);
-
     dec_ref(f);
 
     return error_object();
 }
 
-ObjP Closure::call_frame_(List* args)
+Frame* Closure::call_frame(List* args)
 {
     // Check parameter count.
 
@@ -109,6 +107,10 @@ ObjP Closure::call_frame_(List* args)
     for (int j = 0; j < (int)post.size(); j++)
         sc->set_local(post[j], args->get(i++));
 
-    Frame* f = new Frame(sc, 0, code.get());
-    return *f;
+    return new Frame(sc, 0, code.get());
+}
+
+ObjP Closure::call_frame_(List* args)
+{
+    return *call_frame(args);
 }

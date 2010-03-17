@@ -2,19 +2,19 @@
 
 classes = std.assoc;
 
-class = {<name, code>
+class = {<name code>
     f = code.call_frame;
     c = std.new_type ("class_" + name.s).to_symbol;
 
-    f.set_local 'var {<k>
+    f.scope.set_local 'var {<k>
       c.type.set_method k {<obj> obj.unbox.get k };
-      c.type.set_method ("set_" + k.s).to_symbol {<obj, v> obj.unbox.set k v };
+      c.type.set_method ("set_" + k.s).to_symbol {<obj v> obj.unbox.set k v };
     };
 
-    f.set_local 'def {<name, code>
+    f.scope.set_local 'def {<name code>
         c.type.set_method name {<obj>
             ff = code.call_frame;
-            ff.set_local 'self obj;
+            ff.scope.set_local 'self obj;
             ff.execute;
         };
     };

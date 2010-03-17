@@ -6,7 +6,7 @@ generator = {<code>
 
     return = \f;
 
-    f.set_local 'yield {<value>
+    f.scope.set_local 'yield {<value>
         new_continuation {<orig>
             f = orig;
             return.continue value;

@@ -1,6 +1,6 @@
 # Plop
 
-0.type.set_method 'ne {<a,b> !(a == b)};
+0.type.set_method 'ne {<a b> !(a == b)};
 
 srand = 0;
 rand = {

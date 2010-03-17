@@ -13,5 +13,7 @@ print "returns " (func 111);
 
 (continuation != \f).then {
     print "continuation state " continuation.state;
-    continuation.continue 7;
+    c = continuation;
+    continuation = \f;
+    c.continue 7;
 };

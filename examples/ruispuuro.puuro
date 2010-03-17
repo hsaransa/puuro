@@ -2,7 +2,7 @@ irc_out "NICK ruispuuro";
 irc_out "USER a a a :tehty aidosta rukiista";
 irc_out "JOIN #";
 
-handler {<msg, args>
+handler {<msg args>
     print "MSG " msg " " args;
 
     (msg == 'privmsg).then {

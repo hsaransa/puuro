@@ -16,6 +16,8 @@ namespace pr
         virtual Type* get_type();
         virtual void gc_mark();
 
+        Frame* call_frame(List*);
+
     private:
         ObjP to_string_();
         ObjP scope_();

@@ -1,6 +1,6 @@
 # joo
 
-for = {<start, end, code>
+for = {<start end code>
     i = start;
 
     while {i <= end}

@@ -3,7 +3,7 @@
 std.pollute std;
 
 active_frame().set_exception_handler
-{<exc, cont>
+{<exc cont>
   print "Hello, exception " exc " " cont;
   cont.continue "porkkana";
 };
