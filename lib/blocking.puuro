@@ -1,0 +1,36 @@
+blocking_queue_root = std.new_type 'blocking_queue;
+
+t = blocking_queue_root.type;
+
+t.set_method 'to_string {<s> "<blocking queue>"};
+
+t.set_method 'push {<q obj>
+    qq = q.unbox;
+    qq.first.append obj;
+    qq.second.empty.not.then {
+        w = qq.second.pop_first;
+        bg {
+            w.continue \n
+        }
+    };
+};
+
+t.set_method 'pop {<q>
+    qq = q.unbox;
+    qq.first.empty.then {
+        new_continuation {<cont>
+            qq.second.append cont;
+        };
+    };
+    qq.first.pop_first
+};
+
+make_blocking_queue = {
+    # First list is for items, second list is for waiters
+    blocking_queue_root.new [[] []];
+};
+
+module 'blocking
+{
+    pollute 'blocking_queue make_blocking_queue;
+};

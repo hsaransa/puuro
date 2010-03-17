@@ -1,7 +1,6 @@
-require 'web 'file;
+require 'web 'file 'blocking;
 
 next_client_id = 7;
-foofo = 1;
 
 chat_views = [];
 chat_last = ["yks kaks" "kol"];
@@ -13,20 +12,15 @@ say_to_all = {<x>
 };
 
 make_view = {<id>
-    pushed = [];
-    waiting = \n;
+    pushed = blocking_queue();
 
     f = {<msg *args>
         switch msg
             'pull {
-                pushed.empty.then {
-                    new_continuation {<cont> waiting = cont; };
-                };
-                pushed.pop_first
+                pushed.pop
             }
             'push {
-                pushed.append args.first;
-                (waiting != \n).then { bg { w = waiting; waiting = \n; w.continue \n } };
+                pushed.push args.first;
             }
             'id {id};
     };
@@ -109,7 +103,7 @@ web_server 8080
 
             out s;
             out \n;
-            break;
+            break();
         };
 
         (path == "/push")
@@ -121,7 +115,7 @@ web_server 8080
             out "\r\n";
             out (view 'pull);
             out \n;
-            break;
+            break();
         };
 
         (path == "/act")
@@ -141,7 +135,7 @@ web_server 8080
             out "\r\n";
             out \n;
 
-            break;
+            break();
         };
 
         (path == "/puuroweb.js")
@@ -151,7 +145,7 @@ web_server 8080
             out "\r\n";
             out (read_file "examples/puuroweb.js");
             out \n;
-            break;
+            break();
         };
 
         out "HTTP/1.0 404 File not found\r\n";

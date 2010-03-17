@@ -103,19 +103,6 @@ handle_client = {<s client_code>
         out \n;
     };
 
-#-
-    lollo = streamer {<in dout>
-        path = in();
-        headers = in();
-
-        dout "HTTP/1.0 200 OK\r\n";
-        dout "Content-type: text/html\r\n";
-        dout "\r\n";
-        dout "Ei muuta\r\n";
-        dout \n;
-    };
--#
-
     client = streamer client_code;
 
     http.connect socket_in;
