@@ -2,10 +2,7 @@
 #define _pr_ast_hpp_
 
 #include "prdefs.hpp"
-#include "object.hpp"
-#include "nametable.hpp"
 #include "gc.hpp"
-#include <vector>
 
 namespace pr
 {

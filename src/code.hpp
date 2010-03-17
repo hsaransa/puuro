@@ -2,12 +2,8 @@
 #define _pr_code_hpp_
 
 #include "prdefs.hpp"
-#include "object.hpp"
-#include "nametable.hpp"
-#include "primitives.hpp"
-#include "gc.hpp"
 #include "ast.hpp"
-#include <vector>
+#include "exception.hpp"
 
 namespace pr
 {

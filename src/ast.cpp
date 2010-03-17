@@ -1,5 +1,4 @@
 #include "ast.hpp"
-#include "primitives.hpp"
 #include "type.hpp"
 
 using namespace pr;
@@ -31,7 +30,6 @@ void AST::gc_mark()
     GC::mark(object);
 }
 
-#include <iostream>
 void AST::add_child(AST* ast)
 {
     children.push_back(ast);

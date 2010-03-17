@@ -1,5 +1,4 @@
 #include "scope.hpp"
-#include "type.hpp"
 #include "method.hpp"
 
 using namespace pr;

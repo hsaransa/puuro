@@ -1,11 +1,8 @@
 #include "selector.hpp"
 #include "exception.hpp"
-#include "gc.hpp"
-#include <sys/select.h>
 #include <sys/time.h>
 #include <poll.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <errno.h>
 
 using namespace pr;

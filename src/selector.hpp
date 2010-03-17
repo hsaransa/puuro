@@ -3,9 +3,6 @@
 
 #include "prdefs.hpp"
 #include "gc.hpp"
-#include <map>
-#include <queue>
-#include <string.h>
 
 struct pollfd; // POSIX stuff
 

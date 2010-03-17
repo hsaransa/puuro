@@ -2,8 +2,7 @@
 #define _pr_exception_hpp_
 
 #include "prdefs.hpp"
-#include "nametable.hpp"
-#include "object.hpp"
+#include "primitives.hpp"
 
 namespace pr
 {
@@ -31,6 +30,17 @@ namespace pr
     static inline ObjP throw_exception(Exception* e)
     {
         throw e;
+    }
+
+    template<typename T>
+    T cast_object(ObjP p)
+    {
+        if (!is_object(p))
+            throw new Exception("bad_type", p);
+        T t = dynamic_cast<T>(to_object(p));
+        if (!t)
+            throw new Exception("bad_type", p);
+        return t;
     }
 }
 

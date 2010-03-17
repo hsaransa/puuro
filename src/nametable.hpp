@@ -5,7 +5,6 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <cassert>
 #include <string.h>
 
 namespace pr

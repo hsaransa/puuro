@@ -1,7 +1,3 @@
-#include "exception.hpp"
-#include "string.hpp"
-#include "primitives.hpp"
-#include "gc.hpp"
 #include "type.hpp"
 
 using namespace pr;

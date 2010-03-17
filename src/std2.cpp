@@ -1,9 +1,7 @@
 #include "std2.hpp"
 #include "list.hpp"
 #include "type.hpp"
-#include "string.hpp"
 #include "integer.hpp"
-#include <std2.h>
 
 using namespace pr;
 

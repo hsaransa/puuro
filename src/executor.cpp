@@ -1,13 +1,10 @@
-#include "executor.hpp"
 #include "frame.hpp"
 #include "code.hpp"
 #include "method.hpp"
 #include "closure.hpp"
 #include "list.hpp"
-#include "minicode.hpp"
 #include "integer.hpp"
 #include "scope.hpp"
-#include <stdio.h>
 
 using namespace pr;
 

@@ -1,12 +1,6 @@
 #include "lexer.hpp"
-#include "string.hpp"
-#include "ast.hpp"
 #include "integer.hpp"
-#include "parser.hpp"
-#include "exception.hpp"
-#include "primitives.hpp"
 #include "grammar.hh"
-#include "gc.hpp"
 #include "type.hpp"
 #include <stdio.h>
 

@@ -2,8 +2,6 @@
 #define _pr_lexer_hpp_
 
 #include "prdefs.hpp"
-#include "object.hpp"
-#include "nametable.hpp"
 #include "gc.hpp"
 
 namespace pr

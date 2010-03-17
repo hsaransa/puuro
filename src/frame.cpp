@@ -1,15 +1,7 @@
 #include "frame.hpp"
 #include "code.hpp"
-#include "primitives.hpp"
-#include "type.hpp"
-#include "list.hpp"
-#include "closure.hpp"
 #include "method.hpp"
-#include "gc.hpp"
-#include "string.hpp"
-#include "executor.hpp"
 #include "scope.hpp"
-#include <stdio.h>
 
 using namespace pr;
 

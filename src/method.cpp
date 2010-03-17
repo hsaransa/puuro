@@ -1,8 +1,5 @@
 #include "method.hpp"
-#include "primitives.hpp"
 #include "list.hpp"
-#include "gc.hpp"
-#include "string.hpp"
 
 using namespace pr;
 

@@ -2,13 +2,8 @@
 #define _pr_type_hpp_
 
 #include "prdefs.hpp"
-#include "object.hpp"
-#include "nametable.hpp"
 #include "callable.hpp"
 #include "string.hpp"
-#include <string>
-#include <set>
-#include <map>
 
 namespace pr
 {

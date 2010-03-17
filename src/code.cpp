@@ -1,14 +1,8 @@
 #include "code.hpp"
-#include "ast.hpp"
-#include "frame.hpp"
 #include "list.hpp"
-#include "primitives.hpp"
-#include "gc.hpp"
-#include "string.hpp"
 #include "type.hpp"
 #include <iostream>
 #include <stdio.h>
-#include <stdexcept>
 
 using namespace pr;
 

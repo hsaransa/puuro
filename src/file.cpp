@@ -1,22 +1,12 @@
 #include "file.hpp"
-#include "exception.hpp"
-#include "string.hpp"
 #include "type.hpp"
 #include "list.hpp"
 #include "selector.hpp"
-#include "executor.hpp"
 #include "frame.hpp"
 #include "integer.hpp"
 #include "sockaddr.hpp"
-#include <string.h>
-#include <stdio.h>
 #include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 
 using namespace pr;
 

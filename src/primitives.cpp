@@ -1,9 +1,6 @@
-#include "primitives.hpp"
-#include "string.hpp"
 #include "type.hpp"
 #include "integer.hpp"
 #include "list.hpp"
-#include "executor.hpp"
 #include "minicode.hpp"
 #include <stdio.h>
 

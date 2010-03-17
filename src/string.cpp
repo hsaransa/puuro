@@ -1,9 +1,5 @@
-#include "string.hpp"
 #include "type.hpp"
-#include "primitives.hpp"
-#include "gc.hpp"
 #include "integer.hpp"
-#include <stdio.h>
 
 using namespace pr;
 

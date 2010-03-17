@@ -2,7 +2,6 @@
 #define _pr_typedobject_hpp_
 
 #include "prdefs.hpp"
-#include "object.hpp"
 #include "gc.hpp"
 
 namespace pr

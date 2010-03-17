@@ -1,7 +1,5 @@
-#include "gc.hpp"
 #include "type.hpp"
 #include "selector.hpp"
-#include <stdio.h>
 
 using namespace pr;
 

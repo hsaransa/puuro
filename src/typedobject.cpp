@@ -1,9 +1,4 @@
 #include "typedobject.hpp"
-#include "gc.hpp"
-#include "integer.hpp"
-#include "code.hpp"
-#include "list.hpp"
-#include "string.hpp"
 #include "type.hpp"
 
 using namespace pr;

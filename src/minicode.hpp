@@ -2,10 +2,7 @@
 #define _pr_minicode_hpp_
 
 #include "prdefs.hpp"
-#include "gc.hpp"
 #include "executor.hpp"
-#include <set>
-#include <stack>
 
 namespace pr
 {

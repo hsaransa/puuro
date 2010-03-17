@@ -1,11 +1,6 @@
 #include "list.hpp"
-#include "string.hpp"
 #include "type.hpp"
-#include "primitives.hpp"
-#include "gc.hpp"
 #include "integer.hpp"
-#include "minicode.hpp"
-#include "executor.hpp"
 #include "frame.hpp"
 #include <cstdarg>
 

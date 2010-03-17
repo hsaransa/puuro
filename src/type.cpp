@@ -1,11 +1,6 @@
-#include "type.hpp"
-#include "primitives.hpp"
 #include "list.hpp"
-#include "gc.hpp"
 #include "method.hpp"
-#include "string.hpp"
 #include "integer.hpp"
-#include <stdio.h>
 
 using namespace pr;
 

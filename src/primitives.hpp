@@ -2,7 +2,8 @@
 #define _pr_primitives_hpp_
 
 #include "prdefs.hpp"
-#include "exception.hpp"
+#include "object.hpp"
+#include "nametable.hpp"
 
 namespace pr
 {
@@ -66,7 +67,10 @@ namespace pr
         else if (is_bool(p))
             return bool_type;
         else if (is_error_object(p))
-            throw new Exception("error_object", 0);
+        {
+            assert(0);
+            throw 0;
+        }
         else
             return ((Object*)p)->get_type();
     }
@@ -116,17 +120,6 @@ namespace pr
         return get_type(p)->get_method(n).type != Callable::NONE;
     }
 #endif
-
-    template<typename T>
-    T cast_object(ObjP p)
-    {
-        if (!is_object(p))
-            throw new Exception("bad_type", p);
-        T t = dynamic_cast<T>(to_object(p));
-        if (!t)
-            throw new Exception("bad_type", p);
-        return t;
-    }
 
     void init_primitive_types();
 }

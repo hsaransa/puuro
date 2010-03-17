@@ -2,11 +2,8 @@
 #define _pr_frame_hpp_
 
 #include "prdefs.hpp"
-#include "object.hpp"
-#include "gc.hpp"
 #include "minicode.hpp"
-#include <stack>
-#include <vector>
+#include "exception.hpp"
 #include <list>
 
 namespace pr

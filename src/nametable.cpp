@@ -1,5 +1,4 @@
 #include "nametable.hpp"
-#include <cassert>
 
 using namespace pr;
 

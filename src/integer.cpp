@@ -1,11 +1,8 @@
 #include "integer.hpp"
 #include "type.hpp"
-#include "string.hpp"
-#include "primitives.hpp"
 #include "minicode.hpp"
 #include <stdlib.h>
 #include <stdio.h>
-#include <cmath>
 #include <limits.h>
 
 using namespace pr;

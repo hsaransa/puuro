@@ -1,22 +1,15 @@
 #include <iostream>
-#include "file.hpp"
 #include "string.hpp"
 #include "lexer.hpp"
 #include "parser.hpp"
-#include "ast.hpp"
-#include "exception.hpp"
 #include "code.hpp"
-#include "primitives.hpp"
 #include "frame.hpp"
 #include "std.hpp"
-#include "gc.hpp"
-#include "executor.hpp"
 #include "list.hpp"
 #include "selector.hpp"
 #include "std2.hpp"
 #include "resolver.hpp"
 #include "scope.hpp"
-#include <stdio.h>
 #include <signal.h>
 
 using namespace pr;

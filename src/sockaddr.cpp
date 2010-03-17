@@ -1,10 +1,6 @@
 #include "sockaddr.hpp"
 #include "type.hpp"
 #include "integer.hpp"
-#include <string.h>
-#include <stdio.h>
-#include <netinet/in.h>
-#include <netdb.h>
 #include <arpa/inet.h>
 
 using namespace pr;

@@ -1,6 +1,5 @@
 #include "resolver.hpp"
 #include "type.hpp"
-#include "string.hpp"
 #include "list.hpp"
 #include "sockaddr.hpp"
 #include <netdb.h>

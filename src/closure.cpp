@@ -2,13 +2,8 @@
 #include "frame.hpp"
 #include "scope.hpp"
 #include "code.hpp"
-#include "string.hpp"
 #include "type.hpp"
 #include "list.hpp"
-#include "exception.hpp"
-#include "primitives.hpp"
-#include "gc.hpp"
-#include "executor.hpp"
 
 using namespace pr;
 

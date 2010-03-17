@@ -1,12 +1,5 @@
-#include "object.hpp"
-#include "string.hpp"
-#include "type.hpp"
-#include "method.hpp"
-#include "list.hpp"
 #include "exception.hpp"
-#include "primitives.hpp"
 #include "gc.hpp"
-#include <stdio.h>
 
 using namespace pr;
 

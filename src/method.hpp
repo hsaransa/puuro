@@ -2,8 +2,6 @@
 #define _pr_method_hpp_
 
 #include "prdefs.hpp"
-#include "object.hpp"
-#include "nametable.hpp"
 #include "type.hpp"
 
 namespace pr

@@ -2,9 +2,7 @@
 #define _pr_string_hpp_
 
 #include "prdefs.hpp"
-#include "object.hpp"
-#include "primitives.hpp"
-#include <string>
+#include "exception.hpp"
 
 namespace pr
 {

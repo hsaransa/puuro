@@ -1,7 +1,5 @@
 #include "assoc.hpp"
 #include "type.hpp"
-#include "gc.hpp"
-#include "string.hpp"
 #include "list.hpp"
 
 using namespace pr;

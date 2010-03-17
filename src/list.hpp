@@ -2,9 +2,8 @@
 #define _pr_list_hpp_
 
 #include "prdefs.hpp"
-#include "object.hpp"
 #include "gc.hpp"
-#include <vector>
+#include "exception.hpp"
 
 namespace pr
 {

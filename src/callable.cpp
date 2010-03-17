@@ -1,10 +1,5 @@
-#include "callable.hpp"
-#include "exception.hpp"
 #include "list.hpp"
-#include "primitives.hpp"
-#include "gc.hpp"
 #include "type.hpp"
-#include <stdio.h>
 
 using namespace pr;
 

@@ -4,7 +4,6 @@
 #include "prdefs.hpp"
 #include "primitives.hpp"
 #include <set>
-#include <map>
 
 namespace pr
 {

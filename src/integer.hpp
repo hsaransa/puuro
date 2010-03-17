@@ -2,8 +2,6 @@
 #define _pr_integer_hpp_
 
 #include "prdefs.hpp"
-#include "object.hpp"
-#include "primitives.hpp"
 #include "exception.hpp"
 
 namespace pr

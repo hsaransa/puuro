@@ -4,7 +4,6 @@
 #include "prdefs.hpp"
 #include "object.hpp"
 #include "nametable.hpp"
-#include <string>
 
 namespace pr
 {
