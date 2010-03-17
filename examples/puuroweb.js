@@ -1,6 +1,5 @@
 var server = false;
 var server_pos = 0;
-var view_num=1;
 
 function getClientWidth() {
     return window.document.body.clientWidth;
@@ -63,7 +62,12 @@ function server_ready_change() {
         cmd = s.substr(i, s.indexOf(';', i) - i);
         i += cmd.length + 1;
 
-        if (cmd == "set")
+        if (cmd == "view")
+        {
+            view_num = parseInt(s.substr(i, s.indexOf(';', i) - i));
+            i = s.indexOf(';', i) + 1;
+        }
+        else if (cmd == "set")
         {
             len = parseInt(s.substr(i, s.indexOf(';', i) - i));
             i = s.indexOf(';', i) + 1;
@@ -214,11 +218,6 @@ function on_load()
     elem = document.getElementById("debug");
     if (elem != null)
         elem.innerHTML = "hello from on_load()<br>";
-
-    //send_command("res;" + getClientWidth() + ";" + getClientHeight())
-    //alert(window.document.body.clientHeight);
-    //alert(document.documentElement.clientWidth);
-    //alert(document.documentElement.clientHeight);
 
     setTimeout("wake_up_server();", 100);
 }

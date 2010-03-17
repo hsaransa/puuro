@@ -87,7 +87,6 @@ handle_client = {<s client_code>
 
             while {buf.size < len}
             {
-                dout buf;
                 ss = in();
                 buf = buf + ss;
             };

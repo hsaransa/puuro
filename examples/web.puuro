@@ -3,18 +3,59 @@ require 'web 'file;
 next_client_id = 7;
 foofo = 1;
 
-waiters = [];
+chat_views = [];
+chat_last = ["yks kaks" "kol"];
 
-get_message = {
-    new_continuation {<orig>
-        waiters.append orig;
-    };
+say_to_all = {<x>
+    (chat_last.size >= 10).then { chat_last.pop_first; };
+    chat_last.append x;
+    chat_views.each {<v> v 'push "new;" + x.size.to_string + ";" + x};
 };
 
-push_message = {<msg>
-    w = waiters.map {<x> x};
-    waiters = [];
-    w.each {<x> bg { x.continue msg } };
+make_view = {<id>
+    pushed = [];
+    waiting = \n;
+
+    f = {<msg *args>
+        switch msg
+            'pull {
+                pushed.empty.then {
+                    new_continuation {<cont> waiting = cont; };
+                };
+                pushed.pop_first
+            }
+            'push {
+                pushed.append args.first;
+                (waiting != \n).then { bg { w = waiting; waiting = \n; w.continue \n } };
+            }
+            'id {id};
+    };
+    f
+};
+
+all_clients = [];
+
+make_client = {
+    views = [];
+    id = next_client_id;
+
+    next_client_id = next_client_id + 1;
+
+    f = {<msg *args>
+        switch msg
+            'view {
+                views.at args.first - 1
+            }
+            'new_view {
+                views.append (make_view views.size + 1);
+                views.last
+            }
+            'id {
+                id
+            };
+    };
+    all_clients.append f;
+    f
 };
 
 web_server 8080
@@ -23,49 +64,63 @@ web_server 8080
 
     method = in();
     path = in();
-    query = \n;
+    query = "";
     ((path.find "?") >= 0).then { path, query = path.split "?" };
     headers = in();
     data = (method == 'POST).then {in()};
 
-    # Parse cookie
+    print "DATA '" data "'";
+
+    # Parse client from cookie
 
     c = headers.filter {<x> x.first == "Cookie" };
-    id = c.empty.if
-        {next_client_id = next_client_id + 1; next_client_id}
-        {(c.first.second.split "id=").second.to_integer};
 
-    print "DATA " data;
+    client = c.empty.if
+        {make_client()}
+        {id = (c.first.second.split "id=").second.to_integer;
+         c = all_clients.filter {<x> (x 'id) == id};
+         c.empty.if
+            {make_client()}
+            {c.first}};
 
     block
     {
         (path == "/")
         {
+            view = client 'new_view;
+            chat_views.append view;
+
+            chat_last.each {<x>
+                view 'push "new;" + x.size.to_string + ";" + x
+            };
+
             out "HTTP/1.0 200 OK\r\n";
             out "Content-type: text/html\r\n";
             out "Set-Cookie: id=" + id.to_string + "\r\n";
             out "\r\n";
-            out (read_file "examples/puuroweb.html");
+
+            s = read_file "examples/puuroweb.html";
+            a, b = s.split "$VIEW$" 1;
+            s = a + (view 'id).to_string + b;
+
+            ss = read_file "examples/puuroweb.js";
+            a, b = s.split "$SCRIPT$" 1;
+            s = a + ss + b;
+
+            out s;
             out \n;
             break;
         };
 
         (path == "/push")
         {
-            print "PUSSATTU";
+            view = client 'view (query.to_integer);
+
             out "HTTP/1.0 200 OK\r\n";
             out "Content-type: text/plain\r\n";
             out "\r\n";
-            #repeat
-            #{
-                s = foofo.to_string + " " + get_message();
-                foofo = foofo + 1;
-                x = "new;" + s.len.to_string + ";" + s;
-                print "MENEE " x;
-                out x;
-                out \n;
-            #    \t;
-            #};
+            out (view 'pull);
+            out \n;
             break;
         };
 
@@ -78,7 +133,7 @@ web_server 8080
                 (cmd == "msg")
                 {
                     msg, data = data.split ";end;" 1;
-                    push_message msg;
+                    say_to_all msg;
                 };
             };
 

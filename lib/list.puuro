@@ -7,7 +7,9 @@ t.set_method 'length {<l> l.size };
 t.set_method 'len {<l> l.size };
 
 # Work-around for ambiguous foo[index] operator.
-t.set_method 'call {<a b> a.at b.first};
+t.set_method 'call {<a b> b.at b.first};
+
+t.set_method 'last {<a> a.at a.size - 1};
 
 t.set_method 'to_string {<l>
     s = "[";
@@ -29,15 +31,13 @@ t.set_method 'filter {<l proc>
     ret = [];
     i = 0;
 
-    std.repeat
+    while {i < l.size}
     {
         (proc (l.at i)).then {
             ret.append (l.at i)
         };
 
         i = i + 1;
-
-        i < l.size;
     };
 
     ret;
