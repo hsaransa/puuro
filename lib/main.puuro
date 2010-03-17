@@ -26,11 +26,11 @@ args = args.all_after 2;
 
 execute = {<fn>
   f = std.compile_file fn;
-  f.pollute std;
-  f.set_local 'std std;
-  f.set_local 'std2 std2;
-  f.set_local 'resolver resolver;
-  f.set_local 'args args;
+  f.scope.pollute std;
+  f.scope.set_local 'std std;
+  f.scope.set_local 'std2 std2;
+  f.scope.set_local 'resolver resolver;
+  f.scope.set_local 'args args;
   f.execute;
 };
 

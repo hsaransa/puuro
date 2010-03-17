@@ -6,6 +6,7 @@
 #include "list.hpp"
 #include "minicode.hpp"
 #include "integer.hpp"
+#include "scope.hpp"
 #include <stdio.h>
 
 using namespace pr;
@@ -296,7 +297,7 @@ void Executor::execute()
             {
                 try
                 {
-                    ObjP p = f->lookup(symbol_to_name(arg));
+                    ObjP p = f->scope->lookup(symbol_to_name(arg));
                     f->push(p);
                     dec_ref(p);
                 }
@@ -311,7 +312,7 @@ void Executor::execute()
             {
                 ObjP p = f->pop();
                 f->push(p);
-                f->set(symbol_to_name(arg), p);
+                f->scope->set(symbol_to_name(arg), p);
                 dec_ref(p);
             }
             break;
@@ -326,7 +327,7 @@ void Executor::execute()
 
         case Code::Closure:
             {
-                Closure* closure = new Closure(f, to_code(arg));
+                Closure* closure = new Closure(f->scope, to_code(arg));
                 f->push(*closure);
                 dec_ref(closure);
             }
@@ -506,7 +507,7 @@ void Executor::handle_exception(Exception* e)
     if (!ff)
         throw e;
 
-    Frame* nf = new Frame(ff->previous.get(), 0, new Code());
+    Frame* nf = new Frame(ff->scope.get(), 0, new Code());
 
     set_frame(nf);
 

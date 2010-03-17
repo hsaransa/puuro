@@ -15,6 +15,7 @@
 #include "selector.hpp"
 #include "std2.hpp"
 #include "resolver.hpp"
+#include "scope.hpp"
 #include <stdio.h>
 #include <signal.h>
 
@@ -51,18 +52,21 @@ static void execute_file(const char* fn, List* args)
 #endif
         dec_ref(ast);
 
-        frame = new Frame(0, 0, code);
-        dec_ref(code);
-
         Std* std = new Std();
         Std2* std2 = new Std2();
         Resolver* resolver = new Resolver();
-        frame->set_local("std", *std);
-        frame->set_local("std2", *std2);
-        frame->set_local("resolver", *resolver);
-        frame->set_local("args", args ? (ObjP)*args : 0);
         String* lib_dir = new String(LIB_DIR);
-        frame->set_local("lib_dir", *lib_dir);
+
+        Scope* scope = new Scope(0);
+        scope->set_local("std", *std);
+        scope->set_local("std2", *std2);
+        scope->set_local("resolver", *resolver);
+        scope->set_local("lib_dir", *lib_dir);
+        scope->set_local("args", args ? (ObjP)*args : 0);
+
+        frame = new Frame(scope, 0, code);
+        dec_ref(code);
+
         dec_ref(lib_dir);
 
         dec_ref(args);

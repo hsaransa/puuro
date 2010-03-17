@@ -8,13 +8,14 @@
 #include "gc.hpp"
 #include "string.hpp"
 #include "executor.hpp"
+#include "scope.hpp"
 #include <stdio.h>
 
 using namespace pr;
 
-Frame::Frame(Frame* previous, Frame* caller, Code* code)
+Frame::Frame(Scope* scope, Frame* caller, Code* code)
 :   Object(get_type()),
-    previous(previous),
+    scope(scope),
     caller(caller),
     code(code),
     state(READY),
@@ -23,6 +24,7 @@ Frame::Frame(Frame* previous, Frame* caller, Code* code)
     control_handler(0),
     ret(0)
 {
+    assert(scope);
     assert(code);
 }
 
@@ -45,8 +47,8 @@ Type* Frame::get_type()
     {
         type = new Type("frame");
         type->add_method("to_string", (Callable::mptr0)&Frame::to_string_);
-        type->add_method("set", (Callable::mptr2)&Frame::set_);
-        type->add_method("set_local", (Callable::mptr2)&Frame::set_local_);
+        //type->add_method("set", (Callable::mptr2)&Frame::set_);
+        //type->add_method("set_local", (Callable::mptr2)&Frame::set_local_);
         type->add_method("execute", (Callable::mptr0)&Frame::execute);
         type->add_method("continue", (Callable::mptr1)&Frame::continue_);
         type->add_method("clone_continuation", (Callable::mptr0)&Frame::clone_continuation);
@@ -54,12 +56,11 @@ Type* Frame::get_type()
         type->add_method("get_exception_handler", (Callable::mptr0)&Frame::get_exception_handler_);
         type->add_method("set_control_handler", (Callable::mptr1)&Frame::set_control_handler_);
         type->add_method("get_control_handler", (Callable::mptr0)&Frame::get_control_handler_);
-        type->add_method("previous", (Callable::mptr0)&Frame::previous_);
+        type->add_method("scope", (Callable::mptr0)&Frame::scope_);
         type->add_method("caller", (Callable::mptr0)&Frame::caller_);
         type->add_method("code", (Callable::mptr0)&Frame::code_);
         type->add_method("state", (Callable::mptr0)&Frame::state_);
-        type->add_method("cut_previous", (Callable::mptr0)&Frame::cut_previous_);
-        type->add_method("pollute", (Callable::mptr1)&Frame::pollute_);
+        //type->add_method("pollute", (Callable::mptr1)&Frame::pollute_);
         type->add_method("current_file", (Callable::mptr0)&Frame::current_file_);
         type->add_method("current_line", (Callable::mptr0)&Frame::current_line_);
     }
@@ -68,8 +69,7 @@ Type* Frame::get_type()
 
 void Frame::gc_mark()
 {
-    if (previous)
-        GC::mark(previous);
+    GC::mark(scope);
     if (caller)
         GC::mark(caller);
     GC::mark(code);
@@ -90,59 +90,11 @@ void Frame::gc_mark()
         for (iter = minicode_stack.begin(); iter != minicode_stack.end(); iter++)
             (*iter)->gc_mark();
     }
-
-    std::map<Name, Ref<ObjP> >::iterator iter;
-    for (iter = locals.begin(); iter != locals.end(); iter++)
-        GC::mark(iter->second);
 }
 
 Frame* Frame::cast_frame()
 {
     return this;
-}
-
-void Frame::set_local(Name n, ObjP p)
-{
-    locals[n] = p;
-}
-
-void Frame::set(Name n, ObjP p)
-{
-    Frame* f = this;
-
-    // Get the frame that has this variable assigned.
-
-    while (f)
-    {
-        if (f->locals.count(n))
-        {
-            // Replace the old variable.
-            f->locals[n] = p;
-            return;
-        }
-        else
-            f = f->previous.get();
-    }
-
-    // Not found, add variable to this frame.
-
-    locals[n] = p;
-}
-
-ObjP Frame::set_local_(ObjP n, ObjP v)
-{
-    if (!is_symbol(n))
-        throw new Exception("bad_argument", n);
-    set_local(symbol_to_name(n), v);
-    return inc_ref(v);
-}
-
-ObjP Frame::set_(ObjP n, ObjP v)
-{
-    if (!is_symbol(n))
-        throw new Exception("bad_argument", n);
-    set(symbol_to_name(n), v);
-    return inc_ref(v);
 }
 
 ObjP Frame::set_exception_handler_(ObjP e)
@@ -194,18 +146,6 @@ void Frame::arg(ObjP p)
     args.push_back(p);
 }
 
-ObjP Frame::lookup(Name n)
-{
-    if (locals.count(n) == 0)
-    {
-        if (previous)
-            return previous->lookup(n);
-        throw new Exception("not_defined", name_to_symbol(n));
-    }
-    else
-        return inc_ref(locals[n]);
-}
-
 ObjP Frame::execute()
 {
     if (state != READY)
@@ -241,7 +181,7 @@ Frame* Frame::clone_continuation()
 {
     // TODO: state of the first cloned frame shouldn't be IN_CALL or FINISHED
 
-    Frame* f = new Frame(previous.get(),
+    Frame* f = new Frame(scope.get(),
                          caller.get() ? caller->clone_continuation() : 0,
                          code.get());
 
@@ -256,14 +196,13 @@ Frame* Frame::clone_continuation()
     f->args = args;
     f->exc_handler = exc_handler;
     f->ret = ret;
-    f->locals = locals;
 
     return f;
 }
 
-ObjP Frame::previous_()
+ObjP Frame::scope_()
 {
-    return previous ? inc_ref(*previous.get()) : 0;
+    return scope ? inc_ref(*scope.get()) : 0;
 }
 
 ObjP Frame::caller_()
@@ -288,12 +227,7 @@ ObjP Frame::state_()
     return 0;
 }
 
-ObjP Frame::cut_previous_()
-{
-    previous = 0;
-    return 0;
-}
-
+#if 0
 ObjP Frame::pollute_(ObjP obj)
 {
     Type* t = pr::get_type(obj);
@@ -305,6 +239,7 @@ ObjP Frame::pollute_(ObjP obj)
 
     return 0;
 }
+#endif
 
 const char* Frame::get_current_file()
 {

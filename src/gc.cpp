@@ -10,8 +10,7 @@ std::map<Object*, int> GC::roots;
 int GC::alive_bits;
 int GC::alive_mask;
 bool GC::in_progress;
-bool GC::blocked;
-bool GC::intensive_gc = false;
+bool GC::intensive_gc = true;
 
 static std::map<Type*, std::set<Object*> > objects;
 
@@ -88,7 +87,8 @@ void GC::force_gc()
 #ifdef NO_GC
     return;
 #else
-    if (in_progress || blocked)
+    assert(!in_progress);
+    if (in_progress)
         return;
 
     in_progress = true;

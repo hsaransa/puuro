@@ -18,6 +18,7 @@ namespace pr
     class Integer;
     class MiniCode;
     class Exception;
+    class Scope;
 
     struct FilePosition;
 

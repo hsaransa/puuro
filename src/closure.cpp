@@ -1,5 +1,6 @@
 #include "closure.hpp"
 #include "frame.hpp"
+#include "scope.hpp"
 #include "code.hpp"
 #include "string.hpp"
 #include "type.hpp"
@@ -13,8 +14,8 @@ using namespace pr;
 
 Type* Closure::type = 0;
 
-Closure::Closure(Frame* frame, Code* code)
-:   Object(get_type()), frame(frame), code(code)
+Closure::Closure(Scope* scope, Code* code)
+:   Object(get_type()), scope(scope), code(code)
 {
 //    assert(frame && code);
 }
@@ -29,7 +30,7 @@ Type* Closure::get_type()
     {
         type = new Type("closure");
         type->add_method("to_string", (Callable::mptr0)&Closure::to_string_);
-        type->add_method("frame", (Callable::mptr0)&Closure::frame_);
+        type->add_method("scope", (Callable::mptr0)&Closure::scope_);
         type->add_method("code", (Callable::mptr0)&Closure::code_);
         type->add_method("call", (Callable::mptrx)&Closure::call_);
         type->add_method("call_frame", (Callable::mptrx)&Closure::call_frame_);
@@ -39,7 +40,7 @@ Type* Closure::get_type()
 
 void Closure::gc_mark()
 {
-    GC::mark(frame);
+    GC::mark(scope);
     GC::mark(code);
 }
 
@@ -48,9 +49,9 @@ ObjP Closure::to_string_()
     return *new String("<closure>");
 }
 
-ObjP Closure::frame_()
+ObjP Closure::scope_()
 {
-    return inc_ref(*frame.get());
+    return inc_ref(*scope.get());
 }
 
 ObjP Closure::code_()
@@ -89,24 +90,25 @@ ObjP Closure::call_frame_(List* args)
 
     // Make frame and set local variables.
 
-    Frame* f = new Frame(frame.get(), 0, code.get());
+    Scope* sc = new Scope(scope.get());
 
     int i = 0;
 
     for (int j = 0; j < (int)pre.size(); j++)
-        f->set_local(pre[j], args->get(i++));
+        sc->set_local(pre[j], args->get(i++));
 
     if (sink.valid())
     {
         List* l = new List();
         while (i < args->get_size() - (int)post.size())
             l->append(args->get(i++));
-        f->set_local(sink, *l);
+        sc->set_local(sink, *l);
         dec_ref(l);
     }
 
     for (int j = 0; j < (int)post.size(); j++)
-        f->set_local(post[j], args->get(i++));
+        sc->set_local(post[j], args->get(i++));
 
+    Frame* f = new Frame(sc, 0, code.get());
     return *f;
 }

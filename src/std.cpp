@@ -16,6 +16,7 @@
 #include "ast.hpp"
 #include "selector.hpp"
 #include "integer.hpp"
+#include "scope.hpp"
 #include <stdio.h>
 
 using namespace pr;
@@ -109,7 +110,7 @@ ObjP Std::pollute(ObjP obj)
 
     std::map<Name, Callable>::iterator iter;
     for (iter = t->methods.begin(); iter != t->methods.end(); iter++)
-        f->set_local(iter->first, *new Method(obj, iter->second));
+        f->scope->set_local(iter->first, *new Method(obj, iter->second));
 
     return 0;
 }
@@ -286,8 +287,8 @@ ObjP Std::call_with_cloned_frame(ObjP p)
 
 ObjP Std::new_continuation_(ObjP p)
 {
-    Frame* caller = get_executor()->get_frame();
-    Frame* f = new Frame(caller->previous.get(), 0, new Code());
+    Ref<Frame*> caller = get_executor()->get_frame();
+    Frame* f = new Frame(caller->scope.get(), 0, new Code());
 
     ObjP exc = caller->get_exception_handler_();
     f->set_exception_handler_(exc);
@@ -339,7 +340,12 @@ ObjP Std::compile_file_(ObjP pp)
     Code* code = new Code();
     code->compile(ast, false);
 
-    Frame* frame = new Frame(0, 0, code);
+    Scope* scope = new Scope(0);
+
+    Frame* frame = new Frame(scope, 0, code);
+
+    dec_ref(scope);
+    dec_ref(code);
 
     return *frame;
 }

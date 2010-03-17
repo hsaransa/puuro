@@ -7,7 +7,7 @@ std.type.set_method 'module
     mod = [[] []];
 
     f = code.call_frame;
-    f.set_local 'pollute {<name obj>
+    f.scope.set_local 'pollute {<name obj>
         mod.first.append [name obj];
     };
     f.execute;
@@ -24,7 +24,7 @@ std.type.set_method 'require
 
         module = modules.get m;
         module.first.each {<x>
-            f.set_local x.first x.second;
+            f.scope.set_local x.first x.second;
         };
     };
 };

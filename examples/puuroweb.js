@@ -1,18 +1,6 @@
 var server = false;
 var server_pos = 0;
 
-function getClientWidth() {
-    return window.document.body.clientWidth;
-    //return document.documentElement.clientWidth;
-    //return document.compatMode=='CSS1Compat' && !window.opera?document.documentElement.clientWidth:document.body.clientWidth;
-}
-
-function getClientHeight() {
-    return window.document.body.clientHeight;
-    //return document.documentElement.clientHeight;
-    //return document.compatMode=='CSS1Compat' && !window.opera?document.documentElement.clientHeight:document.body.clientHeight;
-}
-
 function makeRequest(url, fnc) {
     var req = false;
     if (window.XMLHttpRequest) { // Mozilla, Safari,...
@@ -120,38 +108,6 @@ function server_ready_change() {
         server_pos = 0;
         server = false;
     }
-
-/*
-    if (req.readyState == 4) {
-        if (req.status == 200) {
-
-            var xmldoc = req.responseXML;
-            var root = xmldoc.getElementsByTagName('root').item(0);
-
-            for (var iNode = 0; iNode < root.childNodes.length; iNode++) {
-                var node = root.childNodes.item(iNode);
-                for (i = 0; i < node.childNodes.length; i++) {
-                    var sibl = node.childNodes.item(i);
-                    var len = parseInt(sibl.childNodes.length / 2);
-                    var arr = new Array(len);
-                    var cnt = 0;
-                    for (x = 0; x < sibl.childNodes.length; x++) {
-                        var sibl2 = sibl.childNodes.item(x);
-                        var sibl3;
-                        if (sibl2.childNodes.length > 0) {
-                            sibl3 = sibl2.childNodes.item(0);
-                            arr[cnt] = sibl3.data;   
-                            cnt++;
-                        }
-                    }
-                    addrow("mytable", arr);
-                }
-            }
-        } else {
-            alert('There was a problem with the request.');
-        }
-    }
-*/
 }
 
 

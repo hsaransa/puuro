@@ -24,15 +24,13 @@ namespace pr
             FINISHED
         };
 
-        Frame(Frame* prev, Frame* caller, Code* ast);
+        Frame(Scope* scope, Frame* caller, Code* ast);
         virtual ~Frame();
 
         virtual Type* get_type();
         virtual void gc_mark();
         virtual Frame* cast_frame();
 
-        void set_local(Name n, ObjP p);
-        void set(Name n, ObjP p);
         ObjP execute();
         ObjP continue_(ObjP);
 
@@ -54,15 +52,11 @@ namespace pr
         Frame* get_caller() { return caller.get(); }
 
     private:
-        ObjP lookup(Name n);
-
         ObjP to_string_();
-        ObjP set_local_(ObjP, ObjP);
-        ObjP set_(ObjP, ObjP);
 
         ObjP pollute_(ObjP p);
 
-        ObjP previous_();
+        ObjP scope_();
         ObjP caller_();
         ObjP code_();
         ObjP state_();
@@ -70,10 +64,8 @@ namespace pr
         ObjP current_file_();
         ObjP current_line_();
 
-        ObjP cut_previous_();
-
     private:
-        Ref<Frame*> previous;
+        Ref<Scope*> scope;
         Ref<Frame*> caller;
         Ref<Code*> code;
         State state;
@@ -88,8 +80,6 @@ namespace pr
         Ref<ObjP> control_handler;
 
         Ref<ObjP> ret;
-
-        std::map<Name, Ref<ObjP> > locals;
     };
 
     inline Frame* to_frame(ObjP p)

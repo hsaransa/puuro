@@ -15,7 +15,8 @@ namespace pr
     class Type : public Object
     {
         friend class Std;
-        friend class Frame;
+        friend class Frame; // TODO: friends could be avoided
+        friend class Scope;
     public:
         Type(Name n);
         virtual ~Type();

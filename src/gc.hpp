@@ -39,18 +39,6 @@ namespace pr
             return in_progress;
         }
 
-        static inline void block_gc()
-        {
-            assert(blocked == false);
-            blocked = true;
-        }
-
-        static inline void unblock_gc()
-        {
-            assert(blocked == true);
-            blocked = false;
-        }
-
         static inline void dec_ref(Object* p)
         {
             if (!in_progress)
@@ -62,7 +50,8 @@ namespace pr
 
         static inline void mark(Object* p)
         {
-            assert(p);
+            assert(p); // NULL is asserted instead of checked because it's
+                       // it's very rare that p is NULL
 #ifdef OUTPUT_GC_GRAPH
             gc_graph_out << "n" << gc_parent << " -> n" << p << '\n';
 #endif
@@ -94,7 +83,6 @@ namespace pr
         static int alive_bits;
         static int alive_mask;
         static bool in_progress;
-        static bool blocked;
         static bool intensive_gc;
     };
 

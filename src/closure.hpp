@@ -10,7 +10,7 @@ namespace pr
     class Closure : public Object
     {
     public:
-        Closure(Frame* frame, Code* code);
+        Closure(Scope* frame, Code* code);
         virtual ~Closure();
 
         virtual Type* get_type();
@@ -18,13 +18,13 @@ namespace pr
 
     private:
         ObjP to_string_();
-        ObjP frame_();
+        ObjP scope_();
         ObjP code_();
         ObjP call_(List*);
         ObjP call_frame_(List*);
 
     private:
-        Ref<Frame*> frame;
+        Ref<Scope*> scope;
         Ref<Code*> code;
 
         static Type* type;
