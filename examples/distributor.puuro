@@ -1,0 +1,30 @@
+require 'blocking;
+
+d = distributor();
+
+f = {<id>
+    q = d.new_listener;
+
+    bg {
+        print id " " q.pop;
+        (id == 1).then { sleep 1000; };
+        print id " " q.pop;
+        print id " " q.pop;
+
+        d.remove_listener q;
+    };
+};
+
+print "starting listeners";
+
+f 0;
+f 1;
+f 2;
+
+print "pushing data";
+
+d.push 77;
+d.push 88;
+d.push 99;
+
+print "done";

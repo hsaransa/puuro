@@ -1,3 +1,7 @@
+#
+# Blocking queue
+#
+
 blocking_queue_root = std.new_type 'blocking_queue;
 
 t = blocking_queue_root.type;
@@ -30,7 +34,40 @@ make_blocking_queue = {
     blocking_queue_root.new [[] []];
 };
 
+#
+# Distributor
+#
+
+distributor_root = std.new_type 'distributor;
+
+t = distributor_root.type;
+
+t.set_method 'to_string {<s> "<distributor>"};
+
+t.set_method 'new_listener {<d>
+    q = make_blocking_queue();
+    d.unbox.append q;
+    q
+};
+
+t.set_method 'remove_listener {<d q>
+    d.box (d.unbox.filter {<x> x.id != q.id});
+};
+
+t.set_method 'push {<d obj>
+    d.unbox.each {<q> q.push obj};
+};
+
+make_distributor = {
+    distributor_root.new []
+};
+
+#
+# Module
+#
+
 module 'blocking
 {
     pollute 'blocking_queue make_blocking_queue;
+    pollute 'distributor make_distributor;
 };
