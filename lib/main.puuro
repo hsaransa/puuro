@@ -24,13 +24,16 @@ script_file      = args.second;
 
 args = args.all_after 2;
 
-execute = {<fn>
+execute = {<internal fn>
   f = std.compile_file fn;
   f.scope.pollute std;
   f.scope.set_local 'std std;
   f.scope.set_local 'std2 std2;
   f.scope.set_local 'resolver resolver;
   f.scope.set_local 'args args;
+  internal.then {
+      f.scope.set_local 'execute execute;
+  };
   f.execute;
 };
 
@@ -38,16 +41,12 @@ execute = {<fn>
  "module.puuro"
  "list.puuro"
  "utils.puuro"
- "string.puuro"
- "streams.puuro"
- "blocking.puuro"
- "file.puuro"
- "web.puuro"
- "net.puuro"
-# "url.puuro"
- "irc.puuro"
- "dir.puuro"].each {<x>
-    execute lib_dir + "/" + x
+ "string.puuro"].each {<x>
+    execute \t lib_dir + "/" + x
 };
 
-execute script_file;
+['streams 'blocking 'file 'web 'net 'irc 'dir].each {<m>
+    std.module_source m (lib_dir + "/" + m.s + ".puuro");
+};
+
+std.bg { execute \f script_file; };

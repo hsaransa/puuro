@@ -1,10 +1,16 @@
 modules = std.assoc;
+sources = std.assoc;
+
+std.type.set_method 'module_source
+{<std m src>
+    sources.set m src;
+};
 
 std.type.set_method 'module
 {<std m code>
     (modules.has m).then { raise (exception 'bad_module "already exists") };
 
-    mod = [[] []];
+    mod = [[] \n];
 
     f = code.call_frame;
     f.scope.set_local 'pollute {<name obj>
@@ -20,7 +26,13 @@ std.type.set_method 'require
     f = std.active_frame.caller;
 
     mods.each {<m>
-        (modules.has m).else { raise (exception 'bad_module m) };
+        (modules.has m).else {
+            (sources.has m).else {
+                raise (exception 'bad_module m);
+            };
+
+            execute \t (sources.get m);
+        };
 
         module = modules.get m;
         module.first.each {<x>
