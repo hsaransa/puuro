@@ -1,13 +1,13 @@
-modules = std.assoc;
-sources = std.assoc;
+modules = builtin.assoc;
+sources = builtin.assoc;
 
-std.type.set_method 'module_source
-{<std m src>
+builtin.type.set_method 'module_source
+{<builtin m src>
     sources.set m src;
 };
 
-std.type.set_method 'module
-{<std m code>
+builtin.type.set_method 'module
+{<builtin m code>
     (modules.has m).then { raise (exception 'bad_module "already exists") };
 
     mod = [[] \n];
@@ -21,9 +21,9 @@ std.type.set_method 'module
     modules.set m mod;
 };
 
-std.type.set_method 'require
-{<std *mods>
-    f = std.active_frame.caller;
+builtin.type.set_method 'require
+{<builtin *mods>
+    f = builtin.active_frame.caller;
 
     mods.each {<m>
         (modules.has m).else {

@@ -3,7 +3,7 @@
 require 'streams;
 
 open_file = {<fn mode>
-    f = std.file;
+    f = builtin.file;
     f.set_filename fn;
     f.open mode;
     f;
@@ -14,7 +14,7 @@ read_file = {<fn>
 
     s = "";
 
-    std.repeat
+    builtin.repeat
     {
         r = f.read 16384;
         (r != \n).then {s = s + r};
@@ -31,7 +31,7 @@ file_in_streamer = {<fn>
 
         s = "";
 
-        std.repeat
+        builtin.repeat
         {
             r = f.read 4096;
             out r;
@@ -46,7 +46,7 @@ file_out_streamer = {<fn>
     streamer {<in>
         f = open_file fn 'w;
 
-        std.repeat
+        builtin.repeat
         {
             r = in();
             (r != \n).then { f.write r; };

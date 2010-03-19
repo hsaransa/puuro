@@ -2,7 +2,7 @@
 # Blocking queue
 #
 
-blocking_queue_root = std.new_type 'blocking_queue;
+blocking_queue_root = builtin.new_type 'blocking_queue;
 
 t = blocking_queue_root.type;
 
@@ -38,7 +38,7 @@ make_blocking_queue = {
 # Distributor
 #
 
-distributor_root = std.new_type 'distributor;
+distributor_root = builtin.new_type 'distributor;
 
 t = distributor_root.type;
 

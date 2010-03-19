@@ -1,0 +1,45 @@
+require 'std2;
+
+init        = std2_function 'inotify 'init;
+add_watch   = std2_function 'inotify 'add_watch;
+#rm_watch    = std2_function 'inotify 'rm_watch;
+read        = std2_function 'inotify 'read;
+event_mask  = std2_function 'inotify 'event_mask;
+event_name  = std2_function 'inotify 'event_name;
+MODIFY      = std2_const    'inotify 'MODIFY;
+CREATE      = std2_const    'inotify 'CREATE;
+
+inotify = init();
+waiters = [];
+
+bg {
+    repeat {
+        ev = read inotify;
+        print "EVENT " (event_mask ev) " " (event_name ev);
+    }
+};
+
+wait_file_change = {<fn *mode>
+    mode.empty.then { mode = ['modify] };
+
+    m = 0;
+    mode.each {<x>
+        switch x
+            'modify { m = m.or MODIFY }
+            'create { m = m.or CREATE }
+            {assert \f x};
+    };
+
+    w = add_watch inotify fn m;
+
+    new_continuation
+    {<orig>
+        print "WAIT " w;
+        waiters.append [w fn m orig];
+    };
+};
+
+module 'filechange
+{
+    pollute 'wait_file_change wait_file_change;
+};

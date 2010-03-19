@@ -4,7 +4,7 @@
 #include "parser.hpp"
 #include "code.hpp"
 #include "frame.hpp"
-#include "std.hpp"
+#include "builtin.hpp"
 #include "list.hpp"
 #include "selector.hpp"
 #include "std2.hpp"
@@ -45,13 +45,13 @@ static void execute_file(const char* fn, List* args)
 #endif
         dec_ref(ast);
 
-        Std* std = new Std();
+        BuiltIn* std = new BuiltIn();
         Std2* std2 = new Std2();
         Resolver* resolver = new Resolver();
         String* lib_dir = new String(LIB_DIR);
 
         Scope* scope = new Scope(0);
-        scope->set_local("std", *std);
+        scope->set_local("builtin", *std);
         scope->set_local("std2", *std2);
         scope->set_local("resolver", *resolver);
         scope->set_local("lib_dir", *lib_dir);

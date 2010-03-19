@@ -12,20 +12,20 @@ rand = {
 find_cycle_length = {
     first = rand();
     i = 0;
-    std.while {rand() != first} { i = i + 1; };
+    while {rand() != first} { i = i + 1; };
     i;
 };
 
-std.print "cycle length " find_cycle_length();
+print "cycle length " find_cycle_length();
 
 srand 50;
-std.print rand();
-std.print rand();
-std.print rand();
-std.print rand();
+print rand();
+print rand();
+print rand();
+print rand();
 srand 50;
-std.print rand();
-std.print rand();
-std.print rand();
-std.print rand();
+print rand();
+print rand();
+print rand();
+print rand();
 

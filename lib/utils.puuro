@@ -1,25 +1,25 @@
 # Weird features
 
-std.type.set_method 'multi
-{<std m s *r>
-    std.print m " " s " " ;
+builtin.type.set_method 'multi
+{<builtin m s *r>
+    builtin.print m " " s " " ;
     r.each
     {<l>
-        s = std.apply (s.type.get_method m):rcall [s] + r;
+        s = builtin.apply (s.type.get_method m):rcall [s] + r;
     };
     s;
 };
 
 
-std.type.set_method 'bg
-{<std code>
+builtin.type.set_method 'bg
+{<builtin code>
     act = \f;
 
-    std.new_continuation {<orig>
-        std.active_frame.set_exception_handler orig.get_exception_handler;
-        act = std.active_frame;
+    builtin.new_continuation {<orig>
+        builtin.active_frame.set_exception_handler orig.get_exception_handler;
+        act = builtin.active_frame;
 
-        std.sleep 0 orig;
+        builtin.sleep 0 orig;
 
         act = \f;
         code.call;
@@ -28,11 +28,11 @@ std.type.set_method 'bg
     act;
 };
 
-std.type.set_method 'range {<std s e>
+builtin.type.set_method 'range {<builtin s e>
   i = s;
   l = [];
 
-  std.while {i <= e}
+  builtin.while {i <= e}
   {
       l.append i;
       i = i + 1;
@@ -41,7 +41,7 @@ std.type.set_method 'range {<std s e>
   l;
 };
 
-std.type.set_method 'min {<std *l>
+builtin.type.set_method 'min {<builtin *l>
     v = l.first;
     (l.all_after 1).each {<x>
         (x < v) { v = x };
@@ -49,7 +49,7 @@ std.type.set_method 'min {<std *l>
     v;
 };
 
-std.type.set_method 'max {<std *l>
+builtin.type.set_method 'max {<builtin *l>
     v = l.first;
     (l.all_after 1).each {<x>
         (x > v) { v = x };
@@ -57,23 +57,23 @@ std.type.set_method 'max {<std *l>
     v;
 };
 
-std.type.set_method 'all {<std *l>
+builtin.type.set_method 'all {<builtin *l>
     v = \t;
     l.each {<x> v = v.and x};
     v;
 };
 
-std.type.set_method 'any {<std *l>
+builtin.type.set_method 'any {<builtin *l>
     v = \f;
     l.each {<x> v = v.or x};
     v;
 };
 
-std.type.set_method 'assert {<std c *o>
+builtin.type.set_method 'assert {<builtin c *o>
     c.else { raise (exception 'assertion_failed o); }
 };
 
-std.type.set_method 'switch {<std value *cases>
+builtin.type.set_method 'switch {<builtin value *cases>
     ret = \f;
 
     repeat
@@ -100,12 +100,12 @@ std.type.set_method 'switch {<std value *cases>
     ret;
 };
 
-std.type.set_method 'break {<std obj>
+builtin.type.set_method 'break {<builtin obj>
     raise (exception 'break obj);
 };
 
-std.type.set_method 'block {<std c>
-    f = std.active_frame;
+builtin.type.set_method 'block {<builtin c>
+    f = builtin.active_frame;
     prev = f.get_exception_handler;
 
     ret = new_continuation {<orig>

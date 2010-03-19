@@ -15,7 +15,8 @@ namespace pr
         static const int WRITE = 2;
         static const int ERROR = 4;
 
-        typedef void (*callback_func)(void*, ObjP);
+        typedef void (*sleeper_callback_func)(void*, ObjP);
+        typedef void (*watcher_callback_func)(int fd, int mask, void*, ObjP);
 
         Selector();
         ~Selector();
@@ -26,8 +27,8 @@ namespace pr
 
         int64 get_current_time();
 
-        void add_sleeper(int64 us, callback_func cb, void* user, ObjP obj);
-        void add_watcher(int fd, int mask, callback_func cb, void* user, ObjP obj);
+        void add_sleeper(int64 us, sleeper_callback_func cb, void* user, ObjP obj);
+        void add_watcher(int fd, int mask, watcher_callback_func cb, void* user, ObjP obj);
 
         void clean_fd(int fd);
 
@@ -37,7 +38,7 @@ namespace pr
         struct Sleeper
         {
             int64 wake_time;
-            callback_func callback;
+            sleeper_callback_func callback;
             void* user;
             Ref<ObjP> obj;
 
@@ -56,7 +57,7 @@ namespace pr
         {
             int fd;
             int mask;
-            callback_func callback;
+            watcher_callback_func callback;
             void* user;
             Ref<ObjP> obj;
         };

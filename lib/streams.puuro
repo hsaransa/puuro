@@ -1,6 +1,6 @@
 # Stream objects
 
-streamer_root = std.new_type 'streamer;
+streamer_root = builtin.new_type 'streamer;
 
 t = streamer_root.type;
 
@@ -106,7 +106,7 @@ connect = {<producer consumer>
 };
 
 make_streamer = {<*args f>
-    s = std.assoc;
+    s = builtin.assoc;
     s.set 'code f;
     s.set 'args args;
     s.set 'cont \n;

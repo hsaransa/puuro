@@ -9,7 +9,7 @@ namespace pr
 {
     class Type : public Object
     {
-        friend class Std;
+        friend class BuiltIn;
         friend class Frame; // TODO: friends could be avoided
         friend class Scope;
     public:

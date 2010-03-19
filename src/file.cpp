@@ -154,8 +154,10 @@ ObjP File::socket_(ObjP a, ObjP b)
     return 0;
 }
 
-static void connect_cb(void*, ObjP p)
+static void connect_cb(int fd, int mask, void*, ObjP p)
 {
+    (void)fd;
+    (void)mask;
     List* l = to_object(p)->cast_list();
     File* file = (File*)to_object(l->get(0));
     Frame* frame = (Frame*)to_object(l->get(1));
@@ -184,6 +186,7 @@ ObjP File::connect_(ObjP a)
     if (ret < 0 && errno == EINPROGRESS)
     {
         Frame* f = get_executor()->get_frame();
+        // NOTE: list is necessary because reference to this must be kept.
         List* l = new List(3, (ObjP)*this, (ObjP)*f, a);
         get_selector()->add_watcher(fd, Selector::WRITE, connect_cb, 0, *l);
         dec_ref(l);
@@ -211,8 +214,10 @@ ObjP File::listen_(ObjP p)
     return 0;
 }
 
-static void read_cb(void* user, ObjP p)
+static void read_cb(int fd, int mask, void* user, ObjP p)
 {
+    (void)fd;
+    (void)mask;
     List* l = to_object(p)->cast_list();
     File* file = (File*)to_object(l->get(0));
     Frame* frame = (Frame*)to_object(l->get(1));
@@ -242,6 +247,7 @@ ObjP File::read_(ObjP p)
     Frame* f = get_executor()->get_frame();
     int n = int_value(p);
 
+    // NOTE: list is necessary because reference to this must be kept.
     List* l = new List(2, (ObjP)*this, (ObjP)*f);
     get_selector()->add_watcher(fd, Selector::READ, read_cb, (void*)n, *l);
     dec_ref(l);
@@ -251,8 +257,11 @@ ObjP File::read_(ObjP p)
     return error_object();
 }
 
-static void write_cb(void*, ObjP p)
+static void write_cb(int fd, int mask, void*, ObjP p)
 {
+    (void)fd;
+    (void)mask;
+
     List* l = to_object(p)->cast_list();
     File* file = (File*)to_object(l->get(0));
     Frame* frame = (Frame*)to_object(l->get(1));
@@ -285,8 +294,10 @@ ObjP File::write_(ObjP p)
     return error_object();
 }
 
-static void accept_cb(void* user, ObjP p)
+static void accept_cb(int fd, int mask, void* user, ObjP p)
 {
+    (void)fd;
+    (void)mask;
     (void)user;
 
     List* l = to_object(p)->cast_list();

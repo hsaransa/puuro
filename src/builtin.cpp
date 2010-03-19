@@ -1,4 +1,4 @@
-#include "std.hpp"
+#include "builtin.hpp"
 #include "list.hpp"
 #include "typedobject.hpp"
 #include "assoc.hpp"
@@ -16,43 +16,43 @@
 
 using namespace pr;
 
-Type* Std::type;
+Type* BuiltIn::type;
 
-Std::Std()
+BuiltIn::BuiltIn()
 :   Object(get_type())
 {
 }
 
-Std::~Std()
+BuiltIn::~BuiltIn()
 {
 }
 
-Type* Std::get_type()
+Type* BuiltIn::get_type()
 {
     if (!type)
     {
         type = new Type("std");
-        type->add_method("print", (Callable::mptrx)&Std::print);
-        type->add_method("pollute", (Callable::mptr1)&Std::pollute);
-        type->add_method("if", (Callable::mptrx)&Std::if_);
-        type->add_method("gc", (Callable::mptr0)&Std::gc);
-        type->add_method("gc_obj_count", (Callable::mptr0)&Std::gc_obj_count_);
-        type->add_method("while", (Callable::mptr2)&Std::while_);
-        //type->add_method("types", (Callable::mptr0)&Std::types);
-        type->add_method("new_type", (Callable::mptr1)&Std::new_type_);
-        type->add_method("apply", (Callable::mptr2)&Std::apply_);
-        type->add_method("assoc", (Callable::mptr0)&Std::assoc_);
-        type->add_method("active_frame", (Callable::mptr0)&Std::caller_);
-        type->add_method("repeat", (Callable::mptr1)&Std::repeat_);
-        type->add_method("iter", (Callable::mptr2)&Std::iter_);
-        type->add_method("call_with_cloned_frame", (Callable::mptr1)&Std::call_with_cloned_frame);
-        type->add_method("new_continuation", (Callable::mptr1)&Std::new_continuation_);
-        type->add_method("raise", (Callable::mptr1)&Std::raise_);
-        type->add_method("compile_file", (Callable::mptr1)&Std::compile_file_);
-        type->add_method("exception", (Callable::mptr2)&Std::exception_);
-        type->add_method("sleep", (Callable::mptr2)&Std::sleep_);
-        type->add_method("file", (Callable::mptr0)&Std::file_);
-        type->add_method("compile_string", (Callable::mptr1)&Std::compile_string_);
+        type->add_method("print", (Callable::mptrx)&BuiltIn::print);
+        type->add_method("pollute", (Callable::mptr1)&BuiltIn::pollute);
+        type->add_method("if", (Callable::mptrx)&BuiltIn::if_);
+        type->add_method("gc", (Callable::mptr0)&BuiltIn::gc);
+        type->add_method("gc_obj_count", (Callable::mptr0)&BuiltIn::gc_obj_count_);
+        type->add_method("while", (Callable::mptr2)&BuiltIn::while_);
+        //type->add_method("types", (Callable::mptr0)&BuiltIn::types);
+        type->add_method("new_type", (Callable::mptr1)&BuiltIn::new_type_);
+        type->add_method("apply", (Callable::mptr2)&BuiltIn::apply_);
+        type->add_method("assoc", (Callable::mptr0)&BuiltIn::assoc_);
+        type->add_method("active_frame", (Callable::mptr0)&BuiltIn::caller_);
+        type->add_method("repeat", (Callable::mptr1)&BuiltIn::repeat_);
+        type->add_method("iter", (Callable::mptr2)&BuiltIn::iter_);
+        type->add_method("call_with_cloned_frame", (Callable::mptr1)&BuiltIn::call_with_cloned_frame);
+        type->add_method("new_continuation", (Callable::mptr1)&BuiltIn::new_continuation_);
+        type->add_method("raise", (Callable::mptr1)&BuiltIn::raise_);
+        type->add_method("compile_file", (Callable::mptr1)&BuiltIn::compile_file_);
+        type->add_method("exception", (Callable::mptr2)&BuiltIn::exception_);
+        type->add_method("sleep", (Callable::mptr2)&BuiltIn::sleep_);
+        type->add_method("file", (Callable::mptr0)&BuiltIn::file_);
+        type->add_method("compile_string", (Callable::mptr1)&BuiltIn::compile_string_);
     }
     return type;
 }
@@ -70,7 +70,7 @@ static void print_continuation1(MiniCode*, Frame*)
     printf("\n");
 }
 
-ObjP Std::print(List* l)
+ObjP BuiltIn::print(List* l)
 {
     static const MiniCode::Op ops[] =
     {
@@ -97,7 +97,7 @@ ObjP Std::print(List* l)
     return error_object();
 }
 
-ObjP Std::pollute(ObjP obj)
+ObjP BuiltIn::pollute(ObjP obj)
 {
     Type* t = pr::get_type(obj);
     Frame* f = get_executor()->get_frame();
@@ -109,7 +109,7 @@ ObjP Std::pollute(ObjP obj)
     return 0;
 }
 
-ObjP Std::if_(List* l)
+ObjP BuiltIn::if_(List* l)
 {
     int s = l->get_size();
     if (s != 2 && s != 3)
@@ -130,18 +130,18 @@ ObjP Std::if_(List* l)
     return error_object();
 }
 
-ObjP Std::gc()
+ObjP BuiltIn::gc()
 {
     GC::force_gc();
     return 0;
 }
 
-ObjP Std::gc_obj_count_()
+ObjP BuiltIn::gc_obj_count_()
 {
     return int_to_fixnum(GC::get_object_count());
 }
 
-ObjP Std::while_(ObjP a, ObjP b)
+ObjP BuiltIn::while_(ObjP a, ObjP b)
 {
     static const MiniCode::Op ops[] =
     {
@@ -171,7 +171,7 @@ ObjP Std::while_(ObjP a, ObjP b)
 }
 
 #if 0
-ObjP Std::types()
+ObjP BuiltIn::types()
 {
     List* l = new List();
 
@@ -191,7 +191,7 @@ static ObjP new_typed_object(ObjP p, ObjP o)
     return *new TypedObject(t, o);
 }
 
-ObjP Std::new_type_(ObjP p)
+ObjP BuiltIn::new_type_(ObjP p)
 {
     if (!is_symbol(p))
         throw new Exception("bad_type", p);
@@ -203,23 +203,23 @@ ObjP Std::new_type_(ObjP p)
     return *new TypedObject(t, 0);
 }
 
-ObjP Std::apply_(ObjP p, ObjP a)
+ObjP BuiltIn::apply_(ObjP p, ObjP a)
 {
     deferred_method_callx(p, "call", to_list(a));
     return error_object();
 }
 
-ObjP Std::assoc_()
+ObjP BuiltIn::assoc_()
 {
     return *new Assoc();
 }
 
-ObjP Std::caller_()
+ObjP BuiltIn::caller_()
 {
     return inc_ref(*get_executor()->get_frame());
 }
 
-ObjP Std::repeat_(ObjP c)
+ObjP BuiltIn::repeat_(ObjP c)
 {
     static const MiniCode::Op ops[] = {
         { MiniCode::Push, 0 },
@@ -240,7 +240,7 @@ ObjP Std::repeat_(ObjP c)
     return error_object();
 }
 
-ObjP Std::iter_(ObjP s, ObjP c)
+ObjP BuiltIn::iter_(ObjP s, ObjP c)
 {
     static const MiniCode::Op ops[] =
     {
@@ -270,7 +270,7 @@ ObjP Std::iter_(ObjP s, ObjP c)
     return error_object();
 }
 
-ObjP Std::call_with_cloned_frame(ObjP p)
+ObjP BuiltIn::call_with_cloned_frame(ObjP p)
 {
     Frame* f = get_executor()->get_frame();
     Frame* cf = f->clone_continuation();
@@ -279,7 +279,7 @@ ObjP Std::call_with_cloned_frame(ObjP p)
     return error_object();
 }
 
-ObjP Std::new_continuation_(ObjP p)
+ObjP BuiltIn::new_continuation_(ObjP p)
 {
     Closure* closure = cast_object<Closure*>(p);
     Frame* caller = get_executor()->get_frame();
@@ -296,7 +296,7 @@ ObjP Std::new_continuation_(ObjP p)
     return error_object();
 }
 
-ObjP Std::raise_(ObjP p)
+ObjP BuiltIn::raise_(ObjP p)
 {
     Exception* exc = is_object(p) ? to_object(p)->cast_exception() : 0;
     if (!exc)
@@ -305,7 +305,7 @@ ObjP Std::raise_(ObjP p)
     throw exc;
 }
 
-ObjP Std::compile_file_(ObjP pp)
+ObjP BuiltIn::compile_file_(ObjP pp)
 {
     String* fn = to_string(pp);
 
@@ -333,7 +333,7 @@ ObjP Std::compile_file_(ObjP pp)
     return *frame;
 }
 
-ObjP Std::compile_string_(ObjP pp)
+ObjP BuiltIn::compile_string_(ObjP pp)
 {
     String* fn = to_string(pp);
 
@@ -354,7 +354,7 @@ ObjP Std::compile_string_(ObjP pp)
     return *frame;
 }
 
-ObjP Std::exception_(ObjP a, ObjP b)
+ObjP BuiltIn::exception_(ObjP a, ObjP b)
 {
     if (!is_symbol(a))
         throw new Exception("bad_type", a);
@@ -368,7 +368,7 @@ static void wake_up(void*, ObjP c)
     get_executor()->set_frame(f);
 }
 
-ObjP Std::sleep_(ObjP p, ObjP next)
+ObjP BuiltIn::sleep_(ObjP p, ObjP next)
 {
     int64 ms = int_value(p);
 
@@ -382,7 +382,7 @@ ObjP Std::sleep_(ObjP p, ObjP next)
     return error_object();
 }
 
-ObjP Std::file_()
+ObjP BuiltIn::file_()
 {
     return *new File();
 }

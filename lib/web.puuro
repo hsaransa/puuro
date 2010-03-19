@@ -3,7 +3,7 @@
 require 'streams;
 
 start_web_server = {<port client_code>
-    f = std.file;
+    f = builtin.file;
     f.socket 'inet 'stream;
     f.setsockopt 'reuseaddr \t;
     addr = resolver.inaddr_any;
@@ -116,7 +116,7 @@ handle_client = {<s client_code>
     }
     {<e c>
         s.close;
-        (std.active_frame.get_exception_handler) e c;
+        (builtin.active_frame.get_exception_handler) e c;
     };
 };
 

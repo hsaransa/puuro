@@ -1,16 +1,16 @@
-#ifndef _pr_std_hpp_
-#define _pr_std_hpp_
+#ifndef _pr_builtin_hpp_
+#define _pr_builtin_hpp_
 
 #include "prdefs.hpp"
 #include "object.hpp"
 
 namespace pr
 {
-    class Std : public Object
+    class BuiltIn : public Object
     {
     public:
-        Std();
-        virtual ~Std();
+        BuiltIn();
+        virtual ~BuiltIn();
 
         virtual Type* get_type();
 

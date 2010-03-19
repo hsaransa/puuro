@@ -11,7 +11,7 @@ namespace pr
     class Frame : public Object
     {
         friend class Executor;
-        friend class Std;
+        friend class BuiltIn;
     public:
         enum State
         {

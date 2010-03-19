@@ -45,7 +45,7 @@ int64 Selector::get_current_time()
     return (int64)tv.tv_sec * 1000000 + (int64)tv.tv_usec;
 }
 
-void Selector::add_sleeper(int64 us, callback_func cb, void* user, ObjP p)
+void Selector::add_sleeper(int64 us, sleeper_callback_func cb, void* user, ObjP p)
 {
     Sleeper s;
     s.wake_time = get_current_time() + us;
@@ -56,7 +56,7 @@ void Selector::add_sleeper(int64 us, callback_func cb, void* user, ObjP p)
     sleepers.push_back(s);
 }
 
-void Selector::add_watcher(int fd, int mask, callback_func cb, void* user, ObjP p)
+void Selector::add_watcher(int fd, int mask, watcher_callback_func cb, void* user, ObjP p)
 {
     Watcher w;
     w.fd = fd;
@@ -139,7 +139,7 @@ void Selector::select()
 
         Watcher w = watchers[i];
         watchers.erase(watchers.begin() + i);
-        w.callback(w.user, w.obj);
+        w.callback(w.fd, w.mask, w.user, w.obj);
         break;
     }
 }

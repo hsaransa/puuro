@@ -8,7 +8,7 @@ syn clear
 syn keyword xFunctions print new_continuation while if then else repeat iter
 syn keyword xFunctions new_type active_frame
 
-syn keyword xPredefined std
+syn keyword xPredefined builtin
 
 syn region xLineComment start="#" keepend end="$"
 syn region xRegionComment start="#-" end="-#" contains=xRegionComment
