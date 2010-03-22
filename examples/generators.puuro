@@ -2,7 +2,7 @@
 
 generator = {<code>
     f = code.call_frame;
-    f.set_exception_handler std.active_frame.get_exception_handler;
+    f.set_exception_handler builtin.active_frame.get_exception_handler;
 
     return = \f;
 

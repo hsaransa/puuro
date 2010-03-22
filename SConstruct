@@ -39,7 +39,7 @@ env.Append(CPPDEFINES=[('LIB_DIR', '"\\"%s/lib\\""' % os.getcwd())])
 
 env.Append(CPPPATH=[STD2_DIR + '/include'])
 env.Append(LIBPATH=[STD2_DIR])
-env.Append(LIBS=['std2'])
+env.Append(LIBS=['std2', 'readline'])
 
 # udns
 

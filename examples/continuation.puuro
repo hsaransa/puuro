@@ -1,6 +1,6 @@
 # Plop
 
-std.pollute std;
+builtin.pollute builtin;
 
 continuation = \f;
 

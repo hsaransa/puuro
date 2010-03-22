@@ -14,6 +14,7 @@ namespace pr
         static const int READ  = 1;
         static const int WRITE = 2;
         static const int ERROR = 4;
+        static const int ABORT = 16;
 
         typedef void (*sleeper_callback_func)(void*, ObjP);
         typedef void (*watcher_callback_func)(int fd, int mask, void*, ObjP);

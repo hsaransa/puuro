@@ -1,0 +1,19 @@
+require 'std2;
+
+ss = {builtin.active_frame.scope}();
+
+repeat
+{
+    try
+    {
+        s = std2_call 'readline 'readline "> ";
+        c = compile_string s ss;
+        ret = c.execute;
+        (\n != ret).then { print ret };
+    }
+    {<e c>
+        (builtin.active_frame.get_exception_handler) e c;
+    };
+
+    \t
+};

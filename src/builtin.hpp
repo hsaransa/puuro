@@ -34,7 +34,7 @@ namespace pr
         ObjP exception_(ObjP, ObjP);
         ObjP sleep_(ObjP, ObjP);
         ObjP file_();
-        ObjP compile_string_(ObjP);
+        ObjP compile_string_(ObjP, ObjP);
         ObjP sockaddr_(ObjP);
 
         static Type* type;

@@ -5,6 +5,7 @@
 #include "selector.hpp"
 #include "frame.hpp"
 #include <stdio.h>
+#include <stdlib.h>
 
 using namespace pr;
 
@@ -160,65 +161,106 @@ struct callback_data
 
 static void callback(int fd, int mask, void* user, ObjP p)
 {
-    int m = 0;
-    if (mask & STD2_CALLBACK_READ)
-        m |= STD2_CALLBACK_READ;
-    if (mask & STD2_CALLBACK_WRITE)
-        m |= STD2_CALLBACK_WRITE;
-    if (mask & STD2_CALLBACK_ERROR)
-        m |= STD2_CALLBACK_ERROR;
-
     callback_data* data = (callback_data*)user;
 
+    int m = 0;
+    if (mask & Selector::READ)
+        m |= STD2_CALLBACK_READ;
+    if (mask & Selector::WRITE)
+        m |= STD2_CALLBACK_WRITE;
+    if (mask & Selector::ERROR)
+        m |= STD2_CALLBACK_ERROR;
+    if (mask & Selector::ABORT)
+        m |= STD2_CALLBACK_ABORT;
+
+    assert(data->cb.fd == fd);
+    assert((data->cb.flags & m) != 0);
+
+    // Call std2.
+
     int ret;
-    ObjP ret_obj;
+    ObjP ret_obj = 0;
 
     switch (data->ret_type.type)
     {
     case STD2_INT32:
         {
-            int value;
-            ret = data->cb.func((void*)&value, fd, mask, data->cb.user);
-            ret_obj = int_to_object(value);
+            int value = 0;
+            ret = std2_call_callback(&data->cb, (void*)&value, m);
+            if (!ret)
+                ret_obj = int_to_object(value);
             break;
         }
 
     case STD2_INT64:
         {
-            std2_int64 value;
-            ret = data->cb.func((void*)&value, fd, mask, data->cb.user);
-            ret_obj = *new Integer(value);
+            std2_int64 value = 0;
+            ret = std2_call_callback(&data->cb, (void*)&value, m);
+            if (!ret)
+                ret_obj = *new Integer(value);
             break;
         }
 
     case STD2_C_STRING:
         {
-            const char* value;
-            ret = data->cb.func((void*)&value, fd, mask, data->cb.user);
-            if (value)
+            const char* value = 0;
+            ret = std2_call_callback(&data->cb, (void*)&value, m);
+            if (!ret && value)
                 ret_obj = *new String(value);
-            else
-                ret_obj = 0;
+            break;
+        }
+
+    case STD2_M_C_STRING:
+        {
+            char* value = 0;
+            ret = std2_call_callback(&data->cb, (void*)&value, m);
+            if (!ret && value)
+                ret_obj = *new String(value);
+            free(value);
             break;
         }
 
     case STD2_INSTANCE:
         {
-            void* value;
-            ret = data->cb.func((void*)&value, fd, mask, data->cb.user);
-            if (value)
+            void* value = 0;
+            ret = std2_call_callback(&data->cb, (void*)&value, m);
+            if (!ret && value)
                 ret_obj = *new Std2Instance(data->ret_type.module_id, data->ret_type.class_id, value);
-            else
-                ret_obj = 0;
             break;
         }
-        break;
 
     default:
         throw new Exception("unsupported_std2_type", 0);
     }
 
-    assert(ret == 0);
+    // Handle callback.
+
+    if (ret)
+    {
+        struct std2_callback cb = std2_get_callback();
+
+        int m = 0;
+        if (cb.flags & STD2_CALLBACK_READ)
+            m |= Selector::READ;
+        if (cb.flags & STD2_CALLBACK_WRITE)
+            m |= Selector::WRITE;
+        if (cb.flags & STD2_CALLBACK_ERROR)
+            m |= Selector::ERROR;
+        if (cb.flags & STD2_CALLBACK_ABORT)
+            m |= Selector::ABORT;
+
+        data->cb = cb;
+
+        get_selector()->add_watcher(cb.fd, m, callback, data, p);
+
+        assert(ret_obj == 0);
+
+        return;
+    }
+
+    delete data;
+
+    // Return to caller frame.
 
     Frame* f = to_frame(p);
     f->push(ret_obj);
@@ -227,10 +269,7 @@ static void callback(int fd, int mask, void* user, ObjP p)
 
 ObjP Std2Function::call_(List* l)
 {
-#if 0
-    if (l->get_size() != (int)params.size())
-        throw new Exception("bad_param_count", *l);
-#endif
+    // Process parameters.
 
     void*      args[16];
     std2_int32 int32s[16];
@@ -302,61 +341,68 @@ ObjP Std2Function::call_(List* l)
         j++;
     }
 
+    // Call std2.
+
     int ret;
-    ObjP ret_obj;
+    ObjP ret_obj = 0;
 
     switch (ret_type.type)
     {
     case STD2_INT32:
         {
-            int value;
+            int value = 0;
             ret = std2_call(module, function, (void*)&value, args);
-            ret_obj = int_to_object(value);
+            if (!ret)
+                ret_obj = int_to_object(value);
             break;
         }
 
     case STD2_INT64:
         {
-            std2_int64 value;
+            std2_int64 value = 0;
             ret = std2_call(module, function, (void*)&value, args);
-            ret_obj = *new Integer(value);
+            if (!ret)
+                ret_obj = *new Integer(value);
             break;
         }
 
     case STD2_C_STRING:
         {
-            const char* value;
+            const char* value = 0;
             ret = std2_call(module, function, (void*)&value, args);
-            if (value)
+            if (!ret && value)
                 ret_obj = *new String(value);
-            else
-                ret_obj = 0;
+            break;
+        }
+
+    case STD2_M_C_STRING:
+        {
+            char* value = 0;
+            ret = std2_call(module, function, (void*)&value, args);
+            if (!ret && value)
+                ret_obj = *new String(value);
+            free(value);
             break;
         }
 
     case STD2_INSTANCE:
         {
-            void* value;
+            void* value = 0;
             ret = std2_call(module, function, (void*)&value, args);
-            if (value)
+            if (!ret && value)
                 ret_obj = *new Std2Instance(ret_type.module_id, ret_type.class_id, value);
-            else
-                ret_obj = 0;
             break;
         }
-        break;
 
     default:
         throw new Exception("unsupported_std2_type", 0);
     }
 
-    // Handle callbacks.
+    // Handle callback.
 
-    bool delayed_return = false;
-
-    for (int i = 0; i < ret; i++)
+    if (ret)
     {
-        struct std2_callback cb = std2_get_callback(i);
+        struct std2_callback cb = std2_get_callback();
 
         int m = 0;
         if (cb.flags & STD2_CALLBACK_READ)
@@ -365,21 +411,8 @@ ObjP Std2Function::call_(List* l)
             m |= Selector::WRITE;
         if (cb.flags & STD2_CALLBACK_ERROR)
             m |= Selector::ERROR;
-
-        switch (cb.type)
-        {
-        case STD2_FD:
-            break;
-
-        case STD2_RM_FD:
-            assert(!"implement this");
-            break;
-        }
-
-        //if (cb.flags & STD2_CALLBACK_DELAY_RETURN)
-        {
-            delayed_return = true;
-        }
+        if (cb.flags & STD2_CALLBACK_ABORT)
+            m |= Selector::ABORT;
 
         callback_data* data = new callback_data;
         data->ret_type = ret_type;
@@ -387,13 +420,10 @@ ObjP Std2Function::call_(List* l)
 
         Frame* f = get_executor()->get_frame();
         get_selector()->add_watcher(cb.fd, m, callback, data, *f);
-    }
 
-    if (delayed_return)
-    {
         get_executor()->set_frame(0);
 
-        dec_ref(ret_obj); // if it happened to return something, just ignore it
+        assert(ret_obj == 0);
         ret_obj = error_object();
     }
 

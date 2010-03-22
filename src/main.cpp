@@ -70,7 +70,8 @@ static void execute_file(const char* fn, List* args)
     dec_ref(frame);
 
     do {
-        executor->execute();
+        if (executor->get_frame())
+            executor->execute();
         get_selector()->select();
     } while (!get_selector()->empty() || executor->get_frame());
 

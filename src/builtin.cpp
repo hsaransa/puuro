@@ -52,7 +52,7 @@ Type* BuiltIn::get_type()
         type->add_method("exception", (Callable::mptr2)&BuiltIn::exception_);
         type->add_method("sleep", (Callable::mptr2)&BuiltIn::sleep_);
         type->add_method("file", (Callable::mptr0)&BuiltIn::file_);
-        type->add_method("compile_string", (Callable::mptr1)&BuiltIn::compile_string_);
+        type->add_method("compile_string", (Callable::mptr2)&BuiltIn::compile_string_);
     }
     return type;
 }
@@ -333,9 +333,10 @@ ObjP BuiltIn::compile_file_(ObjP pp)
     return *frame;
 }
 
-ObjP BuiltIn::compile_string_(ObjP pp)
+ObjP BuiltIn::compile_string_(ObjP pp, ObjP s)
 {
     String* fn = to_string(pp);
+    Scope *ss = s == 0 ? new Scope(0) : cast_object<Scope*>(s);
 
     Lexer* l = new Lexer("<inline>", fn);
 
@@ -349,7 +350,7 @@ ObjP BuiltIn::compile_string_(ObjP pp)
     Code* code = new Code();
     code->compile(ast, false);
 
-    Frame* frame = new Frame(0, 0, code);
+    Frame* frame = new Frame(ss, 0, code);
 
     return *frame;
 }
