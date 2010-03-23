@@ -43,6 +43,7 @@ Type* String::get_type()
         type->add_method("all_after", (Callable::mptr1)&String::all_after_);
         type->add_method("last", (Callable::mptr0)&String::last_);
         type->add_method("to_integer", (Callable::mptr1)&String::to_integer_);
+        type->add_method("ord", (Callable::mptr1)&String::ord_);
     }
 
     return type;
@@ -184,4 +185,22 @@ ObjP String::all_after_(ObjP p)
 ObjP String::to_integer_()
 {
     return *new Integer(data.c_str());
+}
+
+ObjP String::ord_(ObjP p)
+{
+    int v;
+    if (p == 0)
+    {
+        if (data.length() != 1)
+            throw new Exception("bad_string", *this);
+        v = 0;
+    }
+    else
+    {
+        v = int_value(p);
+        if (v < 0 || v >= (int)data.length())
+            throw new Exception("out_of_range", p);
+    }
+    return int_to_fixnum(data[v]);
 }

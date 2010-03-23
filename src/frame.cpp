@@ -42,6 +42,7 @@ Type* Frame::get_type()
         //type->add_method("set_local", (Callable::mptr2)&Frame::set_local_);
         type->add_method("execute", (Callable::mptr0)&Frame::execute);
         type->add_method("continue", (Callable::mptr1)&Frame::continue_);
+        type->add_method("switch", (Callable::mptr1)&Frame::switch_);
         type->add_method("clone_continuation", (Callable::mptr0)&Frame::clone_continuation);
         type->add_method("set_exception_handler", (Callable::mptr1)&Frame::set_exception_handler_);
         type->add_method("get_exception_handler", (Callable::mptr0)&Frame::get_exception_handler_);
@@ -148,6 +149,28 @@ ObjP Frame::continue_(ObjP p)
 
     get_executor()->set_frame(this);
     return error_object();
+}
+
+ObjP Frame::switch_(ObjP p)
+{
+    if (state == READY)
+    {
+        if (p != 0)
+            throw new Exception("bad_argument", *this);
+
+        state = IN_EXECUTION;
+        get_executor()->set_frame(this);
+        return error_object();
+    }
+
+    if (state == IN_EXECUTION)
+    {
+        push(p);
+        get_executor()->set_frame(this);
+        return error_object();
+    }
+
+    throw new Exception("switch_failed", *this);
 }
 
 Frame* Frame::clone_continuation()

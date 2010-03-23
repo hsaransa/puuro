@@ -54,7 +54,11 @@ namespace pr
         ObjP pre_params_();
         ObjP sink_param_();
         ObjP post_params_();
+        ObjP obj_list_();
+        ObjP new_obj_list_(ObjP);
+        ObjP closure_(ObjP);
 
+        void clear();
         void compile(AST* ast);
         void emit(Op op, ObjP obj=0);
 

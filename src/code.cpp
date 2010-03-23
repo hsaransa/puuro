@@ -1,6 +1,8 @@
 #include "code.hpp"
 #include "list.hpp"
 #include "type.hpp"
+#include "closure.hpp"
+#include "scope.hpp"
 #include <iostream>
 #include <stdio.h>
 
@@ -29,6 +31,9 @@ Type* Code::get_type()
         type->add_method("pre_params", (Callable::mptr0)&Code::pre_params_);
         type->add_method("sink_param", (Callable::mptr0)&Code::sink_param_);
         type->add_method("post_params", (Callable::mptr0)&Code::post_params_);
+        type->add_method("obj_list", (Callable::mptr0)&Code::obj_list_);
+        type->add_method("with_new_obj_list", (Callable::mptr1)&Code::new_obj_list_);
+        type->add_method("closure", (Callable::mptr1)&Code::closure_);
     }
 
     return type;
@@ -45,7 +50,7 @@ Code* Code::cast_code()
     return this;
 }
 
-void Code::compile(AST* ast, bool args)
+void Code::clear()
 {
     pre_params.clear();
     sink_param = Name();
@@ -53,6 +58,11 @@ void Code::compile(AST* ast, bool args)
     operators.clear();
     arguments.clear();
     positions.clear();
+}
+
+void Code::compile(AST* ast, bool args)
+{
+    clear();
 
     tmp_filepos.file = Name("<none>").id();
     tmp_filepos.line = 0;
@@ -428,4 +438,65 @@ ObjP Code::post_params_()
     for (int i = 0; i < (int)post_params.size(); i++)
         l->append(name_to_symbol(post_params[i]));
     return *l;
+}
+
+ObjP Code::obj_list_()
+{
+    pr::List* l = new pr::List();
+    for (int i = 0; i < (int)operators.size(); i++)
+    {
+        switch (operators[i])
+        {
+        case Push:
+        case Closure:
+        case Lookup:
+            l->append(arguments[i]);
+            break;
+
+        default:
+            continue;
+        }
+    }
+    return *l;
+}
+
+ObjP Code::new_obj_list_(ObjP p)
+{
+    pr::List* l = to_list(p);
+
+    Code* c = new Code();
+    c->clear();
+    c->pre_params = pre_params;
+    c->sink_param = sink_param;
+    c->post_params = post_params;
+    c->operators = operators;
+    c->positions = positions;
+
+    int j = 0;
+
+    for (int i = 0; i < (int)operators.size(); i++)
+    {
+        switch (operators[i])
+        {
+        case Push:
+        case Closure:
+        case Lookup:
+            if (j >= l->get_size())
+                throw new Exception("out_of_range", int_to_fixnum(j));
+            c->arguments.push_back(l->get(j++));
+            break;
+
+        default:
+            c->arguments.push_back(arguments[i]);
+            break;
+        }
+    }
+
+    return *c;
+}
+
+ObjP Code::closure_(ObjP s)
+{
+    Scope* ss = cast_object<Scope*>(s);
+    return *new pr::Closure(ss, this);
 }

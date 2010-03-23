@@ -33,6 +33,9 @@ namespace pr
         ObjP get_class_(ObjP);
         ObjP get_const_(ObjP);
         ObjP get_function_(ObjP);
+        ObjP list_classes_();
+        ObjP list_consts_();
+        ObjP list_functions_();
 
         int module;
     };

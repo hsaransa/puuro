@@ -22,6 +22,7 @@ namespace pr
     private:
         ObjP name_();
         ObjP obj_();
+        ObjP raise_();
 
         Name name;
         ObjP obj;

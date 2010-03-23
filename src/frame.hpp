@@ -30,6 +30,7 @@ namespace pr
 
         ObjP execute();
         ObjP continue_(ObjP);
+        ObjP switch_(ObjP);
 
         void push(ObjP p);
         ObjP pop();

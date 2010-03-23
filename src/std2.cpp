@@ -87,6 +87,9 @@ Type* Std2Module::get_type()
         type = new Type("std2module");
         type->add_method("get_function", (Callable::mptr1)&Std2Module::get_function_);
         type->add_method("get_const", (Callable::mptr1)&Std2Module::get_const_);
+        type->add_method("list_classes", (Callable::mptr0)&Std2Module::list_classes_);
+        type->add_method("list_consts", (Callable::mptr0)&Std2Module::list_consts_);
+        type->add_method("list_functions", (Callable::mptr0)&Std2Module::list_functions_);
     }
     return type;
 }
@@ -121,6 +124,39 @@ ObjP Std2Module::get_const_(ObjP s)
         return 0;
     }
 }
+
+#define LIST_ITEMS(f) \
+    int count = 0; \
+    f(module, 0, &count); \
+    const char** names = new const char* [count]; \
+    if (!names) \
+        throw new Exception("out_of_memory", 0); \
+\
+    f(module, names, &count); \
+\
+    List* l = new List(); \
+    for (int i = 0; i < count; i++) \
+        l->append(name_to_symbol(Name(names[i]))); \
+\
+    delete [] names; \
+\
+    return *l;
+
+ObjP Std2Module::list_classes_()
+{
+    LIST_ITEMS(std2_list_classes)
+}
+
+ObjP Std2Module::list_consts_()
+{
+    LIST_ITEMS(std2_list_consts)
+}
+
+ObjP Std2Module::list_functions_()
+{
+    LIST_ITEMS(std2_list_functions)
+}
+
 
 /*
  * Std2Function

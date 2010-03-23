@@ -26,15 +26,19 @@ args = args.all_after 2;
 
 execute = {<internal fn>
   f = builtin.compile_file fn;
+  f.set_exception_handler builtin.active_frame.get_exception_handler;
   f.scope.pollute builtin;
   f.scope.set_local 'builtin builtin;
-  f.scope.set_local 'args args;
-  internal.then {
+  internal.if {
       f.scope.set_local 'resolver resolver;
       f.scope.set_local 'std2 std2;
       f.scope.set_local 'execute execute;
+      f.execute;
+  }
+  {
+      f.scope.set_local 'args args;
+      f.switch;
   };
-  f.execute;
 };
 
 ["exceptions.puuro"
@@ -45,8 +49,8 @@ execute = {<internal fn>
     execute \t lib_dir + "/" + x
 };
 
-['streams 'blocking 'file 'web 'net 'irc 'dir 'std2 'filechange].each {<m>
+['streams 'blocking 'file 'web 'net 'irc 'dir 'std2 'filechange 'interactive].each {<m>
     builtin.module_source m (lib_dir + "/" + m.s + ".puuro");
 };
 
-builtin.bg { execute \f script_file; };
+execute \f script_file;

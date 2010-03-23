@@ -24,6 +24,7 @@ Type* Exception::get_type()
         type->add_method("to_string", (Callable::mptr0)&Exception::to_string);
         type->add_method("name", (Callable::mptr0)&Exception::name_);
         type->add_method("obj", (Callable::mptr0)&Exception::obj_);
+        type->add_method("raise", (Callable::mptr0)&Exception::raise_);
     }
     return type;
 }
@@ -55,4 +56,9 @@ ObjP Exception::name_()
 ObjP Exception::obj_()
 {
     return obj;
+}
+
+ObjP Exception::raise_()
+{
+    throw this;
 }

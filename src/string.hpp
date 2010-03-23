@@ -37,6 +37,7 @@ namespace pr
         ObjP last_();
         ObjP to_symbol_();
         ObjP to_integer_();
+        ObjP ord_(ObjP);
 
     private:
         std::string data;
