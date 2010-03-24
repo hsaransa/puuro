@@ -15,19 +15,19 @@ dir = {<*f p>
     f.each {<x>
         switch x
             'mark { flags = flags.or flag_mark; }
-            { raise (exception 'bad_glob_flag x) };
+            { (exception 'bad_glob_flag x).raise };
     };
     
     g = glob p flags;
     err = glob_error g;
     (err != 0).then
     {
-        raise (exception 'glob_error
+        (exception 'glob_error
             (switch err
                 nospace {'nospace}
                 aborted {'aborted}
                 nomatch {'nomatch}
-                {'unknown_error}));
+                {'unknown_error})).raise;
     };
 
     l = [];

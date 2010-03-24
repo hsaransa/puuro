@@ -364,7 +364,7 @@ ObjP Std2Function::call_(List* l)
                 }
 
                 if (inst->is_freed())
-                    throw new Exception("instance_already_freed", arg);
+                    throw new Exception("instance_freed", arg);
 
                 args[i] = inst->get_ptr();
             }
@@ -377,6 +377,9 @@ ObjP Std2Function::call_(List* l)
         j++;
     }
 
+    if (j != l->get_size())
+        throw new Exception("bad_argument_count", *l);
+
     // Call std2.
 
     int ret;
@@ -384,6 +387,10 @@ ObjP Std2Function::call_(List* l)
 
     switch (ret_type.type)
     {
+    case STD2_VOID:
+        ret = std2_call(module, function, 0, args);
+        break;
+
     case STD2_INT32:
         {
             int value = 0;

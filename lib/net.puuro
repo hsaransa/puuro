@@ -1,9 +1,9 @@
-require 'streams;
+require 'streams 'dns;
 
 make_tcp_streamers = {<host port>
-    sock = std.file;
+    sock = builtin.file;
     sock.socket 'inet 'stream;
-    addr = (resolver.resolve host).first;
+    addr = (dns_resolve host).first;
     addr.set_port port;
     sock.connect addr;
 
@@ -21,7 +21,12 @@ make_tcp_streamers = {<host port>
         repeat
         {
             s = in();
-            (s != \n).then { sock.write s };
+            (s != \n).then {
+                while {s.empty.not} {
+                    ret = sock.write s;
+                    s = s.all_after ret;
+                };
+            };
             s != \n;
         };
         sock.close;

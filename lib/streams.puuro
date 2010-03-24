@@ -42,8 +42,8 @@ t.set_method 'activate {<s>
     };
 };
 
-t.set_method 'call {<s obj>
-    (s.get 'out) obj;
+t.set_method 'call {<s *a>
+    apply (s.get 'call) a;
 };
 
 connect = {<producer consumer>
@@ -141,9 +141,18 @@ bidirectional_connect = {<a b>
     b.second.connect a.first;
 };
 
-out_streamer = {<s2>
+in_stream_end = {<s2>
+    s = make_streamer {<in>
+        s.set 'call in;
+    };
+    s2.connect s;
+    s.start;
+    s;
+};
+
+out_stream_end = {<s2>
     s = make_streamer {<out>
-        s.set 'out out;
+        s.set 'call out;
     };
     s.connect s2;
     s.start;
@@ -152,7 +161,8 @@ out_streamer = {<s2>
 
 module 'streams {
     pollute 'streamer               make_streamer;
-    pollute 'out_streamer           out_streamer;
+    pollute 'in_stream_end          in_stream_end;
+    pollute 'out_stream_end         out_stream_end;
     pollute 'bidirectional_connect  bidirectional_connect;
     pollute 'line_splitter          make_line_splitter;
 };

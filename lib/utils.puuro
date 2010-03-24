@@ -101,7 +101,7 @@ builtin.type.set_method 'switch {<builtin value *cases>
 };
 
 builtin.type.set_method 'break {<builtin obj>
-    raise (exception 'break obj);
+    (exception 'break obj).raise;
 };
 
 builtin.type.set_method 'block {<builtin c>

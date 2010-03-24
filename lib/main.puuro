@@ -3,7 +3,7 @@
 builtin.pollute builtin;
 
 (args.size < 2).then {
-    raise (exception 'not_enough_arguments "give more arguments to the program");
+    (exception 'not_enough_arguments "give more arguments to the program").raise;
 };
 
 builtin.active_frame.set_exception_handler {<e c>

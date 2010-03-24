@@ -8,6 +8,7 @@ event_mask  = std2_function 'inotify 'event_mask;
 event_name  = std2_function 'inotify 'event_name;
 MODIFY      = std2_const    'inotify 'MODIFY;
 CREATE      = std2_const    'inotify 'CREATE;
+CLOSE_WRITE = std2_const    'inotify 'CLOSE_WRITE;
 
 inotify = init();
 waiters = [];
@@ -25,9 +26,10 @@ wait_file_change = {<fn *mode>
     m = 0;
     mode.each {<x>
         switch x
-            'modify { m = m.or MODIFY }
-            'create { m = m.or CREATE }
-            {assert \f x};
+            'modify      { m = m | MODIFY }
+            'create      { m = m | CREATE }
+            'close_write { m = m | CLOSE_WRITE }
+            {assert \f "bad flag for file_change " x};
     };
 
     w = add_watch inotify fn m;

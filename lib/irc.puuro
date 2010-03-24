@@ -93,7 +93,7 @@ irc_client = {<host port handler>
 
     irc.first.second.connect client_in;
 
-    client_out = out_streamer irc.second.first;
+    client_out = out_stream_end irc.second.first;
 
     bg { client_in.start; };
 
