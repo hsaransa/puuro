@@ -110,6 +110,12 @@ int Lexer::next()
             p += 2;
             break;
         }
+        else if (*p == '.' && *(p+1) == '.')
+        {
+            current_token = T_TWO_DOTS;
+            p += 2;
+            break;
+        }
         else if (*p == '\\' && *(p+1) == 't')
         {
             current_token = T_TRUE;

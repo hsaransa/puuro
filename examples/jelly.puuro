@@ -3,11 +3,11 @@
 i = 0;
 j = 0;
 
-std.while {i<200}
+while {i<200}
 {
-    std.if j == 5
+    if j == 5
     {
-        std.print "Jellyfish " i;
+        print "Jellyfish " i;
         j = 0;
     };
 

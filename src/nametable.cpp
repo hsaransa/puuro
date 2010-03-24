@@ -57,6 +57,8 @@ namespace
             MK_NAME(dgram)
             MK_NAME(GetItem)
             MK_NAME(Neg)
+            MK_NAME(And)
+            MK_NAME(Or)
 #undef MK_NAME
         }
 

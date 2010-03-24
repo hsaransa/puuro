@@ -1,15 +1,13 @@
 # Jou
 
-if = std:if;
-
 a = 1;
 b = 2;
 
 c = {<v>
   if v
-    {std.print "hello true"; 100}
-    {std.print "hello false"; 200}
+    {print "hello true"; 100}
+    {print "hello false"; 200}
 };
 
-std.print (c 0 == 1);
-std.print (c 1 == 1);
+print (c 0 == 1);
+print (c 1 == 1);

@@ -38,6 +38,9 @@ namespace pr
         ObjP to_symbol_();
         ObjP to_integer_();
         ObjP ord_(ObjP);
+        ObjP first_();
+        ObjP second_();
+        ObjP third_();
 
     private:
         std::string data;

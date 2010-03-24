@@ -12,5 +12,5 @@ plop
 {
     push 3;
     push 7;
-    std.print "popping: " pop() " " pop();
+    print "popping: " pop() " " pop();
 };

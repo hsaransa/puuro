@@ -59,6 +59,8 @@ namespace pr
         N_dgram,
         N_GetItem,
         N_Neg,
+        N_And,
+        N_Or,
         N__MAX
     };
 

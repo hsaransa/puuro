@@ -1,17 +1,19 @@
 # Jelly
 
-connect = {<host, port, code>
+require 'dns;
+
+connect = {<host port code>
     bg {
-        addr = (resolver.resolve host).first;
+        addr = (dns_resolve host).first;
         addr.set_port port;
 
-        sock = std.file;
+        sock = file();
         sock.socket 'inet 'stream;
         sock.connect addr;
 
         f = code.call_frame;
-        f.set_local 'write {<x> sock.write x };
-        f.set_local 'read {<x> sock.read x };
+        f.scope.set_local 'write {<x> sock.write x };
+        f.scope.set_local 'read {<x> sock.read x };
         f.execute;
 
         sock.close;

@@ -1,7 +1,5 @@
 # Plop
 
-std.pollute std;
-
 active_frame().set_exception_handler
 {<exc cont>
   print "Hello, exception " exc " " cont;

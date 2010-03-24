@@ -1,0 +1,68 @@
+require 'std2;
+
+#get_epoch_time = std2_function 'libc 'get_epoch_time; 
+time      = std2_function 'libc 'time;
+strftime  = std2_function 'libc 'strftime; 
+localtime = std2_function 'libc 'localtime;
+
+# Time type
+
+time_root = builtin.new_type 'time;
+
+time_root.type.set_method 'to_string {<t>
+    t.unbox.first.if {
+        t.unbox.second.to_string + " dt"
+    } {
+        tm = localtime t.unbox.second;
+        s = " "*64;
+        i = strftime s "%F %T" tm;
+        s.all_before i;
+    };
+};
+
+time_root.type.set_method 'rel      {<a> a.unbox.first};
+time_root.type.set_method 'relative {<a> a.unbox.first};
+time_root.type.set_method 'absolute {<a> !a.unbox.first};
+time_root.type.set_method 's   {<a> a.unbox.second};
+
+time_root.type.set_method 'add {<a b>
+    assert a.rel | b.rel "can't add two absolute times";
+};
+
+time_root.type.set_method 'sub {<a b>
+    assert !(a.rel & !b.rel) "can't subtract absolute time from relative time";
+
+    make_time (a.rel == b.rel)
+              a.unbox.second - b.unbox.second
+              a.unbox.third - b.unbox.third;
+};
+
+time_root.type.set_method 'sleep {<a>
+    assert a.rel "only relative times can be slept";
+    time.sleep a.second + a.third / 1000;
+};
+
+# Functions
+
+make_time = {<rel s *us>
+    us = us.empty.if {0} {us.first};
+
+    assert us >= 0 "TODO handle negative us";
+
+    (us > 1000000).then {
+        nus = us % 1000000;
+        s = s + (us - nus) / 1000000;
+        us = nus;
+    };
+
+    time_root.new [rel s us]
+};
+
+time_now = {
+    time_root.new [\f time() 0];
+};
+
+module 'time
+{
+    pollute 'time_now time_now;
+};

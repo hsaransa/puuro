@@ -42,10 +42,12 @@ static void yyerror(const char*)
 
 %term T_INTEGER T_IDENTIFIER T_STRING
 %term T_EQ T_NE T_LE T_GE T_TRUE T_FALSE T_NULL
-%term T_EMPTY_PARENS
+%term T_EMPTY_PARENS T_TWO_DOTS
 
+%left T_TWO_DOTS
 %left T_EQ T_NE
 %left T_LE T_GE '<' '>'
+%left '&' '|'
 %left '-' '+'
 %left '*' '/' '%'
 %left UMINUS
@@ -146,14 +148,23 @@ infix_expr:
 	infix_expr '%' infix_expr
 	{ NODE2($$, Mod, $1, $3); } |
 
+	infix_expr '&' infix_expr
+	{ NODE2($$, And, $1, $3); } |
+
+	infix_expr '|' infix_expr
+	{ NODE2($$, Or, $1, $3); } |
+
 	//term_expr '[' expr ']'
 	//{ NODE2($$, GetItem, $1, $3); } |
 
 	'-' infix_expr
 	{ NODE1($$, Neg, $2); } |
 
-	'!' term_expr
+	'!' infix_expr
 	{ NODE1($$, Not, $2); } |
+
+	infix_expr T_TWO_DOTS T_IDENTIFIER
+	{ NODEO($$, CallMethod, $3); $$->add_child($1); $$->add_child(NEW_AST(ArgList)); } |
 
 	term_expr
 	{ $$ = $1; }

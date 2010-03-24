@@ -47,7 +47,6 @@ Type* BuiltIn::get_type()
         type->add_method("iter", (Callable::mptr2)&BuiltIn::iter_);
         type->add_method("call_with_cloned_frame", (Callable::mptr1)&BuiltIn::call_with_cloned_frame);
         type->add_method("new_continuation", (Callable::mptr1)&BuiltIn::new_continuation_);
-        type->add_method("raise", (Callable::mptr1)&BuiltIn::raise_);
         type->add_method("compile_file", (Callable::mptr1)&BuiltIn::compile_file_);
         type->add_method("exception", (Callable::mptr2)&BuiltIn::exception_);
         type->add_method("sleep", (Callable::mptr2)&BuiltIn::sleep_);
@@ -294,15 +293,6 @@ ObjP BuiltIn::new_continuation_(ObjP p)
     get_executor()->set_frame(f);
 
     return error_object();
-}
-
-ObjP BuiltIn::raise_(ObjP p)
-{
-    Exception* exc = is_object(p) ? to_object(p)->cast_exception() : 0;
-    if (!exc)
-        throw new Exception("bad_exception", p);
-
-    throw exc;
 }
 
 ObjP BuiltIn::compile_file_(ObjP pp)

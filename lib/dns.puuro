@@ -1,0 +1,9 @@
+
+dns_resolve = {<host>
+    resolver.resolve host
+};
+
+module 'dns
+{
+    pollute 'dns_resolve dns_resolve;
+};

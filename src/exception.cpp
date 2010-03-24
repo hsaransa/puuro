@@ -42,9 +42,12 @@ Exception* Exception::cast_exception()
 String* Exception::to_string()
 {
     String* s = new String(name.s());
+    s->append(" exception");
+#if 0
     String* s2 = call_to_string(obj);
     s->append(": ");
     s->append(s2);
+#endif
     return s;
 }
 

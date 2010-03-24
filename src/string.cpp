@@ -44,6 +44,9 @@ Type* String::get_type()
         type->add_method("last", (Callable::mptr0)&String::last_);
         type->add_method("to_integer", (Callable::mptr1)&String::to_integer_);
         type->add_method("ord", (Callable::mptr1)&String::ord_);
+        type->add_method("first", (Callable::mptr0)&String::first_);
+        type->add_method("second", (Callable::mptr0)&String::second_);
+        type->add_method("third", (Callable::mptr0)&String::third_);
     }
 
     return type;
@@ -203,4 +206,34 @@ ObjP String::ord_(ObjP p)
             throw new Exception("out_of_range", p);
     }
     return int_to_fixnum(data[v]);
+}
+
+ObjP String::first_()
+{
+    if (data.length() < 1)
+        throw new Exception("out_of_range", 0);
+    char buf[2];
+    buf[0] = data[0];
+    buf[1] = '\0';
+    return *new String(buf);
+}
+
+ObjP String::second_()
+{
+    if (data.length() < 2)
+        throw new Exception("out_of_range", 0);
+    char buf[2];
+    buf[0] = data[1];
+    buf[1] = '\0';
+    return *new String(buf);
+}
+
+ObjP String::third_()
+{
+    if (data.length() < 3)
+        throw new Exception("out_of_range", 0);
+    char buf[2];
+    buf[0] = data[2];
+    buf[1] = '\0';
+    return *new String(buf);
 }

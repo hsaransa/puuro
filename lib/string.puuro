@@ -38,3 +38,39 @@ t.set_method 'mul {<s n>
     n.times { ss = ss + s; };
     ss;
 };
+
+t.set_method 'each {<s c>
+    i = 0;
+    l = s.size;
+    while {i < l} {
+        c (s.at i);
+        i = i + 1;
+    };
+};
+
+# String classify
+
+libc = std2.get_module 'libc;
+isdigit = libc.get_function 'isdigit;
+isalpha = libc.get_function 'isalpha;
+isalnum = libc.get_function 'isalnum;
+isspace = libc.get_function 'isspace;
+islower = libc.get_function 'islower;
+isupper = libc.get_function 'isupper;
+
+classify = {<s cc>
+    block {
+        s.empty.then { break \f };
+        s.each {<c>
+            ((cc c.ord) == 0).then { break \f }
+        };
+        \t
+    };
+};
+
+t.set_method 'isdigit {<s> classify s isdigit };
+t.set_method 'isalpha {<s> classify s isalpha };
+t.set_method 'isalnum {<s> classify s isalnum };
+t.set_method 'isspace {<s> classify s isspace };
+t.set_method 'islower {<s> classify s islower };
+t.set_method 'isupper {<s> classify s isupper };

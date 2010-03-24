@@ -70,7 +70,7 @@ builtin.type.set_method 'any {<builtin *l>
 };
 
 builtin.type.set_method 'assert {<builtin c *o>
-    c.else { raise (exception 'assertion_failed o); }
+    c.else { (exception 'assertion_failed o).raise }
 };
 
 builtin.type.set_method 'switch {<builtin value *cases>
@@ -118,8 +118,7 @@ builtin.type.set_method 'block {<builtin c>
             prev e c;
         };
 
-        ff.execute;
-        orig.continue \n;
+        orig.continue ff.execute;
     };
 
     ret;

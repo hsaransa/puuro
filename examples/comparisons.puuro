@@ -8,9 +8,9 @@ t.set_method 'gt {<a b> !(a <= b)};
 t.set_method 'le {<a b> (a < b).or a == b};
 t.set_method 'ge {<a b> (a > b).or a == b};
 
-std.print 1 != 2;
-std.print 1 > 2;
-std.print 1 <= 2;
-std.print 1 >= 2;
+print 1 != 2;
+print 1 > 2;
+print 1 <= 2;
+print 1 >= 2;
 
 

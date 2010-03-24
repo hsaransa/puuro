@@ -1,9 +1,11 @@
 # TCP streamer returns output and input streams
 
+require 'streams 'dns;
+
 tcp_stream = {<host port>
-    sock = std.file;
+    sock = file();
     sock.socket 'inet 'stream;
-    addr = (resolver.resolve host).first;
+    addr = (dns_resolve host).first;
     addr.set_port port;
     sock.connect addr;
 
@@ -34,7 +36,7 @@ tcp_stream = {<host port>
 # and one additional output for data
 
 http_stream = {<magic>
-    streamer {<tcp_in, tcp_out, out>
+    streamer {<tcp_in tcp_out out>
         tcp_out "GET / HTTP/1.0\r\n";
         tcp_out "Host: " + magic + "\r\n";
         tcp_out "\r\n";

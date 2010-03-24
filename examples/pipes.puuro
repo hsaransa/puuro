@@ -8,7 +8,7 @@ pipe = {<code>
 
     return = \n;
 
-    f.set_local 'mill {<x>
+    f.scope.set_local 'mill {<x>
         milled_data = x;
 
         new_continuation {<orig>
@@ -19,7 +19,7 @@ pipe = {<code>
         milled_data = \n;
     };
 
-    f.set_local 'pluck {
+    f.scope.set_local 'pluck {
         (\n == plucked_data)
         {
             new_continuation {<orig>

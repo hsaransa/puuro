@@ -287,6 +287,8 @@ void Code::compile(AST* ast)
     case N_NE:
     case N_GE:
     case N_LE:
+    case N_And:
+    case N_Or:
     case N_GetItem:
         compile(ch0);
         compile(ch1);
@@ -306,6 +308,8 @@ void Code::compile(AST* ast)
             case N_NE: m = "ne"; break;
             case N_GE: m = "ge"; break;
             case N_LE: m = "le"; break;
+            case N_And: m = "and"; break;
+            case N_Or: m = "or"; break;
             case N_GetItem: m = "at"; break;
             }
             assert(m);
