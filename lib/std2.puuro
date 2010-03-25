@@ -1,0 +1,55 @@
+std2_function = {<mn fn>
+    m = std2.get_module mn;
+    m.get_function fn
+};
+
+std2_const = {<mn cn>
+    m = std2.get_module mn;
+    m.get_const cn
+};
+
+std2_call = {<mn fn *args>
+    apply (std2_function mn fn) args;
+};
+
+modules = builtin.assoc;
+
+std2_module = {<mn>
+    (modules.has mn).else
+    {
+        mr = builtin.new_type ("std2_module_" + mn.s).to_symbol;
+        m = std2.get_module mn;
+
+        classes   = m.list_classes;
+        consts    = m.list_consts;
+        functions = m.list_functions;
+
+        t = mr.type;
+        t.set_method 'to_string {<s> "std2_module_" + mn.s };
+        t.set_method 'classes {<s> classes };
+        t.set_method 'consts {<s> consts };
+        t.set_method 'functions {<s> functions };
+
+        consts.each {<x>
+            c = m.get_const x;
+            t.set_method x {<y> c};
+        };
+
+        functions.each {<x>
+            f = m.get_function x;
+            t.set_method x {<y *a> builtin.apply f a};
+        };
+
+        modules.set mn (mr.new \n);
+    };
+
+    modules.get mn
+};
+
+module 'std2
+{
+    pollute 'std2_function std2_function;
+    pollute 'std2_const std2_const;
+    pollute 'std2_call std2_call;
+    pollute 'std2_module std2_module;
+};
