@@ -48,6 +48,17 @@ t.set_method 'each {<s c>
     };
 };
 
+t.set_method 'map {<s c>
+    ret = [];
+    i = 0;
+    l = s.size;
+    while {i < l} {
+        ret.append (c (s.at i));
+        i = i + 1;
+    };
+    ret
+};
+
 # String classify
 
 libc = std2.get_module 'libc;

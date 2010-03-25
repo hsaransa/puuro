@@ -205,7 +205,7 @@ ObjP String::ord_(ObjP p)
         if (v < 0 || v >= (int)data.length())
             throw new Exception("out_of_range", p);
     }
-    return int_to_fixnum(data[v]);
+    return int_to_fixnum((unsigned char)data[v]);
 }
 
 ObjP String::first_()

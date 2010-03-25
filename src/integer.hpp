@@ -37,6 +37,7 @@ namespace pr
         ObjP neg_();
         ObjP is_true_();
         ObjP times_(ObjP);
+        ObjP hex_(ObjP);
 
     private:
         long long int value;

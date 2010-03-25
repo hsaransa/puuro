@@ -55,6 +55,7 @@ Type* Integer::get_type()
         type->add_method("neg", (Callable::mptr0)&Integer::neg_);
         type->add_method("is_true", (Callable::mptr1)&Integer::is_true_);
         type->add_method("times", (Callable::mptr1)&Integer::times_);
+        type->add_method("hex", (Callable::mptr1)&Integer::hex_);
     }
     return type;
 }
@@ -202,4 +203,12 @@ ObjP Integer::times_(ObjP p)
     executor->emit(mc);
 
     return error_object();
+}
+
+ObjP Integer::hex_(ObjP p)
+{
+    int n = p == 0 ? 0 : ::int_value(p);
+    char buf[64];
+    snprintf(buf, sizeof(buf), "%.*llx", n, value);
+    return *new String(buf);
 }

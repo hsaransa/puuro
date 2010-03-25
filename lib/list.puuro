@@ -71,3 +71,11 @@ t.set_method 'pop_first_matching {<l f>
         ret;
     };
 };
+
+t.set_method 'fold {<l f>
+    builtin.assert l.empty.not "folding empty list";
+
+    v = l.pop_first;
+    while {l.empty.not} {v = f v l.pop_first};
+    v
+};

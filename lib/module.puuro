@@ -8,7 +8,7 @@ builtin.type.set_method 'module_source
 
 builtin.type.set_method 'module
 {<builtin m code>
-    (modules.has m).then { raise (exception 'bad_module "already exists") };
+    (modules.has m).then { (exception 'bad_module "already exists").raise };
 
     mod = [[] \n];
 
@@ -28,7 +28,7 @@ builtin.type.set_method 'require
     mods.each {<m>
         (modules.has m).else {
             (sources.has m).else {
-                raise (exception 'bad_module m);
+                (exception 'bad_module m).raise;
             };
 
             execute \t (sources.get m);

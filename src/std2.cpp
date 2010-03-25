@@ -246,7 +246,7 @@ static void callback(int fd, int mask, void* user, ObjP p)
             break;
         }
 
-    case STD2_M_C_STRING:
+    case STD2_M_STRING:
         {
             char* value = 0;
             ret = std2_call_callback(&data->cb, (void*)&value, m);
@@ -306,10 +306,12 @@ static void callback(int fd, int mask, void* user, ObjP p)
 ObjP Std2Function::call_(List* l)
 {
     // Process parameters.
+    // TODO: use alloca()? was there some problem with it?
 
-    void*      args[16];
-    std2_int32 int32s[16];
-    std2_int64 int64s[16];
+    void*       args[16];
+    std2_int32  int32s[16];
+    std2_int64  int64s[16];
+    std2_buffer buffers[16];
 
     assert(params.size() <= sizeof(args)/sizeof(args[0]));
 
@@ -317,6 +319,9 @@ ObjP Std2Function::call_(List* l)
 
     for (int i = 0; i < (int)params.size(); i++)
     {
+        if (j >= l->get_size())
+            throw new Exception("bad_argument_count", *l);
+
         ObjP arg = l->get(j);
 
         switch (params[i].type)
@@ -352,10 +357,18 @@ ObjP Std2Function::call_(List* l)
             }
             break;
 
+        case STD2_C_BUFFER:
+            {
+                String* s = to_string(arg);
+                buffers[i].data = (void*)s->get_data();
+                buffers[i].size = s->get_size();
+                args[i] = &buffers[i];
+            }
+            break;
+
         case STD2_INSTANCE:
             {
-                Object* obj = to_object(arg);
-                Std2Instance* inst = dynamic_cast<Std2Instance*>(obj);
+                Std2Instance* inst = cast_object<Std2Instance*>(arg);
                 if (!inst ||
                     inst->get_module() != params[i].module_id ||
                     inst->get_class() != params[i].class_id)
@@ -418,13 +431,25 @@ ObjP Std2Function::call_(List* l)
             break;
         }
 
-    case STD2_M_C_STRING:
+    case STD2_M_STRING:
         {
             char* value = 0;
             ret = std2_call(module, function, (void*)&value, args);
             if (!ret && value)
                 ret_obj = *new String(value);
             free(value);
+            break;
+        }
+
+    case STD2_M_BUFFER:
+    case STD2_C_BUFFER:
+        {
+            struct std2_buffer value;
+            ret = std2_call(module, function, (void*)&value, args);
+            if (!ret && value.data)
+                ret_obj = *new String((const char*)value.data, value.size);
+            if (ret_type.type == STD2_M_BUFFER)
+                free(value.data);
             break;
         }
 

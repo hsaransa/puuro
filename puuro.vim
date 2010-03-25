@@ -6,7 +6,7 @@
 syn clear
 
 syn keyword xFunctions print new_continuation while if then else repeat iter
-syn keyword xFunctions new_type active_frame
+syn keyword xFunctions new_type active_frame require
 
 syn keyword xPredefined builtin
 

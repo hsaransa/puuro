@@ -1,0 +1,12 @@
+require 'std2 'interactive;
+
+openssl = std2_module 'openssl;
+openssl.OpenSSL_add_all_digests;
+
+ctx = openssl.EVP_MD_CTX_init;
+md = openssl.EVP_get_digestbyname "MD5";
+openssl.EVP_DigestInit ctx md;
+openssl.EVP_DigestUpdate ctx "jellyfish";
+s = openssl.EVP_DigestFinal ctx;
+
+print ((s.map {<x> x.ord.hex 2}).fold {<a b> a+b});

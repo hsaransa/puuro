@@ -43,8 +43,8 @@ execute = {<internal fn>
 
 ["exceptions.puuro"
  "module.puuro"
- "list.puuro"
  "utils.puuro"
+ "list.puuro"
  "string.puuro"].each {<x>
     execute \t lib_dir + "/" + x
 };
