@@ -1,0 +1,32 @@
+require 'std2 'interactive;
+
+sdl = std2_module 'sdl;
+
+sdl.Init sdl.INIT_VIDEO;
+screen = sdl.SetVideoMode 640 480 32 sdl.OPENGL;
+assert screen != \n;
+
+sdl.WM_SetCaption "puuro example" "";
+
+r = sdl.new_Rect;
+sdl.Rect_set r 0 0 640 480;
+r2 = sdl.new_Rect;
+sdl.Rect_set r2 320 240 320 240;
+
+bg {
+    start_interactive active_frame().scope;
+};
+
+repeat {
+    sleep 0;
+    ev = sdl.PollEvent;
+    (ev != \n).then {
+        t = (sdl.Event_get_type ev);
+        (t == sdl.QUIT).then { break \n };
+        (t == sdl.KEYDOWN).then {};# print "jelly"; }
+    };
+
+    sdl.FillRect screen r 127 + 13*256;
+    sdl.FillRect screen r2 33 + 99*256;
+    sdl.Flip screen;
+};
