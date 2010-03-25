@@ -1,0 +1,38 @@
+require 'std2;
+
+readline = std2_function 'readline 'readline;
+
+start_interactive = {<*ss>
+    assert ss.length <= 1;
+
+    ss = ss.empty.if {builtin.active_frame.scope} {ss.first};
+
+    ret = \n;
+    block
+    {
+        repeat
+        {
+            try
+            {
+                s = std2_call 'readline 'readline "> ";
+                (s == \n).then { break \n; };
+                c = compile_string s ss;
+                ret = c.execute;
+                ss.set_local '_ ret;
+                (\n != ret).then { print ret };
+            }
+            {<e c>
+                (builtin.active_frame.get_exception_handler) e c;
+            };
+
+            \t
+        };
+    };
+
+    ret
+};
+
+module 'interactive
+{
+    pollute 'start_interactive start_interactive;
+};
