@@ -40,7 +40,7 @@ static void yyerror(const char*)
 	pr::ObjP obj;
 }
 
-%term T_INTEGER T_IDENTIFIER T_STRING
+%term T_INTEGER T_IDENTIFIER T_STRING T_FLOAT
 %term T_EQ T_NE T_LE T_GE T_TRUE T_FALSE T_NULL
 %term T_EMPTY_PARENS T_TWO_DOTS
 
@@ -56,7 +56,7 @@ static void yyerror(const char*)
 %type <ast> call_expr  assign_target assign_list
 %type <ast>  top_expr sink_param infix_expr
 
-%type <obj> T_INTEGER T_IDENTIFIER T_STRING
+%type <obj> T_INTEGER T_IDENTIFIER T_STRING T_FLOAT
 
 %%
 
@@ -182,6 +182,9 @@ term_expr:
 
 	T_STRING
 	{ NODEO($$, String, $1); } |
+
+	T_FLOAT
+	{ NODEO($$, Float, $1); } |
 
 	T_TRUE
 	{ NODE($$, True); } |

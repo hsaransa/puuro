@@ -2,7 +2,10 @@
 #include "integer.hpp"
 #include "grammar.hh"
 #include "type.hpp"
+#include "float.hpp"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 using namespace pr;
 
@@ -140,7 +143,7 @@ int Lexer::next()
                 throw new Exception(Name("lexer_error"), int_to_fixnum(get_line()));
             break;
         }
-        else if (strchr("(){}[]<>:;,=+-*/.'!%|&", *p))
+        else if (strchr("(){}[]<>:;,=+-*/'!%|&", *p))
         {
             if (*p == '(' && *(p+1) == ')')
             {
@@ -165,15 +168,38 @@ int Lexer::next()
             break;
 
         }
-        else if (isdigit(*p))
+        else if (isdigit(*p) || *p == '.')
         {
             const char* s = p;
             while (isdigit(*p) && p < end)
                 p++;
 
-            current_token = T_INTEGER;
-            object = (ObjP)*new Integer(s);
-            dec_ref(object);
+            if (*p == '.')
+            {
+                p++;
+                while (isdigit(*p) && p < end)
+                    p++;
+
+                if (p - s == 1)
+                {
+                    current_token = '.';
+                    break;
+                }
+
+                double v = strtod(s, (char**)&p);
+                if (s == p)
+                    throw new Exception(Name("lexer_error"), int_to_fixnum(get_line()));
+
+                object = (ObjP)*new Float(v);
+                dec_ref(object);
+                current_token = T_FLOAT;
+            }
+            else
+            {
+                current_token = T_INTEGER;
+                object = (ObjP)*new Integer(s);
+                dec_ref(object);
+            }
             break;
         }
         else if (*p == '"')

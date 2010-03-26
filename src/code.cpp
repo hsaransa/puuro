@@ -257,6 +257,7 @@ void Code::compile(AST* ast)
     case N_Integer:
     case N_Symbol:
     case N_String:
+    case N_Float:
         emit(Push, ast->get_object());
         break;
 

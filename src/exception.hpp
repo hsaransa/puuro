@@ -34,6 +34,17 @@ namespace pr
     }
 
     template<typename T>
+    T try_cast_object(ObjP p)
+    {
+        if (!is_object(p))
+            return 0;
+        T t = dynamic_cast<T>(to_object(p));
+        if (!t)
+            return 0;
+        return t;
+    }
+
+    template<typename T>
     T cast_object(ObjP p)
     {
         if (!is_object(p))

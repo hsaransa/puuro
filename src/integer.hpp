@@ -16,6 +16,8 @@ namespace pr
         virtual Type* get_type();
         virtual Integer* cast_integer();
 
+        inline long long int get_value() { return value; }
+
         int int_value();
 
         ObjP to_string_();
@@ -72,6 +74,17 @@ namespace pr
     {
         // TODO: make fixnum when possible
         return *new Integer(i);
+    }
+
+    inline bool is_integer(ObjP p)
+    {
+        // TODO: better implementation
+        try {
+            (void)to_integer(p); // TODO: leaks?
+            return true;
+        } catch (...) {
+            return false;
+        }
     }
 }
 

@@ -59,6 +59,7 @@ namespace
             MK_NAME(Neg)
             MK_NAME(And)
             MK_NAME(Or)
+            MK_NAME(Float)
 #undef MK_NAME
         }
 

@@ -61,6 +61,7 @@ namespace pr
         N_Neg,
         N_And,
         N_Or,
+        N_Float,
         N__MAX
     };
 

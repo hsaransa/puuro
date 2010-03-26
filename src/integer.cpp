@@ -120,12 +120,16 @@ ObjP Integer::le_(ObjP p)
 
 ObjP Integer::eq_(ObjP p)
 {
+    if (!is_integer(p))
+        return false_object();
     Integer* i = pr::to_integer(p);
     return value == i->value ? true_object() : false_object();
 }
 
 ObjP Integer::ne_(ObjP p)
 {
+    if (!is_integer(p))
+        return true_object();
     Integer* i = pr::to_integer(p);
     return value != i->value ? true_object() : false_object();
 }

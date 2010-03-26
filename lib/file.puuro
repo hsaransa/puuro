@@ -11,18 +11,25 @@ open_file = {<fn mode>
 
 read_file = {<fn>
     f = open_file fn 'r;
-
     s = "";
-
     builtin.repeat
     {
-        r = f.read 16384;
+        r = f.read 65536;
         (r != \n).then {s = s + r};
     };
-
     f.close;
+    s
+};
 
-    s;
+write_file = {<fn s>
+    f = open_file fn 'w;
+    builtin.while {s != ""}
+    {
+        r = f.write s;
+        print "WRITTO " r;
+        (r != \n).then {s = s.all_after r};
+    };
+    f.close;
 };
 
 file_in_streamer = {<fn>
@@ -60,6 +67,7 @@ module 'file
 {
     pollute 'open_file         open_file;
     pollute 'read_file         read_file;
+    pollute 'write_file        write_file;
     pollute 'file_in_streamer  file_in_streamer;
     pollute 'file_out_streamer file_out_streamer;
 };
