@@ -4,6 +4,7 @@
 #include "integer.hpp"
 #include "selector.hpp"
 #include "frame.hpp"
+#include "float.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -311,6 +312,8 @@ ObjP Std2Function::call_(List* l)
     void*       args[16];
     std2_int32  int32s[16];
     std2_int64  int64s[16];
+    float       floats[16];
+    double      doubles[16];
     std2_buffer buffers[16];
 
     assert(params.size() <= sizeof(args)/sizeof(args[0]));
@@ -334,17 +337,23 @@ ObjP Std2Function::call_(List* l)
             break;
 
         case STD2_INT32:
-            {
-                int32s[i] = int_value(arg);
-                args[i] = &int32s[i];
-            }
+            int32s[i] = int_value(arg);
+            args[i] = &int32s[i];
             break;
 
         case STD2_INT64:
-            {
-                int64s[i] = int_value(arg);
-                args[i] = &int64s[i];
-            }
+            int64s[i] = int_value(arg);
+            args[i] = &int64s[i];
+            break;
+
+        case STD2_FLOAT:
+            floats[i] = float_value(arg);
+            args[i] = &floats[i];
+            break;
+
+        case STD2_DOUBLE:
+            doubles[i] = float_value(arg);
+            args[i] = &doubles[i];
             break;
 
         case STD2_BUF_PTR:
