@@ -197,7 +197,12 @@ int Lexer::next()
             else
             {
                 current_token = T_INTEGER;
-                object = (ObjP)*new Integer(s);
+
+                long int i = strtol(s, 0, 10);
+                if (does_fit_fixnum(i))
+                    object = int_to_fixnum(i);
+                else
+                    object = (ObjP)*new Integer(s);
                 dec_ref(object);
             }
             break;

@@ -54,8 +54,9 @@ namespace pr
         ObjP pre_params_();
         ObjP sink_param_();
         ObjP post_params_();
-        ObjP obj_list_();
-        ObjP new_obj_list_(ObjP);
+        ObjP operator_list_();
+        ObjP argument_list_();
+        ObjP position_list_();
         ObjP closure_(ObjP);
 
         void clear();

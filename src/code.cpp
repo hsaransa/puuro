@@ -31,8 +31,9 @@ Type* Code::get_type()
         type->add_method("pre_params", (Callable::mptr0)&Code::pre_params_);
         type->add_method("sink_param", (Callable::mptr0)&Code::sink_param_);
         type->add_method("post_params", (Callable::mptr0)&Code::post_params_);
-        type->add_method("obj_list", (Callable::mptr0)&Code::obj_list_);
-        type->add_method("with_new_obj_list", (Callable::mptr1)&Code::new_obj_list_);
+        type->add_method("operator_list", (Callable::mptr0)&Code::operator_list_);
+        type->add_method("argument_list", (Callable::mptr0)&Code::argument_list_);
+        type->add_method("position_list", (Callable::mptr0)&Code::position_list_);
         type->add_method("closure", (Callable::mptr1)&Code::closure_);
     }
 
@@ -445,59 +446,54 @@ ObjP Code::post_params_()
     return *l;
 }
 
-ObjP Code::obj_list_()
+ObjP Code::operator_list_()
 {
     pr::List* l = new pr::List();
     for (int i = 0; i < (int)operators.size(); i++)
     {
+        Name n;
         switch (operators[i])
         {
-        case Push:
-        case Closure:
-        case Lookup:
-            l->append(arguments[i]);
-            break;
-
-        default:
-            continue;
+        case Return:       n = Name("return");       break;
+        case Assign:       n = Name("assign");       break;
+        case Push:         n = Name("push");         break;
+        case Pop:          n = Name("pop");          break;
+        case Peek:         n = Name("peek");         break;
+        case Lookup:       n = Name("lookup");       break;
+        case Method:       n = Name("method");       break;
+        case CallMethod:   n = Name("callmethod");   break;
+        case Arg:          n = Name("arg");          break;
+        case Closure:      n = Name("closure");      break;
+        case List:         n = Name("list");         break;
+        case CopyList:     n = Name("copylist");     break;
+        case ExtractFirst: n = Name("extractfirst"); break;
+        case ExtractSink:  n = Name("extractsink");  break;
+        case PopEmptyList: n = Name("popemptylist"); break;
         }
+        l->append(name_to_symbol(n));
     }
     return *l;
 }
 
-ObjP Code::new_obj_list_(ObjP p)
+ObjP Code::argument_list_()
 {
-    pr::List* l = to_list(p);
+    pr::List* l = new pr::List();
+    for (int i = 0; i < (int)arguments.size(); i++)
+        l->append(arguments[i]);
+    return *l;
+}
 
-    Code* c = new Code();
-    c->clear();
-    c->pre_params = pre_params;
-    c->sink_param = sink_param;
-    c->post_params = post_params;
-    c->operators = operators;
-    c->positions = positions;
-
-    int j = 0;
-
-    for (int i = 0; i < (int)operators.size(); i++)
+ObjP Code::position_list_()
+{
+    pr::List* l = new pr::List();
+    for (int i = 0; i < (int)positions.size(); i++)
     {
-        switch (operators[i])
-        {
-        case Push:
-        case Closure:
-        case Lookup:
-            if (j >= l->get_size())
-                throw new Exception("out_of_range", int_to_fixnum(j));
-            c->arguments.push_back(l->get(j++));
-            break;
-
-        default:
-            c->arguments.push_back(arguments[i]);
-            break;
-        }
+        pr::List* l2 = new pr::List(2, name_to_symbol(Name(positions[i].file)),
+                                       int_to_fixnum(positions[i].line));
+        l->append(*l2);
+        dec_ref(*l2);
     }
-
-    return *c;
+    return *l;
 }
 
 ObjP Code::closure_(ObjP s)

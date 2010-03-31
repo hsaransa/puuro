@@ -14,11 +14,13 @@ std2_call = {<mn fn *args>
 
 modules = builtin.assoc;
 
-std2_module = {<mn>
+std2_module = {<mn *fork>
+    fork = fork.empty.if {\n} {fork.first};
+
     (modules.has mn).else
     {
         mr = builtin.new_type ("std2_module_" + mn.s).to_symbol;
-        m = std2.get_module mn;
+        m = std2.get_module mn fork;
 
         classes   = m.list_classes;
         consts    = m.list_consts;
@@ -46,10 +48,15 @@ std2_module = {<mn>
     modules.get mn
 };
 
+std2_fork = {
+    std2.fork
+};
+
 module 'std2
 {
     pollute 'std2_function std2_function;
     pollute 'std2_const std2_const;
     pollute 'std2_call std2_call;
     pollute 'std2_module std2_module;
+    pollute 'std2_fork std2_fork;
 };

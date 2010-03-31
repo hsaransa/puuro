@@ -37,6 +37,7 @@ Type* List::get_type()
         type = new Type("list");
         type->add_method(Name("map"), (Callable::mptr1)&List::map_);
         type->add_method(Name("append"), (Callable::mptr1)&List::append_);
+        type->add_method(Name("extend"), (Callable::mptr1)&List::extend_);
         type->add_method(Name("push"), (Callable::mptr1)&List::append_);
         type->add_method(Name("prepend"), (Callable::mptr1)&List::prepend_);
         //type->add_method(Name("filter"), (Callable::mptr1)&List::filter_);
@@ -258,6 +259,13 @@ ObjP List::add_(ObjP p)
         l2->append(l->items[i]);
 
     return *l2;
+}
+
+ObjP List::extend_(ObjP p)
+{
+    List* l = pr::to_list(p);
+    items.insert(items.end(), l->items.begin(), l->items.end());
+    return inc_ref(*this);
 }
 
 ObjP List::first_()

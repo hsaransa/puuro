@@ -31,7 +31,7 @@ Type* BuiltIn::get_type()
 {
     if (!type)
     {
-        type = new Type("std");
+        type = new Type("builtin");
         type->add_method("print", (Callable::mptrx)&BuiltIn::print);
         type->add_method("pollute", (Callable::mptr1)&BuiltIn::pollute);
         type->add_method("if", (Callable::mptrx)&BuiltIn::if_);
@@ -52,6 +52,7 @@ Type* BuiltIn::get_type()
         type->add_method("sleep", (Callable::mptr2)&BuiltIn::sleep_);
         type->add_method("file", (Callable::mptr0)&BuiltIn::file_);
         type->add_method("compile_string", (Callable::mptr2)&BuiltIn::compile_string_);
+        type->add_method("scope", (Callable::mptr1)&BuiltIn::scope_);
     }
     return type;
 }
@@ -376,4 +377,10 @@ ObjP BuiltIn::sleep_(ObjP p, ObjP next)
 ObjP BuiltIn::file_()
 {
     return *new File();
+}
+
+ObjP BuiltIn::scope_(ObjP s)
+{
+    Scope *ss = s == 0 ? new Scope(0) : new Scope(cast_object<Scope*>(s));
+    return *ss;
 }

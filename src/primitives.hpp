@@ -4,6 +4,7 @@
 #include "prdefs.hpp"
 #include "object.hpp"
 #include "nametable.hpp"
+#include <limits.h>
 
 namespace pr
 {
@@ -100,6 +101,11 @@ namespace pr
         return ((Object*)p)->member(n);
     }
 #endif
+
+    inline bool does_fit_fixnum(long int i)
+    {
+        return i >= (INT_MIN / 2) && i <= (INT_MAX / 2);
+    }
 
     inline int fixnum_to_int(ObjP p)
     {

@@ -31,6 +31,7 @@ namespace pr
         ObjP each_(ObjP p);
         ObjP append_(ObjP p);
         ObjP prepend_(ObjP p);
+        ObjP extend_(ObjP p);
         ObjP pop_();
         ObjP pop_first_();
         ObjP empty_();

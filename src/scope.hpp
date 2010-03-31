@@ -22,7 +22,12 @@ namespace pr
     private:
         ObjP set_local_(ObjP, ObjP);
         ObjP set_(ObjP, ObjP);
+        ObjP get_local_(ObjP);
+        ObjP get_(ObjP);
         ObjP pollute_(ObjP);
+        ObjP parent_();
+        ObjP set_parent_(ObjP);
+        ObjP locals_();
 
         Ref<Scope*> parent;
         std::map<Name, Ref<ObjP> > locals;

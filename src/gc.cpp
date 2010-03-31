@@ -76,7 +76,7 @@ int GC::get_object_count()
 
 void GC::gc()
 {
-    if (magic_counter > 1024 || intensive_gc)
+    if (magic_counter > 1024*16 || intensive_gc)
         GC::force_gc();
 }
 

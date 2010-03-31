@@ -4,6 +4,7 @@
 #include <poll.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <stdio.h>
 
 using namespace pr;
 
@@ -134,12 +135,24 @@ void Selector::select()
 
     for (int i = 0; i < (int)watchers.size(); i++)
     {
+        assert(!(pollfds[i].revents & POLLNVAL));
+
         if (!pollfds[i].revents)
             continue;
 
+        int m = 0;
+        if (pollfds[i].revents & POLLIN)
+            m |= READ;
+        if (pollfds[i].revents & POLLOUT)
+            m |= WRITE;
+        if (pollfds[i].revents & (POLLERR | POLLHUP | POLLNVAL))
+            m |= ERROR;
+
+        fprintf(stderr, "%x\n", pollfds[i].revents);
+
         Watcher w = watchers[i];
         watchers.erase(watchers.begin() + i);
-        w.callback(w.fd, w.mask, w.user, w.obj);
+        w.callback(w.fd, m, w.user, w.obj);
         break;
     }
 }
