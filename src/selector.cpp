@@ -148,8 +148,6 @@ void Selector::select()
         if (pollfds[i].revents & (POLLERR | POLLHUP | POLLNVAL))
             m |= ERROR;
 
-        fprintf(stderr, "%x\n", pollfds[i].revents);
-
         Watcher w = watchers[i];
         watchers.erase(watchers.begin() + i);
         w.callback(w.fd, m, w.user, w.obj);

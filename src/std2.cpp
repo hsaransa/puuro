@@ -111,14 +111,15 @@ ObjP Std2::fork_()
  */
 
 Std2Fork::Std2Fork(int f)
-:   Object(get_type()), fork_id(f)
+:   Object(get_type()), valid(true), fork_id(f)
 {
     assert(fork_id >= 0);
 }
 
 Std2Fork::~Std2Fork()
 {
-    std2_unfork(fork_id);
+    if (valid)
+        std2_unfork(fork_id);
 }
 
 Type* Std2Fork::get_type()
@@ -127,8 +128,20 @@ Type* Std2Fork::get_type()
     if (!type)
     {
         type = new Type("std2fork");
+        type->add_method("to_string", (Callable::mptr0)&Std2Fork::to_string_);
+        type->add_method("valid", (Callable::mptr0)&Std2Fork::valid_);
     }
     return type;
+}
+
+ObjP Std2Fork::to_string_()
+{
+    return *new String("<std2fork>");
+}
+
+ObjP Std2Fork::valid_()
+{
+    return valid ? true_object() : false_object();
 }
 
 /*
@@ -277,7 +290,6 @@ static void callback(int fd, int mask, void* user, ObjP p_)
     callback_data* data = (callback_data*)user;
 
     int m = selector_flags_to_std2(mask);
-    fprintf(stderr, "maski on %x, haluttu olis %x\n", m, data->cb.flags);
 
     assert(data->cb.fd == fd);
     assert((data->cb.flags & m) != 0);
@@ -356,6 +368,22 @@ static void callback(int fd, int mask, void* user, ObjP p_)
 
         data->cb = std2_get_callback();
 
+        if (data->cb.flags & STD2_CALLBACK_FORK_ERROR)
+        {
+            delete data;
+
+            List* l = cast_object<List*>(p_);
+            Frame* frame = cast_object<Frame*>(l->get(0));
+            Std2Fork* fork = cast_object<Std2Fork*>(l->get(1));
+
+            fork->invalidate();
+
+            get_executor()->set_frame(frame);
+            get_executor()->handle_exception(new Exception("invalid_fork", *fork));
+
+            return;
+        }
+
         int m = std2_flags_to_selector(data->cb.flags);
         get_selector()->add_watcher(data->cb.fd, m, callback, data, p_);
         return;
@@ -374,6 +402,9 @@ static void callback(int fd, int mask, void* user, ObjP p_)
 
 ObjP Std2Function::call_(List* l)
 {
+    if (!fork->is_valid())
+        throw new Exception("invalid_fork", *fork);
+
     // Process parameters.
     // TODO: use alloca()? was there some problem with it?
 
@@ -453,7 +484,7 @@ ObjP Std2Function::call_(List* l)
                     throw new Exception("bad_type", arg);
                 }
 
-                if (inst->is_freed())
+                if (inst->is_freed() || !inst->get_fork()->is_valid())
                     throw new Exception("instance_freed", arg);
 
                 args[i] = inst->get_ptr();
@@ -548,7 +579,20 @@ ObjP Std2Function::call_(List* l)
 
     if (ret)
     {
+        assert(ret_obj == 0);
+        ret_obj = error_object();
+
         struct std2_callback cb = std2_get_callback();
+
+        // Fork error means that all instances are invalid.
+
+        if (cb.flags & STD2_CALLBACK_FORK_ERROR)
+        {
+            fork->invalidate();
+            throw new Exception("invalid_fork", *fork);
+        }
+
+        // Normal callback.
 
         int m = 0;
         if (cb.flags & STD2_CALLBACK_READ)
@@ -570,9 +614,6 @@ ObjP Std2Function::call_(List* l)
         get_selector()->add_watcher(cb.fd, m, callback, data, *l);
 
         get_executor()->set_frame(0);
-
-        assert(ret_obj == 0);
-        ret_obj = error_object();
     }
 
     return ret_obj;

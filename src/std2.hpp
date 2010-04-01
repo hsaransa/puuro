@@ -32,9 +32,16 @@ namespace pr
 
         virtual Type* get_type();
 
+        void invalidate() { valid = false; }
+
+        bool is_valid() const { return valid; }
         int get_fork_id() const { return fork_id; }
 
     private:
+        ObjP to_string_();
+        ObjP valid_();
+
+        bool valid;
         int fork_id;
     };
 
@@ -92,6 +99,7 @@ namespace pr
         int get_module() { return module; }
         int get_class() { return clas; }
         void* get_ptr() { return ptr; }
+        Std2Fork* get_fork() { return fork.get(); }
 
     private:
         ObjP to_string_();
