@@ -1,0 +1,115 @@
+serializers = builtin.assoc;
+serializers.set 'list     {<a> [['list ""]] + a };
+serializers.set 'fixnum   {<a> [['fixnum a.to_string]] };
+serializers.set 'null     {<a> [['null ""]] };
+serializers.set 'bool     {<a> [['bool a.to_string]] };
+serializers.set 'string   {<a> [['string a]] };
+serializers.set 'symbol   {<a> [['symbol a.s]] };
+serializers.set 'builtin  {<a> [['builtin ""]] };
+serializers.set 'std2     {<a> [['std2 ""]] };
+serializers.set 'resolver {<a> [['resolver ""]] };
+serializers.set 'closure  {<a> [['closure ""] a.code a.scope] };
+serializers.set 'assoc    {<a> [['assoc ""] a.items] };
+serializers.set 'code     {<a> [['code ""] a.pre_params a.sink_param a.post_params
+                                           a.operator_list a.argument_list a.position_list] };
+serializers.set 'scope {<a>
+    print (a.locals.map {<a> a.first});
+    [['scope ""] a.parent a.locals]
+};
+
+serializers.set 'method {<a>
+    [['method ""]]
+};
+
+pre_deserializers = builtin.assoc;
+post_deserializers = builtin.assoc;
+pre_deserializers.set  'list  {<s> []};
+post_deserializers.set 'list  {<a *l> a.extend l};
+pre_deserializers.set  'fixnum {<s> s.to_integer};
+post_deserializers.set 'fixnum {<a>};
+
+serialize_to_primitives = {<obj>
+    root = obj.id;
+
+    done = [];
+    todo = [obj];
+
+    while {todo.empty.not} {
+        obj = todo.pop_first;
+
+        (done.filter {<x> x.first == obj.id}).empty.then {
+            (serializers.has obj.type.name).not.then {
+                (exception 'serialization_failed obj).raise
+            };
+
+            a, *b = (serializers.get obj.type.name) obj;
+
+            foo = [obj.id] + a + (b.map {<x> x.id});
+            done.append foo;
+
+            todo = todo + b;
+        };
+    };
+
+    [root done]
+};
+
+serialize_to_string = {<obj>
+    root, objs = serialize_to_primitives obj;
+
+    s = root.to_string + "\n";
+
+    objs.each {<x>
+        s = s + x.first.to_string + " " + x.second.s;
+        (x.all_after 2).each {<x>
+            s = s + " " + x.to_string
+        };
+
+        s = s + "\n";
+    };
+
+    s
+};
+
+deserialize_string = {<s>
+    root, *lines, last = s.split "\n";
+    assert last == "";
+
+    objs = [];
+
+    find = {<id>
+        (objs.filter {<x> x.first == id }).first.second
+    };
+
+    lines.each {<line>
+        s = line.split " ";
+        sym = s.second.to_symbol;
+        pre  = pre_deserializers.get sym;
+        objs.append [s.first (pre s.third)];
+    };
+
+    lines.each {<line>
+        s = line.split " ";
+        sym = s.second.to_symbol;
+        post = post_deserializers.get sym;
+
+        obj = find s.first;
+        args = (s.all_after 3).map {<x> find x};
+
+        apply post [obj] + args;
+    };
+
+    find root;
+};
+
+serialization_barrier = {<c>
+    c();
+};
+
+module 'serialize
+{
+    pollute 'serialize_to_primitives serialize_to_primitives;
+    pollute 'serialize_to_string     serialize_to_string;
+    pollute 'deserialize_string      deserialize_string;
+    pollute 'serialization_barrier   serialization_barrier;
+};
