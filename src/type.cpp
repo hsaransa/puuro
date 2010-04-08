@@ -1,6 +1,7 @@
 #include "list.hpp"
 #include "method.hpp"
 #include "integer.hpp"
+#include <stdio.h>
 
 using namespace pr;
 
@@ -24,6 +25,14 @@ static ObjP obj_id(ObjP p)
     return *new Integer(p);
 }
 
+static ObjP obj_to_string(ObjP p)
+{
+    Type* t = get_type(p);
+    char buf[64];
+    snprintf(buf, sizeof(buf), "<instance of %s>", t->get_name().s());
+    return *new String(buf);
+}
+
 Type* Type::type;
 
 Type::Type(Name n)
@@ -33,6 +42,7 @@ Type::Type(Name n)
     add_method(Name("eq"), obj_eq);
     add_method(Name("ne"), obj_ne);
     add_method(Name("id"), obj_id);
+    add_method(Name("to_string"), obj_to_string);
 
     GC::add_root(this);
     GC::add_type(this);

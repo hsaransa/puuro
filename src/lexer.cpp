@@ -174,7 +174,7 @@ int Lexer::next()
             while (isdigit(*p) && p < end)
                 p++;
 
-            if (*p == '.')
+            if (*p == '.' && !(isalpha(*(p+1)) || *(p+1) == '_'))
             {
                 p++;
                 while (isdigit(*p) && p < end)
@@ -196,6 +196,13 @@ int Lexer::next()
             }
             else
             {
+                if (*p == '.' && p - s == 0)
+                {
+                    p++;
+                    current_token = '.';
+                    break;
+                }
+
                 current_token = T_INTEGER;
 
                 long int i = strtol(s, 0, 10);

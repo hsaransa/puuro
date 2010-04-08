@@ -97,6 +97,12 @@ ObjP Std2::get_module_(ObjP s, ObjP f)
     if (ret < 0)
         throw new Exception("bad_module", s);
 
+    int flags = std2_get_module_flags(ret);
+    if (!(flags & STD2_MODULE_VALID))
+        throw new Exception("invalid_module", s);
+    if (fork == 0 && (flags & STD2_MODULE_MUST_FORK))
+        throw new Exception("must_fork", s);
+
     return *new Std2Module(ret, fork);
 }
 
@@ -375,6 +381,7 @@ static void callback(int fd, int mask, void* user, ObjP p_)
             List* l = cast_object<List*>(p_);
             Frame* frame = cast_object<Frame*>(l->get(0));
             Std2Fork* fork = cast_object<Std2Fork*>(l->get(1));
+            assert(fork);
 
             fork->invalidate();
 
@@ -402,7 +409,7 @@ static void callback(int fd, int mask, void* user, ObjP p_)
 
 ObjP Std2Function::call_(List* l)
 {
-    if (!fork->is_valid())
+    if (fork && !fork->is_valid())
         throw new Exception("invalid_fork", *fork);
 
     // Process parameters.
@@ -484,8 +491,11 @@ ObjP Std2Function::call_(List* l)
                     throw new Exception("bad_type", arg);
                 }
 
-                if (inst->is_freed() || !inst->get_fork()->is_valid())
-                    throw new Exception("instance_freed", arg);
+                if (!inst->is_valid())
+                    throw new Exception("invalid_instance", arg);
+
+                if (inst->get_fork() != fork)
+                    throw new Exception("fork_mismatch", arg);
 
                 args[i] = inst->get_ptr();
             }
@@ -588,6 +598,7 @@ ObjP Std2Function::call_(List* l)
 
         if (cb.flags & STD2_CALLBACK_FORK_ERROR)
         {
+            assert(fork);
             fork->invalidate();
             throw new Exception("invalid_fork", *fork);
         }

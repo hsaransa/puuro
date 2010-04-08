@@ -95,11 +95,13 @@ namespace pr
         virtual Type* get_type();
         virtual void gc_mark();
 
-        bool is_freed() { return freed; };
         int get_module() { return module; }
         int get_class() { return clas; }
         void* get_ptr() { return ptr; }
         Std2Fork* get_fork() { return fork.get(); }
+
+        bool is_freed() { return freed; };
+        bool is_valid() { return !freed && (!fork.get() || fork->is_valid()); }
 
     private:
         ObjP to_string_();
