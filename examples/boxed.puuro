@@ -8,7 +8,7 @@ mint = {
         "<mint " + v.unbox.to_string + ">"
     };
 
-    c.type.set_method 'bad_method
+    c.type.set_method 'method_missing
     {<obj name args>
         obj = obj.unbox;
 

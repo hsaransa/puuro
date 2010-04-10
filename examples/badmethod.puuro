@@ -2,6 +2,6 @@
 
 a = 33;
 
-a.type.set_method 'bad_method {<a b c> print "bad method " a " " b " " c; 7 };
+a.type.set_method 'method_missing {<a b c> print "bad method " a " " b " " c; 7 };
 
 print (a.plop 1 2 3);

@@ -268,7 +268,7 @@ void Executor::execute()
                 Callable c = type->get_method(name);
 
                 if (c.type == Callable::NONE)
-                    handle_exception(new Exception(Name("bad_method"), arg));
+                    handle_exception(new Exception(Name("method_missing"), arg));
 
                 Method* m = new Method(p, c);
                 f->push(*m);
@@ -422,9 +422,9 @@ void Executor::call_method(Name name)
 
         if (c.type == Callable::NONE)
         {
-            Callable c = type->get_method("bad_method");
+            Callable c = type->get_method("method_missing");
             if (c.type == Callable::NONE)
-                throw new Exception(Name("bad_method"), name_to_symbol(name));
+                throw new Exception(Name("method_missing"), name_to_symbol(name));
 
             List* list = new List();
             for (int i = 0; i < (int)f->args.size(); i++)

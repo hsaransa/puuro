@@ -64,7 +64,7 @@ static ObjP fixnum_s(ObjP p)
     return *new String(buf);
 }
 
-static ObjP fixnum_bad_method(ObjP p, ObjP arg1, ObjP arg2)
+static ObjP fixnum_method_missing(ObjP p, ObjP arg1, ObjP arg2)
 {
     if (!is_symbol(arg1))
         throw new Exception(Name("bad_argument"), arg1);
@@ -160,7 +160,7 @@ void pr::init_primitive_types()
     fixnum_type->add_method("eq", fixnum_eq);
     fixnum_type->add_method("ne", fixnum_ne);
     fixnum_type->add_method("to_string", fixnum_s);
-    fixnum_type->add_method("bad_method", fixnum_bad_method);
+    fixnum_type->add_method("method_missing", fixnum_method_missing);
 
     bool_type = new Type("bool");
     GC::add_root(bool_type);

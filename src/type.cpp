@@ -113,7 +113,7 @@ ObjP Type::get_method_(ObjP n)
     Callable c = get_method(name);
 
     if (c.type == Callable::NONE)
-        throw new Exception(Name("bad_method"), 0);
+        throw new Exception(Name("method_missing"), 0);
 
     return *new Method(this, c);
 }
