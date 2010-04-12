@@ -9,6 +9,8 @@
 
 namespace pr
 {
+    class Std2Fork;
+
     class Std2 : public Object
     {
     public:
@@ -16,12 +18,25 @@ namespace pr
         virtual ~Std2();
 
         virtual Type* get_type();
+        void gc_mark();
+
+        void add_delayed_return(int id, Frame* frame, Std2Fork* fork, std2_param ret_type);
+        void handle_delayed_returns();
 
     private:
         ObjP list_modules_();
         ObjP get_module_(ObjP s, ObjP f);
         ObjP get_main_fork_();
         ObjP fork_();
+
+        struct DelayedReturn
+        {
+            Ref<Frame*>    frame;
+            Ref<Std2Fork*> fork;
+            std2_param     ret_type;
+        };
+
+        std::map<int, DelayedReturn> returns;
     };
 
     class Std2Fork : public Object
@@ -48,7 +63,7 @@ namespace pr
     class Std2Module : public Object
     {
     public:
-        Std2Module(int m, Std2Fork*);
+        Std2Module(int m, Std2Fork*, Std2*);
         virtual ~Std2Module();
 
         virtual Type* get_type();
@@ -64,12 +79,13 @@ namespace pr
 
         int module;
         Ref<Std2Fork*> fork;
+        Ref<Std2*> std2;
     };
 
     class Std2Function : public Object
     {
     public:
-        Std2Function(int mod, int func, Std2Fork*);
+        Std2Function(int mod, int func, Std2Fork*, Std2*);
         virtual ~Std2Function();
 
         virtual Type* get_type();
@@ -81,6 +97,7 @@ namespace pr
         int module;
         int function;
         Ref<Std2Fork*> fork;
+        Ref<Std2*> std2;
 
         std2_param ret_type;
         std::vector<std2_param> params;
