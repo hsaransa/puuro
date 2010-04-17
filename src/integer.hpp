@@ -40,6 +40,7 @@ namespace pr
         ObjP is_true_();
         ObjP times_(ObjP);
         ObjP hex_(ObjP);
+        ObjP chr_();
 
     private:
         long long int value;

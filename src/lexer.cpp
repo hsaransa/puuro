@@ -89,7 +89,19 @@ int Lexer::next()
             continue;
         }
 
-        if (*p == '=' && *(p+1) == '=')
+        if (*p == '&' && *(p+1) == '&')
+        {
+            current_token = T_AND2;
+            p += 2;
+            break;
+        }
+        else if (*p == '|' && *(p+1) == '|')
+        {
+            current_token = T_OR2;
+            p += 2;
+            break;
+        }
+        else if (*p == '=' && *(p+1) == '=')
         {
             current_token = T_EQ;
             p += 2;

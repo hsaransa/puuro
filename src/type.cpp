@@ -29,7 +29,7 @@ static ObjP obj_to_string(ObjP p)
 {
     Type* t = get_type(p);
     char buf[64];
-    snprintf(buf, sizeof(buf), "<instance of %s>", t->get_name().s());
+    snprintf(buf, sizeof(buf), "<instance of %s at %p>", t->get_name().s(), (void*)p);
     return *new String(buf);
 }
 
@@ -43,6 +43,8 @@ Type::Type(Name n)
     add_method(Name("ne"), obj_ne);
     add_method(Name("id"), obj_id);
     add_method(Name("to_string"), obj_to_string);
+    add_method(Name("str"), obj_to_string);
+    add_method(Name("repr"), obj_to_string);
 
     GC::add_root(this);
     GC::add_type(this);

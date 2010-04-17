@@ -17,6 +17,7 @@ refcount = int(ARGUMENTS.get('refcount', 1))
 gc = int(ARGUMENTS.get('gc', 1))
 optimized = int(ARGUMENTS.get('optimized', 0))
 profile = int(ARGUMENTS.get('profile', 0))
+debug = int(ARGUMENTS.get('debug', 1))
 
 if not refcount:
   env.Append(CPPDEFINES=[('NO_REFCOUNT')])
@@ -25,9 +26,14 @@ if not gc:
   env.Append(CPPDEFINES=[('NO_GC')])
 
 if optimized:
-  env.Append(CPPFLAGS=['-O3', '-fomit-frame-pointer'])
-  env.Append(CPPDEFINES=[('NDEBUG')])
+  debug = 0
+  env.Append(CPPFLAGS=['-O3'])
+  if not profile:
+    env.Append(CPPFLAGS=['-fomit-frame-pointer'])
   env.Append(CPPDEFINES=[('OPTIMIZED')])
+
+if not debug:
+  env.Append(CPPDEFINES=[('NDEBUG')])
 
 if profile:
   env.Append(CPPFLAGS=['-pg'])

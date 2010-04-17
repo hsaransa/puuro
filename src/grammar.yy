@@ -45,6 +45,7 @@ static void yyerror(const char*)
 %term T_EMPTY_PARENS T_TWO_DOTS
 
 %left T_TWO_DOTS
+%left T_AND2 T_OR2
 %left T_EQ T_NE
 %left T_LE T_GE '<' '>'
 %left '&' '|'
@@ -151,7 +152,13 @@ infix_expr:
 	infix_expr '&' infix_expr
 	{ NODE2($$, And, $1, $3); } |
 
+	infix_expr T_AND2 infix_expr
+	{ NODE2($$, And, $1, $3); } |
+
 	infix_expr '|' infix_expr
+	{ NODE2($$, Or, $1, $3); } |
+
+	infix_expr T_OR2 infix_expr
 	{ NODE2($$, Or, $1, $3); } |
 
 	//term_expr '[' expr ']'

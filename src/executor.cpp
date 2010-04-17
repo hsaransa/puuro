@@ -197,6 +197,16 @@ void Executor::execute()
                 }
                 break;
 
+            case MiniCode::IfCounterZero:
+                if (mc->counter == 0)
+                    mc->pos = op.ref;
+                break;
+
+            case MiniCode::IfCounterOne:
+                if (mc->counter == 1)
+                    mc->pos = op.ref;
+                break;
+
             case MiniCode::IncCounter:
                 mc->counter++;
                 break;

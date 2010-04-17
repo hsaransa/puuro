@@ -50,7 +50,7 @@ execute = {<internal fn>
 };
 
 ['streams 'blocking 'file 'web 'net 'irc 'dir 'std2 'filechange 'interactive
- 'dns 'time 'serialize].each {<m>
+ 'dns 'time 'serialize 'return].each {<m>
     builtin.module_source m (lib_dir + "/" + m.s + ".puuro");
 };
 

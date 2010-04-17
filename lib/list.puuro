@@ -79,3 +79,16 @@ t.set_method 'fold {<l f>
     while {l.empty.not} {v = f v l.pop_first};
     v
 };
+
+t.set_method 'find_index {<l f>
+    i = 0;
+    found = \f;
+    while {i < l.size && !found} {
+        (f (l.at i)).if {
+            found = \t
+        } {
+            i = i + 1;
+        };
+    };
+    (i >= l.size).if {\n} {i}
+};

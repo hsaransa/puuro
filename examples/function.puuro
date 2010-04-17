@@ -1,0 +1,11 @@
+require 'return;
+
+f = function {<x>
+    (x < 5).then { return 111 };
+    (x > 10).then { return 222 };
+    333
+};
+
+print (f 3);
+print (f 7);
+print (f 12);

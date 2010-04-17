@@ -26,6 +26,7 @@ namespace pr
 
     private:
         ObjP add(ObjP);
+        ObjP extend_(ObjP);
         ObjP at(ObjP);
         ObjP len_();
         ObjP eq_(ObjP p);
@@ -37,6 +38,7 @@ namespace pr
         ObjP last_();
         ObjP to_symbol_();
         ObjP to_integer_();
+        ObjP repr_();
         ObjP ord_(ObjP);
         ObjP first_();
         ObjP second_();

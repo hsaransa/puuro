@@ -1,6 +1,6 @@
 #include "type.hpp"
 #include "integer.hpp"
-
+#include <stdio.h>
 using namespace pr;
 
 String::String()
@@ -31,7 +31,10 @@ Type* String::get_type()
     {
         type = new Type("string");
         type->add_method("to_string", (Callable::mptr0)&String::copy);
+        type->add_method("str", (Callable::mptr0)&String::copy);
+        type->add_method("repr", (Callable::mptr0)&String::repr_);
         type->add_method("add", (Callable::mptr1)&String::add);
+        type->add_method("extend", (Callable::mptr1)&String::extend_);
         type->add_method("at", (Callable::mptr1)&String::at);
         type->add_method("len", (Callable::mptr0)&String::len_);
         type->add_method("eq", (Callable::mptr1)&String::eq_);
@@ -64,6 +67,26 @@ String* String::copy() const
     return str;
 }
 
+ObjP String::repr_()
+{
+    std::string s = "\"";
+    for (int i = 0; i < (int)data.length(); i++)
+    {
+        unsigned char c = data[i];
+        if (isalnum(c) || strchr(" [](){}", c) != 0)
+        {
+            s += c;
+            continue;
+        }
+
+        char buf[16];
+        snprintf(buf, sizeof(buf), "\\x%02x", c);
+        s += buf;
+    }
+    s += "\"";
+    return *new String(s.c_str(), s.length());
+}
+
 const char* String::get_data() const
 {
     return data.c_str();
@@ -91,6 +114,13 @@ ObjP String::add(ObjP p)
     String* s = copy();
     s->append(to_string(p));
     return *s;
+}
+
+ObjP String::extend_(ObjP p)
+{
+    String* s = to_string(p);
+    data += s->data;
+    return 0;
 }
 
 ObjP String::at(ObjP p)

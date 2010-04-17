@@ -26,6 +26,7 @@ syn match xSpecialVariable "\$[cenr]"
 
 syn match xSpecialVariable "\\[ftn]"
 
+syn match xNumber "0x\x\x*"
 syn match xNumber "\d\d*"
 syn match xNumber "\d*\.\d\d*"
 

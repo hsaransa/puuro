@@ -35,6 +35,9 @@ Type* List::get_type()
     if (!type)
     {
         type = new Type("list");
+        type->add_method(Name("str"), (Callable::mptr0)&List::to_string_);
+        type->add_method(Name("repr"), (Callable::mptr0)&List::to_string_);
+        type->add_method(Name("to_string"), (Callable::mptr0)&List::to_string_);
         type->add_method(Name("map"), (Callable::mptr1)&List::map_);
         type->add_method(Name("append"), (Callable::mptr1)&List::append_);
         type->add_method(Name("extend"), (Callable::mptr1)&List::extend_);
@@ -42,7 +45,6 @@ Type* List::get_type()
         type->add_method(Name("prepend"), (Callable::mptr1)&List::prepend_);
         //type->add_method(Name("filter"), (Callable::mptr1)&List::filter_);
         type->add_method(Name("each"), (Callable::mptr1)&List::each_);
-        type->add_method(Name("to_string"), (Callable::mptr0)&List::to_string_);
         type->add_method(Name("pop"), (Callable::mptr0)&List::pop_);
         type->add_method(Name("pop_first"), (Callable::mptr0)&List::pop_first_);
         type->add_method(Name("empty"), (Callable::mptr0)&List::empty_);
@@ -82,15 +84,53 @@ List* List::copy() const
 
 ObjP List::to_string_()
 {
-    String* s = new String("[");
-    for (int i = 0; i < (int)items.size(); i++)
+    static const MiniCode::Op ops[] =
     {
-        if (i != 0)
-            s->append(" ");
-        s->append(call_to_string(items[i]));
-    }
-    s->append("]");
-    return *s;
+        // 0, get next item
+        PR_MC_PUSH(0)
+        PR_MC_OP1(NextItemOrGoto, 14)
+
+        // 2, append a space if counter is not zero
+        PR_MC_OP1(IfCounterOne, 8)
+        PR_MC_PUSH(5)
+        PR_MC_ARG()
+        PR_MC_PUSH(1)
+        PR_MC_CALL(3)
+        PR_MC_POP()
+
+        // 8, call repr and extend, then goto 0
+        PR_MC_CALL(2)
+        PR_MC_ARG()
+        PR_MC_PUSH(1)
+        PR_MC_CALL(3)
+        PR_MC_POP()
+        PR_MC_GOTO(0)
+
+        // 14, append ]
+        PR_MC_PUSH(4)
+        PR_MC_ARG()
+        PR_MC_PUSH(1)
+        PR_MC_CALL(3)
+        PR_MC_POP()
+        PR_MC_PUSH(1)
+        PR_MC_END()
+    };
+
+    MiniCode* mc = new MiniCode(ops);
+    mc->counter = 0;
+
+    String* s = new String("[");
+
+    mc->objects.push_back((ObjP)*this);
+    mc->objects.push_back((ObjP)*s);
+    mc->objects.push_back(name_to_symbol("repr"));
+    mc->objects.push_back(name_to_symbol("extend"));
+    mc->objects.push_back((ObjP)*new String("]"));
+    mc->objects.push_back((ObjP)*new String(" "));
+
+    get_executor()->emit(mc);
+
+    return error_object();
 }
 
 void List::append(ObjP p)

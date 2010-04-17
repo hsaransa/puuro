@@ -1,0 +1,20 @@
+function = {<c>
+    {<*a>
+        f = apply c:call_frame a;
+        new_continuation {<orig>
+            f.scope.set_local '__return_frame orig;
+            ret = f.execute;
+            orig.continue ret;
+        };
+    };
+};
+
+return = {<v>
+    f = builtin.active_frame.caller.scope.get '__return_frame;
+    f.continue v;
+};
+
+module 'return {
+    pollute 'function function;
+    pollute 'return return;
+};

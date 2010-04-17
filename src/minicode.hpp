@@ -28,6 +28,8 @@ namespace pr
             PushNull,
             NextItemOrGoto,
             CallCall,
+            IfCounterZero,
+            IfCounterOne,
             IfCounterGE,
             IncCounter,
         };
@@ -77,6 +79,7 @@ namespace pr
 #define PR_MC_OP1(op, a) { MiniCode::op, a },
 
 #define PR_MC_PUSH(x)     PR_MC_OP1(Push, x)
+#define PR_MC_POP(x)      PR_MC_OP0(Pop)
 #define PR_MC_CALL(x)     PR_MC_OP1(Call, x)
 #define PR_MC_GOTO(x)     PR_MC_OP1(Goto, x)
 #define PR_MC_IF_FALSE(x) PR_MC_OP1(IfFalse, x)
@@ -85,7 +88,7 @@ namespace pr
 #define PR_MC_FUNC1()     PR_MC_OP0(CallFunc1)
 #define PR_MC_END()       PR_MC_OP0(End)
 #define PR_MC_NULL()      PR_MC_OP0(PushNull)
-#define PR_MC_ARG()      PR_MC_OP0(Arg)
+#define PR_MC_ARG()       PR_MC_OP0(Arg)
 #define PR_MC_CALL_CALL() PR_MC_OP0(CallCall)
 
     void deferred_method_call0(ObjP p, Name n);

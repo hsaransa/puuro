@@ -36,6 +36,8 @@ Type* Integer::get_type()
     if (!type)
     {
         type = new Type("integer");
+        type->add_method("str", (Callable::mptr0)&Integer::to_string_);
+        type->add_method("repr", (Callable::mptr0)&Integer::to_string_);
         type->add_method("to_string", (Callable::mptr0)&Integer::to_string_);
         type->add_method("add", (Callable::mptr1)&Integer::add_);
         type->add_method("sub", (Callable::mptr1)&Integer::sub_);
@@ -56,6 +58,7 @@ Type* Integer::get_type()
         type->add_method("is_true", (Callable::mptr1)&Integer::is_true_);
         type->add_method("times", (Callable::mptr1)&Integer::times_);
         type->add_method("hex", (Callable::mptr1)&Integer::hex_);
+        type->add_method("chr", (Callable::mptr0)&Integer::chr_);
     }
     return type;
 }
@@ -215,4 +218,13 @@ ObjP Integer::hex_(ObjP p)
     char buf[64];
     snprintf(buf, sizeof(buf), "%.*llx", n, value);
     return *new String(buf);
+}
+
+ObjP Integer::chr_()
+{
+    if (value < 0 || value >= 256)
+        throw new Exception("out_of_range", *this);
+    char buf[1];
+    buf[0] = value;
+    return *new String(buf, 1);
 }
