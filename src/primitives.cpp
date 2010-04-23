@@ -57,6 +57,20 @@ static ObjP fixnum_ne(ObjP a, ObjP b)
     return (new Integer(fixnum_to_int(a)))->ne_(b);
 }
 
+static ObjP fixnum_add(ObjP a, ObjP b)
+{
+    if (is_fixnum(b))
+    {
+        long long int v = (long long int)fixnum_to_int(a) + (long long int)fixnum_to_int(b);
+        if (does_fit_fixnum(v))
+            return int_to_fixnum(v);
+        else
+            return *new Integer(v);
+    }
+    else
+        return (new Integer(fixnum_to_int(a)))->add_(b);
+}
+
 static ObjP fixnum_s(ObjP p)
 {
     char buf[32];
@@ -159,6 +173,7 @@ void pr::init_primitive_types()
     GC::add_root(fixnum_type);
     fixnum_type->add_method("eq", fixnum_eq);
     fixnum_type->add_method("ne", fixnum_ne);
+    fixnum_type->add_method("add", fixnum_add);
     fixnum_type->add_method("to_string", fixnum_s);
     fixnum_type->add_method("method_missing", fixnum_method_missing);
 

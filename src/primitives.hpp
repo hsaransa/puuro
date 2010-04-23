@@ -102,7 +102,7 @@ namespace pr
     }
 #endif
 
-    inline bool does_fit_fixnum(long int i)
+    inline bool does_fit_fixnum(long long int i)
     {
         return i >= (INT_MIN / 2) && i <= (INT_MAX / 2);
     }
