@@ -7,7 +7,7 @@ builtin.pollute builtin;
 };
 
 builtin.active_frame.set_exception_handler {<e c>
-    print "exception: " e.name.s ", " e.obj.type " " e.obj;
+    print "exception: " e.name.s ", " e.obj.repr;
     (e.name == 'system_error).then {
         print "system error: " (((std2.get_module 'libc).get_function 'strerror) e.obj);
     };

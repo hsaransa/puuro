@@ -166,6 +166,8 @@ void pr::init_primitive_types()
     symbol_type = new Type("symbol");
     GC::add_root(symbol_type);
     symbol_type->add_method("to_string", symbol_s);
+    symbol_type->add_method("str", symbol_s);
+    symbol_type->add_method("repr", symbol_s);
     symbol_type->add_method("s", symbol_as_string);
     symbol_type->add_method("eq", symbol_eq);
 
@@ -175,6 +177,8 @@ void pr::init_primitive_types()
     fixnum_type->add_method("ne", fixnum_ne);
     fixnum_type->add_method("add", fixnum_add);
     fixnum_type->add_method("to_string", fixnum_s);
+    fixnum_type->add_method("str", fixnum_s);
+    fixnum_type->add_method("repr", fixnum_s);
     fixnum_type->add_method("method_missing", fixnum_method_missing);
 
     bool_type = new Type("bool");

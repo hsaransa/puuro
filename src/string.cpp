@@ -73,7 +73,7 @@ ObjP String::repr_()
     for (int i = 0; i < (int)data.length(); i++)
     {
         unsigned char c = data[i];
-        if (isalnum(c) || strchr(" [](){}", c) != 0)
+        if (isalnum(c) || strchr(" [](){}._", c) != 0)
         {
             s += c;
             continue;

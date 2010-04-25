@@ -14,7 +14,12 @@ return = {<v>
     f.continue v;
 };
 
+do = {<c>
+    c()
+};
+
 module 'return {
     pollute 'function function;
-    pollute 'return return;
+    pollute 'return   return;
+    pollute 'do       do;
 };

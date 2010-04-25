@@ -87,7 +87,7 @@ ObjP BuiltIn::print(List* l)
 
     MiniCode* mc = new MiniCode(ops);
     mc->objects.push_back((ObjP)*l);
-    mc->objects.push_back(name_to_symbol("to_string"));
+    mc->objects.push_back(name_to_symbol("str"));
     mc->func0 = print_continuation0;
     mc->func1 = print_continuation1;
     mc->counter = 0;

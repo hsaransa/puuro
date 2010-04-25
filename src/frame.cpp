@@ -46,6 +46,7 @@ Type* Frame::get_type()
         type->add_method("clone_continuation", (Callable::mptr0)&Frame::clone_continuation);
         type->add_method("set_exception_handler", (Callable::mptr1)&Frame::set_exception_handler_);
         type->add_method("get_exception_handler", (Callable::mptr0)&Frame::get_exception_handler_);
+        type->add_method("set_scope", (Callable::mptr1)&Frame::set_scope_);
         type->add_method("scope", (Callable::mptr0)&Frame::scope_);
         type->add_method("caller", (Callable::mptr0)&Frame::caller_);
         type->add_method("code", (Callable::mptr0)&Frame::code_);
@@ -194,6 +195,13 @@ Frame* Frame::clone_continuation()
     f->ret = ret;
 
     return f;
+}
+
+ObjP Frame::set_scope_(ObjP p)
+{
+    Scope* s = cast_object<Scope*>(p);
+    scope = s;
+    return 0;
 }
 
 ObjP Frame::scope_()

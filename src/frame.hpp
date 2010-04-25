@@ -50,6 +50,7 @@ namespace pr
         ObjP to_string_();
 
         ObjP pollute_(ObjP p);
+        ObjP set_scope_(ObjP p);
 
         ObjP scope_();
         ObjP caller_();
