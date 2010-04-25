@@ -45,6 +45,7 @@ namespace pr
         ObjP all_before_(ObjP);
         ObjP all_after_(ObjP);
         ObjP erase_at_(ObjP);
+        ObjP clear_();
 
     private:
         std::vector<Ref<ObjP> > items;

@@ -59,6 +59,7 @@ Type* List::get_type()
         type->add_method(Name("all_before"), (Callable::mptr1)&List::all_before_);
         type->add_method(Name("all_after"), (Callable::mptr1)&List::all_after_);
         type->add_method(Name("erase_at"), (Callable::mptr1)&List::erase_at_);
+        type->add_method(Name("clear"), (Callable::mptr0)&List::clear_);
     }
 
     return type;
@@ -362,3 +363,8 @@ ObjP List::erase_at_(ObjP p)
     return obj;
 }
 
+ObjP List::clear_()
+{
+    items.clear();
+    return 0;
+}
