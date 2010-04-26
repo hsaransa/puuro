@@ -37,6 +37,7 @@ namespace pr
         ObjP empty_();
         ObjP size_();
         ObjP at_(ObjP);
+        ObjP clamped_at_(ObjP);
         ObjP set_(ObjP, ObjP);
         ObjP add_(ObjP);
         ObjP first_();

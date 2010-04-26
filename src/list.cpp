@@ -50,6 +50,7 @@ Type* List::get_type()
         type->add_method(Name("empty"), (Callable::mptr0)&List::empty_);
         type->add_method(Name("size"), (Callable::mptr0)&List::size_);
         type->add_method(Name("at"), (Callable::mptr1)&List::at_);
+        type->add_method(Name("clamped_at"), (Callable::mptr1)&List::clamped_at_);
         type->add_method(Name("call"), (Callable::mptr1)&List::at_);
         type->add_method(Name("set"), (Callable::mptr2)&List::set_);
         type->add_method(Name("add"), (Callable::mptr1)&List::add_);
@@ -279,6 +280,14 @@ ObjP List::at_(ObjP p)
     int i = int_value(p);
     if (i < 0 || i >= (int)items.size())
         throw new Exception("out_of_range", p);
+    return inc_ref(items[i]);
+}
+
+ObjP List::clamped_at_(ObjP p)
+{
+    int i = int_value(p);
+    if (i < 0 || i >= (int)items.size())
+        return 0;
     return inc_ref(items[i]);
 }
 

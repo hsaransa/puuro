@@ -74,7 +74,10 @@ namespace pr
     inline ObjP int_to_object(int i)
     {
         // TODO: make fixnum when possible
-        return *new Integer(i);
+        if (does_fit_fixnum(i))
+            return int_to_fixnum(i);
+        else
+            return *new Integer(i);
     }
 
     inline bool is_integer(ObjP p)

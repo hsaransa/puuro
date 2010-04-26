@@ -23,6 +23,13 @@ static ObjP null_s(ObjP p)
     return *new String("null");
 }
 
+static ObjP null_repr(ObjP p)
+{
+    (void)p;
+    assert(!p);
+    return *new String("\\n");
+}
+
 /* Symbol methods. */
 
 static ObjP symbol_s(ObjP p)
@@ -162,6 +169,8 @@ void pr::init_primitive_types()
     null_type = new Type("null");
     GC::add_root(null_type);
     null_type->add_method("to_string", null_s);
+    null_type->add_method("str", null_s);
+    null_type->add_method("repr", null_repr);
 
     symbol_type = new Type("symbol");
     GC::add_root(symbol_type);

@@ -27,7 +27,8 @@ std2_module = {<mn *fork>
         functions = m.list_functions;
 
         t = mr.type;
-        t.set_method 'to_string {<s> "std2_module_" + mn.s };
+        t.set_method 'to_string {<s> "<std2_module_" + mn.s + ">" };
+        t.set_method 'module {<s> m };
         t.set_method 'classes {<s> classes };
         t.set_method 'consts {<s> consts };
         t.set_method 'functions {<s> functions };

@@ -6,9 +6,6 @@ t.set_method 'length {<l> l.len };
 t.set_method 'size {<l> l.len };
 t.set_method 'empty {<l> l.len == 0 };
 
-# Work-around for ambiguous foo[index] operator.
-t.set_method 'call {<a b> a.at b.first};
-
 t.set_method 'split {<src s *n>
     l = [];
     i = 0;
@@ -68,6 +65,8 @@ isalnum = libc.get_function 'isalnum;
 isspace = libc.get_function 'isspace;
 islower = libc.get_function 'islower;
 isupper = libc.get_function 'isupper;
+tolower = libc.get_function 'tolower;
+toupper = libc.get_function 'toupper;
 
 classify = {<s cc>
     block {
@@ -85,3 +84,11 @@ t.set_method 'isalnum {<s> classify s isalnum };
 t.set_method 'isspace {<s> classify s isspace };
 t.set_method 'islower {<s> classify s islower };
 t.set_method 'isupper {<s> classify s isupper };
+
+t.set_method 'tolower {<s>
+    (s.map {<x> (tolower x.ord).chr}).fold {<a b> a + b};
+};
+
+t.set_method 'toupper {<s>
+    (s.map {<x> (toupper x.ord).chr}).fold {<a b> a + b};
+};
