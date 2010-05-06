@@ -1,1 +1,5 @@
 Puuro interpreter.
+
+You'll need std2 also.
+
+scons -C std2 && scons
