@@ -129,8 +129,9 @@ namespace pr
 
         const char* s() const
         {
-            static char buf[64];
-            strncpy(buf, g_nameTable.getName(_id).c_str(), 64);
+            static char buf[256];
+            strncpy(buf, g_nameTable.getName(_id).c_str(), sizeof(buf));
+            buf[sizeof(buf)-1] = '\0';
             return buf;
         }
 
