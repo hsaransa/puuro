@@ -2,7 +2,8 @@ PKG="puuro-"`date +%y%m%d`
 
 FILES=`find . -iname "*.puuro" -or -iname "*.cpp" -or -iname "*.hpp" -or \
               -iname "SConstruct" -or -iname "*.c" -or -iname "*.h" -or \
-              -iname "*.html" -or -iname "*.js" -or -iname "*.yy"`
+              -iname "*.html" -or -iname "*.js" -or -iname "*.yy" -or \
+              -iname "README"`
 for i in $FILES
 do
   mkdir -vp $PKG/`dirname $i` || exit 1
